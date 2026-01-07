@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="task_type_tree_view" model="ir.ui.view">
+            <field name="name">task.type.tree.view</field>
+            <field name="model">task.type</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_task_type" model="ir.actions.act_window">
+            <field name="name">Task Types</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">task.type</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id="menu_module_task_type" name="Task Types"
+            parent="project.menu_project_config" action="action_task_type"
+            groups="base.group_user"/>
+    </data>
+</odoo>

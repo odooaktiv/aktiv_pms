@@ -1,0 +1,756 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="project_task_form_view_inherit" model="ir.ui.view">
+            <field name="name">project.task.form.view.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[@name='extra_info']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//notebook/page[@name='task_dependencies']"
+                       position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='parent_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='milestone_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='user_ids']" position="after">
+                    <field name="code_reviewer_ids" widget="many2many_avatar_user"
+                           context="{'for_cr':project_id}"
+                           readonly="is_user and not is_team_leader"
+                           invisible="task_type_name in ('Consulting', 'Communication/Calls')"
+                           required="state in 'state'" />
+                    <field name="task_type_name" invisible="1"/>
+                    <field name="hide_approved_hours" invisible="1"/>
+                    <field name="task_qa_ids" widget="many2many_avatar_user"
+                           context="{'for_qa':project_id}"
+                           options="{'no_create_edit': True,  'no_create':True}"
+                           readonly="is_user and not is_team_leader"
+                           invisible="task_type_name in ('Consulting', 'Communication/Calls')"
+                           required="state == 'qa'"
+                           />
+                    <field name="task_state_count"
+                        invisible="not task_state_count" readonly="1"/>
+                    <field name="pm_tool_task_id" invisible="1"/>
+                    <field name="pm_tool_task_name"/>
+                    <!-- <field name="pm_tool_tasks"/> -->
+                    <field name="tag_ids" position="move"/>
+                    <field name="user_manual" widget="url"/>
+                    <!-- Added field for branch in after user manual filed -->
+                    <field name="development_branch_name"/>
+                    <field name="qa_branch_name"/>
+                    <field name="is_visible_dashboard"/>
+                    <field name="deployment_type"/>
+                    <field name="go_live_date"
+                        required="deployment_type == 'task_wise'"
+                        readonly="deployment_type in (False, 'phase_wise')"
+                        />
+                    <field name="hide_re_development_btn" invisible="1"/>
+                </xpath>
+                <xpath expr="//form/sheet/group/group[2]/field[@name='partner_id']"
+                       position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form/header/field[@name='stage_id']" position="replace">
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="new,approval,cust_review,done,cancel,apps"/>
+                </xpath>
+                <!-- <xpath expr="//button[@name='action_assign_to_me']"
+                       position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath> -->
+                <xpath expr="//button[@name='action_dependent_tasks']"
+                       position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form/sheet/group/group[2]/field[@name='partner_id']"
+                       position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form/header" position="inside">
+                    <button name="sync_timesheet_to_pm_tool" type="object" string="Sync Timesheet to PM Tool" class="oe_highlight"/>
+                    <button type="object" name="waiting_for_ca" class="oe_highlight"
+                            string="Waiting For Customer Approval"
+                            invisible="state != 'new'"/>
+                    <button type="object" name="action_start_task" class="oe_highlight"
+                            string="Start Task"
+                            invisible="task_type_name in ('Consulting', 'Communication/Calls') or state not in ('approval','on_hold', 'cancel')  or not id "/>
+
+                    <button type="object" name="action_code_review" class="oe_highlight"
+                            string="Send for Code Review"
+                            invisible="task_type_name in ('Consulting', 'Communication/Calls', 'QA') or state in ('new', 'cd_review', 'qa', 'done', 'cust_review', 'approval', 'cancel', 'ready_deploy')  or not is_developer or bugs_type in ('production_bug', 'staging_bug')"
+                            />
+                    <button type="object" name="action_testing_qa_bugs" class="oe_highlight"
+                            string="Send for QA Testing"
+                            invisible="task_type_name in ('Consulting', 'Communication/Calls') or state in ('new', 'cd_review', 'qa', 'done', 'cust_review', 'approval', 'cancel', 'ready_deploy') or not is_developer or not bugs_type"/>
+                    <button type="object" name="action_qa_test" class="oe_highlight"
+                            string="Send for QA Testing"
+                            invisible="task_type_name in ('Consulting', 'Communication/Calls') or state != 'cd_review' or not is_code_reviewer"/>
+
+                    <button type="object" name="action_qa_test" class="oe_highlight"
+                            string="Send for QA Testing"
+                            invisible="task_type_name not in ('QA') or state != 'redevelop' or not is_developer"/>
+
+                    <button type="object" name="action_re_development"
+                            class="oe_highlight"
+                            string="Send for Re-development"
+                            invisible="hide_re_development_btn"
+                            />
+                    <button name="action_calls_consulting" type="object" string="Start Task"
+                            invisible="task_type_name not in ('Consulting', 'Communication/Calls') or state in ('new', 'call_consult', 'cust_review', 'done','cancel' )"
+                            class="oe_highlight"/>
+                    <button type="object" name="action_cus_review" class="oe_highlight"
+                            string="Send for Customer Review"
+                            invisible="not is_qa or state not in ('qa', 'call_consult') or is_bug"
+                            groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager, aktiv_pms.group_aktiv_project_QA"/>
+                    <button type="object" name="action_done" class="oe_highlight"
+                            string="Done"
+                            invisible="state not in ('cust_review','ready_deploy')"
+                            groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"/>
+                    <button name="aktiv_pms_cancel" type="object" string="Cancel"
+                            invisible="state in ('cancel')"
+                            />
+                    <button name="ready_deployment" type="object" string="Ready for Deployment" class="btn-primary"
+                            invisible="state != 'cust_review'"
+                            />
+                    <button name="on_hold" type="object" string="On Hold" class="btn-primary"
+                            invisible="state in ('on_hold', 'done', 'cancel')"
+                            />
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="planned_hours"
+                           readonly="is_user and not is_team_leader" string="Initially Planned Hours"
+                           required="True"/>
+                </xpath>
+                <!--    Take sub-tasks total hours below the Initially planned hours. Right now the field is in timesheet tab   -->
+                <xpath expr="//label[@for='date_deadline']" position="before">
+                    <field name="est_st_dt"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="before">
+                    <field name="billed_hours" widget="float_time" groups="aktiv_pms.group_aktiv_project_manager"/>
+                </xpath>
+
+                <xpath expr="//field[@name='date_deadline']/.." position="after">
+                    <field name="task_type_id" required="1"
+                           readonly="is_user and not is_team_leader"
+                           options="{'no_create_edit': True,  'no_create':True}"/>
+                    <field name="urgent_task"
+                           readonly="is_user and not is_team_leader"
+                           />
+                    <field name="is_bug" invisible="1"/>
+                    <field name="bugs_type"/>
+                    <field name="parent_id"
+                            required="bugs_type and state in ('new', 'approval') and not dont_remember_parent_task"
+                            invisible="not bugs_type or dont_remember_parent_task"
+                           domain="[('parent_id','=', False),
+                                    ('project_id', '=', project_id),
+                                    ('id', '!=', id),
+                                    ('task_type_id', '=', task_type_id)
+                                    ]"
+                    />
+                    <!-- do not remember the parent task -->
+                    <field name="dont_remember_parent_task"/>
+                    <field name="skip_quality_check"/>
+                    <field name="is_user" invisible="1"/>
+                    <field name="is_team_leader" invisible="1"/>
+                    <field name="is_code_reviewer" invisible="1"/>
+                    <field name="task_completion" invisible="1"/>
+                    <field name="is_qa" invisible="1"/>
+                    <field name="is_developer" invisible="1"/>
+                </xpath>
+                <xpath expr="//notebook/page[@name='description_page']/field[@name='description']"
+                       position="replace">
+                    <group>
+                        <group>
+                            <field name="description" placeholder="Type '/' for command"
+                                    readonly="is_user and not is_team_leader" string="Functional Description"/>
+                     </group>
+                     <group>
+                            <field name="tech_description" placeholder="Type '/' for command" 
+                                invisible="task_type_name not in ('Development', 'Training', 'Apps')"
+                                required="task_type_name in ('Development', 'Training', 'Apps')"
+                                readonly="is_user and not is_team_leader"/>
+                    </group>
+                </group>
+                </xpath>
+
+                <!-- Sub Task Page -->
+                <xpath expr="//page[@name='sub_tasks_page']//field[@name='child_ids']" position="attributes">
+                    <attribute name="context">{
+                        'default_project_id': project_id, 'default_display_in_project': True,'default_user_ids': user_ids,'default_parent_id':id,'default_task_type_id':task_type_id,'default_user_manual': user_manual,'default_partner_id':partner_id,'form_view_ref':'project.view_task_form2'}
+                    </attribute>
+                </xpath>
+                <xpath expr="//page[@name='sub_tasks_page']//field[@name='child_ids']" position="after">
+                    <group>
+                        <group class="oe_subtotal_footer oe_right" name="sub_tasks_hours">
+                            <span>
+                                <label class="font-weight-bold" for="subtask_planned_hours"
+                                       string="Planned Hours on Sub-tasks"/>
+                            </span>
+                            <field name="subtask_planned_hours" nolabel="1" widget="float_time"/>
+
+                            <span>
+                                <label class="font-weight-bold" for="productive_hours_on_sub_task"
+                                       string="Productive Hours On Sub-tasks"/>
+                            </span>
+                            <field name="productive_hours_on_sub_task" nolabel="1" widget="float_time"/>
+
+                            <span>
+                                <label class="font-weight-bold" for="unbilled_hours_on_sub_task"
+                                       string="Unbilled Hours On Sub-tasks"/>
+                            </span>
+                            <field name="unbilled_hours_on_sub_task" nolabel="1" widget="float_time"/>
+
+                            <button name="action_view_subtask_timesheet" type="object" class="o_form_subtask_button oe_inline oe_link"
+                                invisible="not subtask_count or not subtask_effective_hours">
+                                <span class="text-nowrap"
+                                    invisible="encode_uom_in_days">Hours Spent on Sub-tasks:</span>
+                                <span class="text-nowrap" invisible="not encode_uom_in_days">Days Spent on Sub-tasks:</span>
+                            </button>
+                            <field name="subtask_effective_hours" class="mt-2" widget="timesheet_uom"
+                                invisible="not subtask_count or not subtask_effective_hours" nolabel="1"/>
+                        </group>
+                    </group>
+                </xpath>
+
+                <xpath expr="//page[@name='sub_tasks_page']//field[@name='child_ids']//tree" position="attributes">
+                    <attribute name="editable"/>
+                </xpath>
+                <!--Test Cases Page-->
+                <xpath expr="//page[@name='extra_info']" position="after">
+                    <page name="qa_activities" string="Test Cases">
+                        <group>
+                            <group>
+                                <field name="success_ratio" widget="progressbar"/>
+                                <field name="qa_state_count" invisible="1"/>
+                                <field name="total_tasks_performed"/>
+                                <field name="passed_tests"/>
+                                <field name="failed_tests"/>
+                            </group>
+                            <group>
+                                <field name="post_test_ratio" widget="progressbar"/>
+                                <field name="post_performed_test_case"/>
+                                <field name="post_passed_test_case"/>
+                                <field name="post_failed_test_case"/>
+                            </group>
+                        </group>
+                        <field name="qa_ids" widget="section_and_note_one2many" mode="tree" readonly="state == 'cancel'">
+                            <tree string="Quality Analysis" editable="bottom"
+                                  decoration-success="outcomes == 'expected'"
+                                  decoration-danger="outcomes == 'bug'">
+                                <control>
+                                    <create name="add_product_control"
+                                            string="Add a line"/>
+                                    <create name="add_section_control"
+                                            string="Add a section"
+                                            context="{'default_display_type': 'line_section'}"/>
+                                </control>
+                                <field name="sequence" required="True"/>
+                                <field name="display_type" column_invisible="1"/>
+                                <field name="date" required="True" optional="hide"/>
+                                <field name="name" widget="section_and_note_text"
+                                       optional="show"/>
+                                <field name="pre_conditions"/>
+                                <field name="steps_performed"/>
+                                <field name="expected_result"/>
+                                <field name="attachment"/>
+                                <field name="server" required="True"/>
+                                <field name="outcomes" required="True"/>
+                                <button type="object" string=" Copy"
+                                        name="copy_test_case" class="fa fa-copy"
+                                        column_invisible="parent.qa_state_count &lt; 2 or parent.state != 'qa'"/>
+                                <field name="is_updated" column_invisible="1"/>
+                                <field name="is_new" column_invisible="1"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Remarks For QA From Developer">
+                        <group>
+                            <field name="qa_remark_note" type="html" options="{'collaborative': true}" string="Note" readonly="state == 'cancel'"
+                                       />
+                        </group>
+                    </page>
+                    <page name="notes" string="Code Reviewer Remarks"
+                        invisible="state not in ('cd_review', 'dev', 'redevelop')">
+                        <field name="note" type="html" options="{'collaborative': true}"
+                            readonly="not is_code_reviewer"/>
+                    </page>
+                </xpath>
+                <xpath expr="//field[@name='priority']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                </xpath>
+               
+                <xpath expr="//group/group/field[@name='project_id']"
+                       position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                </xpath>
+                <xpath expr="//group/field[@name='project_id']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='user_ids']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                    <attribute name="context">{'for_dev':project_id}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date_deadline']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                    <attribute name="required">task_type_name == 'Development'
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='recurring_task']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                    <attribute name="invisible">state != 'new'
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='child_ids']" position="attributes">
+                   <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='depend_on_ids']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>                
+                </xpath>
+                <xpath expr="//field[@name='repeat_interval']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                    <attribute name="required">recurring_task
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='repeat_unit']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                    <attribute name="required">recurring_task
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='repeat_type']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                    <attribute name="required">recurring_task
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='repeat_until']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader
+                    </attribute>
+                    <attribute name="invisible">repeat_type != 'until'
+                    </attribute>
+                    <attribute name="required">repeat_type == 'until'
+                    </attribute>
+                </xpath>
+                <xpath expr="//field[@name='child_ids']/tree/field[@name='date_deadline']"
+                       position="before">
+                    <field name="state" column_invisible="1"/>
+                    <field name="is_user" column_invisible="1"/>
+                    <field name="task_type_id"/>
+                    <field name="task_type_name" column_invisible="1"/>
+                    <field name="subtask_effective_hours" class="mt-2" widget="timesheet_uom" optional="hide"/>
+                    <field name="approved_hours" optional="hide" string="Productive Hours" sum="Productive Hours" widget="float_time"/>
+                    <field name="unbilled_hours" optional="hide" sum="Unbilled Hours" widget="float_time"/>
+                    <field name="subtask_planned_hours" optional="show"/>
+                </xpath>
+                <!-- <xpath expr="//field[@name='state']" position="after">
+                    <field name="planned_hours" required="1" sum="Planned Hour" widget="float_time"/>
+                    <field name="task_type_name" invisible="1"/>
+
+                </xpath>
+     -->
+                <xpath expr="//field[@name='child_ids']/tree/field[@name='date_deadline']"
+                       position="attributes">
+                    <attribute name="required">task_type_name == 'Development'</attribute>
+                </xpath>
+
+                <!--Extra Info Page-->
+                <xpath expr="//field[@name='analytic_account_id']"
+                       position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader</attribute>
+                </xpath>
+                
+                <xpath expr="//field[@name='email_cc']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date_assign']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date_last_stage_update']"
+                       position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader</attribute>
+                </xpath>
+                <xpath expr="//field[@name='working_hours_open']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader</attribute>
+                </xpath>
+                <xpath expr="//field[@name='working_days_open']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader</attribute>
+                </xpath>
+                <xpath expr="//field[@name='working_hours_close']"
+                       position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader</attribute>
+                </xpath>
+                <xpath expr="//field[@name='working_days_close']" position="attributes">
+                    <attribute name="readonly">is_user and not is_team_leader</attribute>
+                </xpath>
+                <xpath expr="//field[@name='child_ids']/tree/field[@name='stage_id']"
+                       position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='child_ids']/tree/field[@name='priority']"
+                       position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath><xpath expr="//field[@name='child_ids']/tree/field[@name='state']"
+                       position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='depend_on_ids']/tree/field[@name='stage_id']"
+                       position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='depend_on_ids']/tree/field[@name='stage_id']"
+                       position="after">
+                    <field name="state"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_task_form3">
+            <field name="name">project.task.form3</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@id='timesheets_tab']" position="attributes">
+                    <attribute name="string">Development+QA Timesheets</attribute>
+                </xpath>
+                <xpath expr="//page[@id='timesheets_tab']//group//field[@name='effective_hours']" position="after">
+                    <span>
+                        <label class="font-weight-bold" for="unbilled_hours"
+                               string="Unbilled Hours"/>
+                    </span>
+                    <field name="unbilled_hours" nolabel="1" widget="float_time"/>
+
+                </xpath>
+                <xpath expr="//page[@id='timesheets_tab']/field[@name='timesheet_ids']"
+                       position="attributes">
+                       <attribute name="readonly">state == 'new'</attribute>
+                </xpath>
+                <xpath expr="//page[@id='timesheets_tab']//group" position="before">
+                    <group  invisible="task_type_name in ('Consulting', 'Communication/Calls')">
+                        <group id='qa_details' string="QA Details">
+                            <field name="qa_start_date"/>
+                            <field name="qa_deadline"/>
+                            <field name="qa_hours" widget="float_time"/>
+                            <field name="qa_billed_hours" widget="float_time"
+                                   groups="aktiv_pms.group_aktiv_project_manager"/>
+                            <field name="hide_approved_hours" invisible="1"/>
+                        </group>
+                        <group id='dev_details' string="Development Details">
+                            <field name="dev_start_date"/>
+                            <field name="dev_deadline"/>
+                            <field name="dev_hours" widget="float_time"
+                                readonly="is_user and not is_team_leader"/>
+                            <field name="dev_billed_hours" widget="float_time"
+                                   groups="aktiv_pms.group_aktiv_project_manager"/>
+                        </group>
+                    </group>
+                </xpath>
+
+           
+                <!--                invsible in phase 2 -->
+                <!-- <xpath expr="//label[@for='subtask_planned_hours']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='subtask_planned_hours']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath> -->
+
+                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='name']"
+                       position="attributes">
+                    <attribute name="required">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='unit_amount']"
+                       position="after">
+                    <field name="team_leader_approval" column_invisible="1"/>
+                    <field name="hide_approved_hours" column_invisible="1"/>
+                    <field name="effective_hours" widget="float_time" optional="show" force_save="1"/>
+                    <field name="remaining_hours" widget="float_time"
+                        column_invisible="parent.hide_approved_hours == True"
+                        readonly="team_leader_approval == True"/>
+                    <field name="checked" column_invisible="1"/>
+                    <field name="approved_hours" widget="float_time" force_save="1"
+                        column_invisible="parent.hide_approved_hours == True"
+                        readonly="state == 'approved' or team_leader_approval == True"/>
+                    <field name="user_type" groups="aktiv_pms.group_aktiv_project_manager, aktiv_pms.group_aktiv_project_team_leader" column_invisible="1"/>
+                    <field name="state" readonly="1"/>
+                    <field name="data_sync"  optional="hide"/>
+                    <field name="hide_timesheet_approve_btn" column_invisible="1"/>
+                    <field name="show_timesheet_reset_btn" column_invisible="1"/>
+                    <button name="timesheet_approved" type='object' string='Approve'
+                            class="btn-info"
+                            invisible="not id or hide_timesheet_approve_btn" groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_team_leader,aktiv_pms.group_aktiv_project_functional"/>
+                    <button name="timesheet_reset" type='object' string='Reset' class="btn-info" invisible="not show_timesheet_reset_btn"/>
+                </xpath>
+                <xpath expr="//page[@id='timesheets_tab']//group//field[@name='effective_hours']"
+                       position="after">
+                    <span>
+                        <label class="font-weight-bold" for="approved_hours"
+                               string="Productive Hours"/>
+                    </span>
+                    <field name="approved_hours" nolabel="1" widget="float_time"/>
+                </xpath>
+                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='name']"
+                       position="attributes">
+                       <attribute name="readonly">state == 'approved'</attribute>
+                </xpath>
+                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='date']"
+                       position="attributes">
+                       <attribute name="readonly">state == 'approved'</attribute>
+                </xpath>
+                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='employee_id']"
+                       position="attributes">
+                       <attribute name="readonly">state == 'approved'</attribute>
+                </xpath>
+                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='unit_amount']"
+                       position="attributes">
+                       <attribute name="readonly">state == 'approved'</attribute>
+                </xpath>
+
+                <xpath expr="//page[@id='timesheets_tab']//group/button[@name='action_view_subtask_timesheet']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//page[@id='timesheets_tab']//group//field[@name='subtask_effective_hours']"  position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='state']"
+                       position="after">
+                   <field name="status" groups="project.group_project_manager"
+                      force_save="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="project.action_view_all_task" model="ir.actions.act_window">
+            <field name="context">{'search_default_State': 1, 'search_kanban_records': 1}</field>
+        </record>
+
+        <record id="project.act_project_project_2_project_task_all" model="ir.actions.act_window">
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+            <field name="context">{'pivot_row_groupby':['user_ids'],'default_project_id': active_id,'show_project_update': True}</field>
+            <field name="domain">[('project_id', '=', active_id)]</field>
+        </record>
+
+        <record id="project.project_task_tree_action_view" model="ir.actions.act_window.view">
+            <field name="sequence" eval="0"/>
+        </record>
+
+        <record id="view_task_search_form_inherited" model="ir.ui.view">
+            <field name="name">project.task.search.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_search_form"/>
+            <field eval="2" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='my_tasks']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="state"/>
+                </xpath>
+                <xpath expr="//filter[@name='my_tasks']" position="after">
+                    <filter string="Planned" name="planned_tasks"
+                            domain="[('state','=', 'new')]"/>
+                </xpath>
+                <xpath expr="//filter[@name='stage']" position="replace">
+                    <filter name="date_filter" string="Today"
+                            domain="[('date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter name="yesterday_date_filter" string="Yesterday"
+                            domain="[('date_deadline','&gt;=', ((context_today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))), ('date_deadline','&lt;', ((context_today() + datetime.timedelta(days=0)).strftime('%Y-%m-%d 00:00:00')))]"/>
+                    <separator/>
+                    <filter string="Task Type" name="task_type_id"
+                            domain="[('task_type_id','!=', False)]"/>
+                    <filter string="State" name="State"
+                            context="{'group_by': 'state'}"/>
+                    <field name="hide_approved_hours" invisible="1"/>
+                    <field string="QA Approved Hours" name="qa_approved_hr"
+                           context="{'group_by': 'qa_approved_hr'}"
+                           column_invisible="hide_approved_hours == True"/>
+                    <field string="Development Approved Hours" name="dev_approved_hr"
+                           context="{'group_by': 'dev_approved_hr'}"
+                           column_invisible="hide_approved_hours == True"/>
+                </xpath>
+                <xpath expr="//filter[@name='my_tasks']" position="after">
+                    <filter string="Billed Hours" name="billed_hours"/>
+                    <filter string="Task Type" name="task_type_id"
+                            context="{'group_by': 'task_type_id'}"/>
+                </xpath>
+                <!-- <xpath expr="//group/filter[@name='kanban_state']" position="replace">
+                </xpath> -->
+                <!-- <xpath expr="//group/filter[@name='personal_stage']" position="replace">
+                </xpath> -->
+            </field>
+        </record>
+
+        <!-- <record id="project_task_view_search_inherited" model="ir.ui.view">
+            <field name="name">project.task.search.timesheet.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="hr_timesheet.project_task_view_search"/>
+            <field eval="2" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='my_team_tasks']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+            </field>
+        </record> -->
+
+        <record id="project_view_task_tree_inherit" model="ir.ui.view">
+            <field name="name">project.task.tree.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_tree2"/>
+            <field eval="2" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="default_group_by"></attribute>
+                </xpath>
+
+                <xpath expr="//tree/field[@name='name']" position="attributes">
+                    <attribute name="string">Name</attribute>
+                </xpath>
+                <!-- <xpath expr="//tree/field[@name='progress']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='effective_hours']" position="attributes">
+                    <attribute name="string">Invested Hours</attribute>
+                </xpath> -->
+
+                <xpath expr="//tree/field[@widget='project_task_progressbar']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@widget='timesheet_uom']" position="attributes">
+                    <attribute name="string">Invested Hours</attribute>
+                </xpath>
+
+                <xpath expr="//tree/field[@name='effective_hours']" position="before">
+                    <field name="planned_hours" sum="Planned Hours" />
+                </xpath>
+                <xpath expr="//tree/field[@name='effective_hours']" position="after">
+                    <field name="productive_hours_on_sub_task" sum="Productive Hours on Sub-tasks"  optional="hide"/>
+                    <field name="subtask_planned_hours" sum="Planned Hours on Sub-tasks"  optional="hide"/>
+                </xpath>
+                <xpath expr="//tree/field[@name='project_id']" position="attributes">
+                    <attribute name="column_invisible">context.get('default_project_id')</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='activity_ids']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='tag_ids']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='stage_id']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='stage_id']" position="after">
+                    <field name="task_completion" column_invisible="1"/>
+                    <field name="hide_approved_hours" column_invisible="1"/>
+                    <field groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"
+                           name="qa_approved_hr" widget="float_time" sum="QA Approved Hours"
+                           string="QA Approved Hours"/>
+                    <field groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"
+                           name="dev_approved_hr" widget="float_time" sum="Developer Approved Hours"
+                           string="Developer Approved Hours"/>
+                    <field name="state"/>
+                </xpath>
+                <xpath expr="//tree/field[@name='name']" position="after">
+                    <field name="tag_ids" widget="many2many_tags" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="project_task_view_tree_inherit" model="ir.ui.view">
+            <field name="name">project.task.tree.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.project_task_view_tree_base"/>
+            <field eval="2" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='personal_stage_type_id']" position="after">
+                    <field name="development_branch_name" optional="hide"/>
+                    <field name="qa_branch_name" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="view_task_kanban_inherit">
+            <field name="name">project.task.kanban.inhert</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="attributes">
+                    <attribute name="default_group_by">state</attribute>
+                </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <t t-if="!record.hide_approved_hours.raw_value">
+                        <field name="hide_approved_hours" invisible="1"/>
+
+                        <label column_invisible="hide_approved_hours == True"
+                               class="font-weight-bold" style="font-size:12px" for="approved_hours">Productive Hours:
+                        </label>
+                        <field name="approved_hours" string="Total Approve Hours" widget="float_time" column_invisible="hide_approved_hours == True"/>
+                        <label column_invisible="hide_approved_hours == True"
+                            class="font-weight-bold" style="font-size:12px" for="approved_hours">Development Approve
+                            Hours:
+                        </label>
+                        <field column_invisible="hide_approved_hours == True"
+                               name="dev_approved_hr"
+                               widget="float_time"/>
+                        <label column_invisible="hide_approved_hours == True"
+                               class="font-weight-bold" style="font-size:12px" for="approved_hours">QA Approve Hours:
+                        </label>
+                        <field name="qa_approved_hr" widget="float_time"
+                            column_invisible="hide_approved_hours == True"/>
+                    </t>
+                </xpath>
+                <xpath expr="//field[@name='priority']" position="after">
+                    <field name="state" invisible="1" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_task_search_form_project_fsm_base_inherited" model="ir.ui.view">
+            <field name="name">project.task.search.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_search_form_project_fsm_base"/>
+            <field eval="2" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search//filter[@name='project']" position="after">
+                    <separator/>
+                    <filter string="Development" name="customization"
+                            domain="[('task_type_id.name', '=', 'Development')]"/>
+                    <filter string="Consulting" name="consulting"
+                            domain="[('task_type_id.name', '=', 'Consulting')]"/>
+                    <filter string="Urgent Task" name="urgent_task"
+                            domain="[('urgent_task', '=', True)]"/>
+                    <filter string="Task Type" name="groupby_task_type_id" domain="[]"
+                            context="{'group_by': 'task_type_id'}"/>
+                    <filter string="Urgent Task" name="groupby_urgent_task"
+                            context="{'group_by': 'urgent_task'}"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

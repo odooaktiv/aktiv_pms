@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="technology_form_view" model="ir.ui.view">
+        <field name="name">technology.form.view</field>
+        <field name="model">technology</field>
+        <field name="arch" type="xml">
+            <form delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" required="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="technology_tree_view" model="ir.ui.view">
+        <field name="name">technology.tree.view</field>
+        <field name="model">technology</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="name" required="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_technology" model="ir.actions.act_window">
+        <field name="name">Technology</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">technology</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem
+    id="menu_technology"
+    name="Technology"
+    parent="crm.menu_crm_config_lead"
+    action="ak_crm.action_technology"
+    sequence="7"/>
+</odoo>

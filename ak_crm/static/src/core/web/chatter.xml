@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="mail.template" xml:space="preserve">
+    <!-- <t t-name="mail.Chatter"> -->
+    <t t-name="send_mail_messages" t-inherit="mail.Chatter" t-inherit-mode="extension">
+        <xpath expr="//button[1]" position="replace">
+            <t t-if="state.thread.model === 'crm.lead' and state.leadType === 'lead'">
+                <button class="btn btn-link" type="button" t-att-class="{}" title="Send a mail"
+                        data-hotkey="m"
+                        t-on-click="openSendMail">Send Message</button>
+            </t>
+            <t t-else="">
+                <button t-if="props.hasMessageList" class="o-mail-Chatter-sendMessage btn text-nowrap me-1" t-att-class="{
+                    'btn-primary': state.composerType !== 'note',
+                    'btn-secondary': state.composerType === 'note',
+                    'active': state.composerType === 'message',
+                    'my-2': !props.compactHeight
+                }" t-att-disabled="!state.thread.hasWriteAccess and !(state.thread.hasReadAccess and state.thread.canPostOnReadonly) and props.threadId" data-hotkey="m" t-on-click="() => this.toggleComposer('message')">
+                    Send message
+                </button>
+            </t>
+        </xpath>
+    </t>
+</templates>

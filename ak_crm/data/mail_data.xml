@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="message_user_assigned_inherited" inherit_id="mail.message_user_assigned">
+        <xpath expr="//span[1]" position="replace">
+            <span>Hello,</span><br />
+        </xpath>
+    </template>
+</odoo>

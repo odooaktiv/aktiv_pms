@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record id="crm_type_outbound_lead" model="crm.type">
+        <field name="key">outbound_lead</field>
+        <field name="name">Outbound Lead</field>
+    </record>
+    <record id="crm_type_lead" model="crm.type">
+        <field name="key">lead</field>
+        <field name="name">Email Lead</field>
+    </record>
+    <record id="crm_type_opportunity" model="crm.type">
+        <field name="key">opportunity</field>
+        <field name="name">Opportunity</field>
+    </record>
+</odoo>

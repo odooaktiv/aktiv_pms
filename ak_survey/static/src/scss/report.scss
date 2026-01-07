@@ -1,0 +1,101 @@
+.odoo_days_certificate{
+    width: 11.3in;
+    height: 8.2in;
+    font-family: 'Roboto-Regular';
+}
+.certificate_wrapper{
+    padding: 8%;
+    height: 100%;
+}
+.certificate_logo{
+    text-align: center;
+}
+.certificate_logo_img{
+    width: 25%;
+    max-width: 25%;
+}
+.certificate_first_header{
+    text-align: center;
+    color: #121b55;
+    font-size: 48pt;
+    font-family: 'Gontserrat-Bold';
+    line-height: 0.8;
+    margin-top: 20px;
+}
+.certificate_second_header{
+    text-align: center;
+    color: #121b55;
+    font-size: 24pt;
+    font-family: 'Gontserrat-Regular';
+    margin-bottom: 20px;
+}
+.participant_name{
+    text-align: center;
+    font-family: 'Roboto-Bold' !important;
+    font-size: 20pt;
+}
+.participant_underline{
+    text-align: center;
+    width: 60%;
+    margin: auto;
+    margin-bottom: 20px;
+}
+.participant_underline_img{
+    width: 100%;
+    max-width: 100%;
+}
+.certificate_content_1{
+    text-align: center;
+    width: 85%;
+    margin: auto;
+    font-size: 11pt;
+}
+.certificate_content_2{
+    text-align: center;
+    width: 85%;
+    margin: auto;
+    font-size: 11pt;
+    margin-top: 10px;
+}
+.signature_image_block{
+    text-align: center;
+    width: 50%;
+    margin: auto;
+    height: 50px;
+}
+.signature_image{
+    text-align: center;
+    width: 60%;
+    max-width: 60%;
+}
+.signature_underline{
+    text-align: center;
+    border-top: 1px solid #777;
+    width: 40%;
+    height: 1px;
+    margin: 7px auto;
+    box-sizing: border-box;
+}
+.signature_text{
+    text-align: center;
+    font-size: 16pt;
+    color: #121b55;
+}
+.date_block{
+    text-align: center;
+    height: 50px;
+    padding-top: 20px;
+}
+.date_underline{
+    text-align: center;
+    border-top: 1px solid #777;
+    width: 40%;
+    height: 1px;
+    margin: 7px auto;
+    box-sizing: border-box;
+}
+.date_text{
+    text-align: center;
+    font-size: 16pt;
+    color: #121b55;
+}

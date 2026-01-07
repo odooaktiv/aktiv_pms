@@ -1,0 +1,64 @@
+<odoo>
+    <template id="report_timesheet_inherit" inherit_id="hr_timesheet.report_timesheet">
+        <xpath expr="//div[hasclass('page')]" position="replace">
+            <div class="page">
+                <t t-foreach="docs.mapped('task_id')" t-as="task_id">
+                    <div class="row mt32 mb32">
+                        <h5>
+                            Task:
+                            <span t-field="task_id.name"/>
+                        </h5>
+                    </div>
+                    <div class="row mt32 mb32">
+                        <h6>
+                            <strong>Planned Hour:</strong>
+                            <span>
+                                <t t-esc="task_id.planned_hours"/>
+                            </span>
+                        </h6>
+                    </div>
+                    <div class="row mt32 mb32">
+                        <h6>
+                            <strong>Date Of Delivery:</strong>
+                            <span>
+                                <t t-esc="task_id.date_deadline"/>
+                            </span>
+                        </h6>
+                    </div>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th class="align-middle"><span>Date</span></th>
+                                <th class="align-middle"><span>Description</span></th>
+                                <th class="text-right"><span>Productive Hours</span></th>
+                            </tr>
+                       </thead>
+                       <tbody>
+                            <tr t-foreach="docs.filtered(lambda t: t.task_id == task_id)" t-as="lines">
+                                <td>
+                                   <span t-field="lines.date"/>
+                                </td>
+                                <td >
+                                    <span t-field="lines.name" t-options="{'widget': 'text'}"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="lines.approved_hours" t-options="{'widget': 'duration', 'digital': True, 'unit': 'hour', 'round': 'minute'}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <t t-set="nbCols" t-value="4"/>
+                                <t t-set="lines" t-value="sum(docs.filtered(lambda t: t.task_id == task_id).mapped('approved_hours'))"/>
+                                <td class="text-right" t-attf-colspan="{{nbCols}}">
+                                    <strong>
+                                        <span style="margin-right: 15px;">Total Approved Hour</span>
+                                        <t t-esc="lines" t-options="{'widget': 'duration', 'digital': True, 'unit': 'hour', 'round': 'minute'}"/>
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+            </div>
+        </xpath>
+    </template>
+</odoo>

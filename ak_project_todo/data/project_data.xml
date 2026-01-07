@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_sop_bank" model="project.project">
+        <field name="name">SOP Bank</field>
+        <field name="is_sop_bank" eval="True"/>
+    </record>
+</odoo>

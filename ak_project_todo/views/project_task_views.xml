@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="project_todo_task_type_tree_inherited" model="ir.ui.view">
+        <field name="name">project.task.type.tree.inherited</field>
+        <field name="model">project.task.type</field>
+        <field name="inherit_id" ref="project.task_type_tree_inherited"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="default_group_by"></attribute>
+            </xpath>
+            <xpath expr="//field[@name='project_ids']" position="attributes">
+                <attribute name="required">0</attribute>
+                <attribute name="readonly">1</attribute>
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="task_type_edit" model="ir.ui.view">
+        <field name="name">project.task.type.form</field>
+        <field name="model">project.task.type</field>
+        <field name="inherit_id" ref="project.task_type_edit"/>
+        <field name="arch" type="xml">
+             <xpath expr="//field[@name='project_ids']" position="after">
+                <field name="sop_stage"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

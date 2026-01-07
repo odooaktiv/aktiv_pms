@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- Inherit the original template using t tag instead of template for consistency -->
+    <t t-name="ak_project_todo.todo_form_view_inherited" t-inherit="project_todo.TodoFormView" t-inherit-mode="extension" owl="1">
+        <!-- Locate the todo-mark-as-done-button slot and replace it with empty content -->
+        <xpath expr="//t[@t-set-slot='todo-mark-as-done-button']" position="replace">
+            <t t-set-slot="todo-mark-as-done-button">
+                <!-- The slot is empty now-->
+            </t>
+        </xpath>
+    </t>
+</templates>

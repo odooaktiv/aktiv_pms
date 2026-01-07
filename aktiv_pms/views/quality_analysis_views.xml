@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="quality_analysis_tree_view" model="ir.ui.view">
+            <field name="name">quality.analysis.tree.view</field>
+            <field name="model">quality.analysis</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="sequence" required="True"/>
+                    <field name="display_type" invisible="1"/>
+                    <field name="date" required="True"/>
+                    <field name="name" string="Test Case Description" widget="section_and_note_text"
+                           optional="show"/>
+                    <field name="pre_conditions" />
+                    <field name="steps_performed" />
+                    <field name="expected_result" />
+                    <field name="server" required="True"/>
+                    <field name="outcomes" required="True"/>
+                    <field name="attachment"/>
+                    <button type="object" string=" Copy"
+                            name="copy_test_case" class="fa fa-copy"/>
+                    <field name="is_updated" invisible="1"/>
+                    <field name="is_new" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="quality_analysis_search_form" model="ir.ui.view">
+            <field name="name">quality.analysis.search.form</field>
+            <field name="model">quality.analysis</field>
+            <field name="arch" type="xml">
+                <search string="Quality Analysis">
+                    <field name="project_id"/>
+                    <filter string="Project" name="project" context="{'group_by': 'project_id'}"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_quality_analysis" model="ir.actions.act_window">
+            <field name="name">Module Quality Check</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">quality.analysis</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{'search_default_project': 1}</field>
+        </record>
+
+        <menuitem id="menu_module_quality_analysis" name="Test Cases"
+            parent="project.menu_project_report" action="action_quality_analysis"/>
+    </data>
+</odoo>

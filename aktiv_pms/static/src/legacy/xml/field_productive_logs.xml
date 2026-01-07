@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="web.field_productive_logs">
+        <div class="d-inline-flex w-100 m-100 d-flex" data-tooltip="">
+            <t t-if="props.readonly">
+                <a t-if="props.record.data[props.name]" t-esc="formattedValue"/>
+                <t t-if="props.record.data[props.name]">
+                    <span tabindex="0" class="fa fa-exclamation-triangle o_alert_symbol productive-logs-anchor"
+                          t-on-click="openProductiveLogs"/>
+                </t>
+            </t>
+        </div>
+    </t>
+
+    <!-- Popup Template -->
+    <t t-name="ProductiveLogs.PopoverContent">
+        <div class="popover-content table-container">
+            <table class="table table-sm">
+                <thead>
+                    <th>
+                         <span class="logs_title">Hours Logs</span><a href="#" class="o_task_redirect me-2 pr-20" t-on-click.prevent="openTask"><i class="fa fa-external-link" role="img" aria-label='Redirect' title="Redirect"></i></a>
+                    </th>
+                    <th>
+                        <a href="#" class="o_close_dialog" t-on-click.prevent="close"><i class="fa fa-times pr20" role="img" aria-label='Close' title="Close"></i></a>
+                    </th>
+                </thead>
+                <tbody>
+                    <tr t-foreach="props.logs" t-as="log" t-key="log_index">
+                        <td style="text-align:left">
+                            <div t-attf-class="text-{{ log.isokay ? 'success' : 'danger' }}">
+                                <span t-esc="log.old_hour"/><i class="fa fa-long-arrow-right px-2"/><span t-esc="log.new_hour"/>
+                            </div>
+                            <div class="text-muted">
+                                <i class="fa fa-clock-o" style="padding-right:5px;"/><span t-esc="log.datetime"/>
+                            </div>
+                        </td>
+                        <td style="text-align:left">
+                            <div>
+                                <span class="badge rounded-pill text-white bg-primary" t-esc="log.employee"/>
+                            </div>
+                            <div>
+                                <span t-esc="log.reason"/>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </t>
+</templates>

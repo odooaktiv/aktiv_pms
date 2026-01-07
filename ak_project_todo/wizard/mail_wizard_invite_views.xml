@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- wizard view -->
+    <record model="ir.ui.view" id="mail_wizard_invite_form">
+        <field name="name">Add Followers</field>
+        <field name="model">mail.wizard.invite</field>
+        <field name="inherit_id" ref="mail.mail_wizard_invite_form" />
+        <field name="arch" type="xml">
+            <field name="partner_ids" position="before">
+                <field name="group_ids" widget="many2many_tags" />
+            </field>
+        </field>
+    </record>
+</odoo>

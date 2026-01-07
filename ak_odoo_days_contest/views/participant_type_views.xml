@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="participant_type_tree_view" model="ir.ui.view">
+        <field name="name">participant.type.tree.view</field>
+        <field name="model">participant.type</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="name"/>
+                <field name="survey_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_aktiv_odoo_days_root"
+        name="Aktiv Odoo Days"
+        groups="base.group_erp_manager"
+        web_icon="ak_odoo_days_contest,static/description/icon.png"
+        sequence="185"/>
+
+    <record id="action_participant_type" model="ir.actions.act_window">
+        <field name="name">Participant Type</field>
+        <field name="res_model">participant.type</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem action="action_participant_type" id="menu_participant_type" parent="menu_aktiv_odoo_days_root"/>
+</odoo>

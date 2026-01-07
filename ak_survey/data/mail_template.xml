@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record id="contest_winner_mail_template" model="mail.template">
+			<field name="name">Contest Winner Template</field>
+			<field name="model_id" ref="survey.model_survey_user_input"/>
+			<field name="email_from">hr@aktivsoftware.com</field>
+			<field name="email_to">{{object.participant_id.email}}</field>
+			<field name="reply_to">hr@aktivsoftware.com</field>
+			<field name="subject">Congratulations from Aktiv! You've Won the Odoo Days Contest.</field>
+			<field name="body_html" type="html">
+				<div style="margin: 0px; padding: 0px;">
+					Hello
+					<t t-out="object.participant_id.name"/>,
+					<br/>
+					<br/>
+					<p>We are thrilled to inform you that you have emerged as a winner in the Odoo Days Contest hosted
+						by Aktiv Software.
+						Congratulations on this remarkable achievement! Your dedication and contributions to the Odoo
+						community have truly shone, and we are excited to reward your efforts.
+					</p>
+					<br/>
+					<p>To claim your prize, please visit Booth A1 at the Odoo Community Days event venue. Our
+						representatives will be available to assist you with the prize collection process. Kindly bring
+						your identification and the email notification with you for verification purposes.
+					</p>
+					<br/>
+					<p>If you have any questions or require further information, please feel free to reply to this email
+						or contact our team at hr@aktivsoftware.com.
+					</p>
+					<br/>
+					<p>Once again, congratulations on your well-deserved victory! We look forward to meeting you at
+						Booth 35.
+					</p>
+					<br/>
+					<p>Best Regards,</p>
+					<br/>
+					<t t-if="user.signature"  t-out="user.signature"/>
+					<br/>
+				</div>
+			</field>
+		</record>
+	</data>
+</odoo>
