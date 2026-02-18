@@ -1039,4 +1039,16 @@ class ProjectTask(models.Model):
                 rec.project_id.update({'pm_tool_task_id': task_ids[0].get('id'),
                                       'pm_tool_task_name': task_ids[0].get('name'),
                                       'pm_tool_project_id': task_ids[0].get('project_id')[0],
-                                    })      
+                                    })
+
+    def action_open_quality_analysis(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Quality Analysis",
+            "res_model": "quality.analysis",
+            "view_mode": "tree,form",
+            "domain": [("task_id", "=", self.id)],
+            "context": {"default_task_id": self.id},
+            "target": "current",
+        }

@@ -60,6 +60,10 @@ class QualityAnalysis(models.Model):
 
         qa_ids = False
         project_task = False
+        if not vals.get("task_id"):
+            default_task_id = self.env.context.get("default_task_id")
+            if default_task_id:
+                vals["task_id"] = default_task_id
         if vals.get("task_id"):
             qa_ids = self.env["project.task"].browse(vals["task_id"]).mapped("qa_ids")
             project_task = self.env["project.task"].browse(vals["task_id"])

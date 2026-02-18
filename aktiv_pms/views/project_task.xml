@@ -426,6 +426,17 @@
                        position="after">
                     <field name="state"/>
                 </xpath>
+                <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                    <button type="object"
+                            name="action_open_quality_analysis"
+                            class="oe_stat_button"
+                            icon="fa-flask">
+                        <div class="o_stat_info">
+                                <span class="o_stat_text">Test Cases</span>
+                            </div>
+
+                    </button>
+                </xpath>
             </field>
         </record>
 
