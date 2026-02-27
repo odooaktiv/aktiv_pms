@@ -922,6 +922,8 @@ class ProjectTask(models.Model):
                     "date": date,
                     "name": timesheet.name,
                     "unit_amount": timesheet.unit_amount,
+                    "effective_hours": timesheet.effective_hours,
+                    "productive_hours": timesheet.approved_hours,
                     "project_id": project_task[0].get('project_id')[0],
                     "employee_id": employee_id[0],
                 }
@@ -1004,6 +1006,8 @@ class ProjectTask(models.Model):
                     "date": date,
                     "name": timesheet.name,
                     "unit_amount": timesheet.unit_amount,
+                    "effective_hours": timesheet.effective_hours,
+                    "productive_hours": timesheet.approved_hours,
                     "project_id": project_id,
                     # "b2c_timesheet_sync": True,
                     "employee_id": b2b_employee_id[0] if b2b_employee_id else False,

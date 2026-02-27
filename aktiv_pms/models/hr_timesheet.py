@@ -230,6 +230,7 @@ class AccountAnalyticLine(models.Model):
                     )
         vals = self.update_user_type(vals)
         if self.data_sync == 'sync' and (vals.get("date") or vals.get("name")
+                                         or 'effective_hours' in vals or 'approved_hours' in vals
                                          or 'unit_amount' in vals or vals.get("project_id") or vals.get("task_id")):
             vals.update({"data_sync": "not_sync"})
         return super(AccountAnalyticLine, self).write(vals)
