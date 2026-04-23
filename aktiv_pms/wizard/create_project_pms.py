@@ -59,7 +59,7 @@ class ProjectCreationWizard(models.TransientModel):
         b2c_parent_user_data = odoo_conn.env['hr.employee'].read(b2c_parent_id.id, ['user_id']) if b2c_parent_id else False
         b2c_parent_user_id = b2c_parent_user_data[0].get('user_id')[0] if b2c_parent_user_data else False
 
-        b2c_project_category_id = odoo_conn.env.ref('ak_pm_tool.customer_projects').id
+        b2c_project_category_id = odoo_conn.env.ref('pms_tool.customer_projects').id
 
         project_values = {'name': self.name,
                           'partner_id': partner_id,

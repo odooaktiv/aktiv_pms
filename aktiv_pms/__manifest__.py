@@ -2,7 +2,7 @@
     "name": "Aktiv PMS",
     "category": "Services/Project",
     "author": "Aktiv Software",
-    "version": "17.0.1.0.1",
+    "version": "17.0.1.0.2",
     "license": "OPL-1",
     "depends": ["project", "hr_timesheet", "analytic", "ak_crm","ak_public_holidays"],
     "data": [
