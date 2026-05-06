@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<template id="base_colour_template" name="Colour Scheme Template" inherit_id="web.webclient_bootstrap">
+		<xpath expr="." position='inside'>
+			<t t-if="not o" t-set="o" t-value="doc"/>
+			<t t-if="not company">
+				<t t-if="company_id">
+					<t t-set="company" t-value="company_id"/>
+				</t>
+				<t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+					<t t-set="company" t-value="o.company_id.sudo()"/>
+				</t>
+				<t t-else="">
+					<t t-set="company" t-value="res_company"/>
+				</t>
+			</t>
+			<t t-if="isinstance(company, int)">
+				<t t-set="company"
+				   t-value="request.env['res.company'].sudo().browse(company)"/>
+			</t>
+			<t t-set="active_company" t-value="active_id or company"/>
+			<t t-set="user" t-value="request.env.user"/>
+			<t t-set="in_dark_mode"
+			   t-value="request.httprequest.cookies.get('color_scheme') == 'dark'"/>
+			<t t-if="not in_dark_mode">
+				<t t-set="active_pallet"
+				   t-value="(active_company.allow_user_scheme and user.colour_scheme_pallet_id) or active_company.colour_scheme_pallet_id"/>
+				<t t-set="primary_color"
+				   t-value="active_pallet.primary_color if active_pallet.darker_primary else active_pallet.primary_color_font"/>
+				<t t-set="primary_color_font"
+				   t-value="active_pallet.primary_color_font if active_pallet.darker_primary else active_pallet.primary_color"/>
+				<t t-set="secondary_color"
+				   t-value="active_pallet.secondary_color if active_pallet.darker_secondary else active_pallet.secondary_color_font"/>
+				<t t-set="secondary_color_font"
+				   t-value="active_pallet.secondary_color_font if active_pallet.darker_secondary else active_pallet.secondary_color"/>
+			</t>
+			<t t-else="">
+				<t t-set="active_pallet"
+				   t-value="(active_company.allow_user_scheme and user.dark_colour_scheme_pallet_id) or active_company.dark_colour_scheme_pallet_id"/>
+				<t t-set="primary_color"
+				   t-value="active_pallet.primary_color if not active_pallet.darker_primary else active_pallet.primary_color_font"/>
+				<t t-set="primary_color_font"
+				   t-value="active_pallet.primary_color_font if not active_pallet.darker_primary else active_pallet.primary_color"/>
+				<t t-set="secondary_color"
+				   t-value="active_pallet.secondary_color if not active_pallet.darker_secondary else active_pallet.secondary_color_font"/>
+				<t t-set="secondary_color_font"
+				   t-value="active_pallet.secondary_color_font if not active_pallet.darker_secondary else active_pallet.secondary_color"/>
+			</t>
+			<t t-if="active_pallet and not website_id">
+				<t t-set="header_color" t-value="active_pallet.header_color"/>
+				<t t-set="header_color_font" t-value="active_pallet.header_color_font"/>
+				<t t-set="home_screen_background" t-value="active_company.home_screen_background"/>
+				<t t-set="home_screen_background_style" t-value="active_company.home_screen_background_style"/>
+		        <style>
+			        <!-- Home menu background-->
+			        <t t-if="home_screen_background and home_screen_background_style">
+				        .mk_app_menu .o_app_icon {
+				        background: rgba(255, 255, 255, 0.05) !important;
+				        border: 2px solid <t t-out="primary_color"/>
+				        }
+				        .mk_app_menu:not(.mk_app_menu_custom) .o_main_navbar {
+		                    background-color: transparent !important;
+		                    border-color: transparent !important;
+		                }
+				        .o_home_menu .o_app .o_caption {
+		                    color: <t t-out="header_color_font"/> !important;
+		                }
+				        <t t-if="home_screen_background_style == 'gradiant'">
+					        .mk_app_menu {
+			                    background: linear-gradient(135deg,<t t-out="header_color"/>,<t t-out="primary_color"/>) !important ;
+			                }
+				        </t>
+				        <t t-if="home_screen_background_style == 'solid'">
+					        .mk_app_menu {
+			                    background: <t t-out="header_color"/> !important ;
+			                }
+				        </t>
+			        </t>
+			        .o_main_navbar,
+			        .o_main_navbar > a,
+			        .o_main_navbar > a > .o_menu_brand,
+			        .o_main_navbar > .o_navbar_apps_menu > .o-dropdown > i,
+			        .o_main_navbar > .o_menu_sections > a,
+			        .o_main_navbar > .o_menu_sections > button,
+			        .o_main_navbar > .o_menu_sections > .o-dropdown > button,
+			        .o-mail-MessagingMenu > * > button.fw-bold,
+					.o_navbar .alert-primary, .o_navbar .alert-primary .company_label,
+			        .o_website_switcher_container > .o-dropdown--menu > .dropdown-item
+			        {
+	                    background-color: <t t-out="header_color"/> !important;
+	                    color: <t t-out="header_color_font"/> !important;
+	                }
+
+					.dropdown-item:hover, .dropdown-item:focus, .btn:hover{
+						background-color: <t t-out="secondary_color"/> !important;
+	                    color: <t t-out="secondary_color_font"/> !important;
+					}
+	                .o_main_navbar > .o_menu_sections > a:hover,
+	                .o_main_navbar > .o_menu_sections > button:hover,
+					.o_main_navbar > .o_navbar_apps_menu:hover,
+	                .o_main_navbar > .o_menu_sections > .o-dropdown > button:hover,
+	                .o_main_navbar > .o_menu_sections > .o-dropdown > .o-dropdown--menu > .dropdown-item:hover,
+			        .o-mail-MessagingMenu > * > .o-mail-NotificationItem.o-important:hover,
+			        .o-mail-ActivityGroup:hover,
+			        .o-mail-NotificationItem:hover,
+			        .o_switch_company_menu > .o-dropdown--menu > .dropdown-item:focus,
+			        .o_user_menu > .o-dropdown--menu > .dropdown-item:hover,
+			        .o_debug_manager > .o-dropdown--menu > .dropdown-item:hover,
+			        .o_website_switcher_container > .o-dropdown--menu > .dropdown-item:hover{
+	                    background-color: <t t-out="secondary_color"/> !important;
+	                    color: <t t-out="secondary_color_font"/> !important;
+	                }
+	                .o_main_navbar .o_menu_systray > * > button,
+			        .o_main_navbar .o_menu_systray .o-dropdown > button{
+	                    color: <t t-out="header_color_font"/> !important;
+	                }
+			        .o_dropdown_title{
+			            color: <t t-out="primary_color"/>
+			        }
+			        .o_main_navbar .dropdown-menu {
+			            border: 1px solid <t t-out="header_color_font"/> !important;
+			        }
+			        .o-mail-MessagingMenu > .o-mail-MessagingMenu-header.border-bottom {
+			            border-bottom: 1px solid <t t-out="header_color_font"/> !important;
+			        }
+			        .o_switch_company_menu > .o-dropdown--menu > .dropdown-item > * > .border-end {
+			            border-right: 1px solid <t t-out="header_color_font"/> !important;
+			        }
+			        .o_user_menu > .o-dropdown--menu > .dropdown-divider,
+			        .o_debug_manager > .o-dropdown--menu > .dropdown-divider {
+			            border-top: 1px solid <t t-out="header_color_font"/> !important;
+			            margin: 0 !important;
+			        }
+			        .o-mail-DiscussSystray-class.show,
+			        .o-mail-DiscussSystray-class:hover {
+                        background-color: rgba(0, 0, 0, 0.075);
+			        }
+			        .dropdown-menu {
+			            padding: 0;
+			        }
+			        .o_ChatWindowHeader,
+			        .o_dial_window_title {
+			            background: <t t-out="header_color"/> !important;
+	                    color: <t t-out="header_color_font"/> !important;
+			        }
+			        .o_burger_menu .o_burger_menu_topbar,
+			        .o_burger_menu .o_burger_menu_topbar > .dropdown-toggle,
+			        .o_burger_menu .o_burger_menu_content.o_burger_menu_dark {
+			            background: <t t-out="header_color"/> !important;
+	                    color: <t t-out="header_color_font"/> !important;
+			        }
+			        .o_user_menu_mobile > a,
+			        .o_user_menu_mobile > div {
+			            color: <t t-out="secondary_color_font"/> !important;
+			        }
+			        .o_user_menu_mobile > div > .form-check-input {
+			            border-color: <t t-out="secondary_color_font"/> !important;
+			        }
+			        .o_search_panel_section_icon {
+						color: <t t-out="header_color"/> !important;
+			        }
+			        .o_tooltip .o_tooltip_visible,
+			        .o_tooltip::before {
+			            background: <t t-out="header_color"/> !important;
+			        }
+			        .o_tooltip.active,
+			        .o_tooltip.active::before {
+			            border-color: <t t-out="header_color"/> !important;
+			        }
+
+					<!-- Buttons, Text, ...-->
+					a:not(.dropdown-item, .btn-primary) {
+	                    color: <t t-out="primary_color"/> !important;
+	                    text-decoration: none;
+	                    background-color: transparent;
+	                }
+	                .btn-primary, .btn-primary a  {
+	                    color: <t t-out="primary_color_font"/> !important;
+	                    background-color: <t t-out="primary_color"/> !important;
+	                    border-color: <t t-out="primary_color"/> !important;
+	                }
+			        .btn-primary:hover {
+	                    background-color: <t t-out="primary_color"/>CC !important;
+	                }
+	                .btn-outline-primary {
+	                    color: <t t-out="primary_color"/> !important;
+	                    border-color: <t t-out="primary_color"/> !important;
+	                }
+			        .btn-outline-secondary{
+			            color: <t t-out="secondary_color"/> !important;
+	                    border-color: <t t-out="secondary_color"/> !important;
+			        }
+			        .btn-outline-secondary:hover{
+						color: <t t-out="secondary_color"/> !important;
+	                    border-color: <t t-out="secondary_color"/> !important;
+			        }
+			        .o-form-buttonbox .oe_stat_button.dropdown > .o_button_more:after{
+			            border-top-color: <t t-out="secondary_color"/> !important;
+			        }
+	                .btn-outline-primary:hover {
+	                    background-color: <t t-out="primary_color"/>CC !important;
+	                    color: <t t-out="primary_color_font"/>CC !important;
+	                }
+			        .text-primary {
+			            color: <t t-out="primary_color"/> !important;
+			        }
+			        .alert-primary {
+			            color: <t t-out="primary_color_font"/> !important;
+			            background-color: <t t-out="primary_color"/> !important;
+			            border-color: <t t-out="primary_color"/> !important;
+			        }
+			        .border-primary {
+	                    border-color: <t t-out="primary_color"/> !important;
+			        }
+					code{
+						color: <t t-out="header_color"/> !important;
+					}
+					.badge.text-bg-default,
+			        .badge.bg-light,
+			        .badge.text-bg-light,
+			        .badge.bg-default,
+			        .badge.text-primary{
+						outline-color: <t t-out="primary_color"/> !important;
+					}
+					a.text-primary:hover,
+			        a.text-primary:focus,
+			        a.text-primary:active,
+			        a.text-primary.active,
+			        button.text-primary:hover,
+			        button.text-primary:focus,
+			        button.text-primary:active,
+			        button.text-primary.active{
+						color: <t t-out="primary_color"/>CC !important;
+					}
+			        .bg-primary {
+			            background-color: <t t-out="primary_color"/> !important;
+			        }
+			        .text-bg-primary {
+			            background: <t t-out="primary_color"/> !important;
+			            color: <t t-out="primary_color_font"/> !important;
+			            border-color: <t t-out="primary_color_font"/> !important;
+			        }
+			        .btn-secondary:not(.o_arrow_button):not(.o-mail-DiscussSidebarChannel) {
+	                    color: <t t-out="secondary_color_font"/> !important;
+	                    background: <t t-out="secondary_color"/> !important;
+	                }
+			        .btn-secondary:hover:not(.o_arrow_button) {
+	                    background-color: <t t-out="secondary_color"/>CC !important;
+	                }
+			        .btn-check:checked + .btn-secondary,
+			        .btn-check:active + .btn-secondary,
+			        .btn-secondary:active,
+			        .btn-secondary.active, .show > .btn-secondary.dropdown-toggle {
+			            background-color: <t t-out="secondary_color"/>CC !important;
+			            border-color: <t t-out="secondary_color_font"/>CC !important;
+			        }
+
+	                .btn-link, .btn-link:not(.text-muted) {
+	                    color: <t t-out="primary_color"/> !important;
+	                }
+			        .btn-link:hover,
+			        .btn-link:focus {
+	                    color: <t t-out="primary_color"/>CC !important;
+	                }
+	                .btn-link.btn-primary {
+	                    color: <t t-out="primary_color_font"/> !important;
+	                }
+			        .btn-link.btn-primary:hover,
+			        .btn-link.btn-primary:focus,
+			        .btn-link.btn-primary.focus,
+			        .btn-link.text-primary:hover,
+			        .btn-link.text-primary:focus,
+			        .btn-link.text-primary.focus{
+			            color: <t t-out="primary_color"/>CC !important;
+			        }
+			        .btn-link.btn-action:hover,
+			        .btn-link.btn-action:focus,
+			        .btn-link.btn-action.focus,
+			        .btn-link.text-action:hover,
+			        .btn-link.text-action:focus,
+			        .btn-link.text-action.focus {
+			            color: <t t-out="primary_color"/>CC !important;
+			        }
+			        .o_cp_action_menus button {
+	                    color: <t t-out="primary_color"/> !important;
+	                }
+			        .o_view_nocontent_smiling_face{
+						color: <t t-out="primary_color"/> !important;
+					}
+
+			        <!--Statusbar color-->
+			        .o_field_statusbar > .o_statusbar_status > .o_arrow_button.o_arrow_button_current:not(.d-none):disabled,
+			        .o_field_statusbar_duration > .o_statusbar_status > .o_arrow_button.o_arrow_button_current:not(.d-none):disabled,
+			        .o_field_statusbar > .o_statusbar_status > .o_arrow_button:not(.d-none):active:not(.o_first),
+			        .o_field_statusbar_duration > .o_statusbar_status > .o_arrow_button:not(.d-none):active:not(.o_first) {
+			            border-color: <t t-out="primary_color"/> !important;
+			            color: <t t-out="primary_color_font"/> !important;
+			            background: <t t-out="primary_color"/> !important;
+			        }
+			        .o_field_statusbar > .o_statusbar_status > .o_arrow_button.o_arrow_button_current:not(.d-none):disabled:before,
+			        .o_field_statusbar_duration > .o_statusbar_status > .o_arrow_button.o_arrow_button_current:not(.d-none):disabled:before,
+			        .o_field_statusbar > .o_statusbar_status > .o_arrow_button.o_arrow_button_current:not(.d-none):disabled + .btn:before,
+			        .o_field_statusbar_duration > .o_statusbar_status > .o_arrow_button.o_arrow_button_current:not(.d-none):disabled + .btn:before {
+						border-left-color: <t t-out="primary_color"/> !important;
+			        }
+			        .o_field_statusbar > .o_statusbar_status > .o_arrow_button.o_arrow_button_current:not(.d-none):disabled:after,
+			        .o_field_statusbar_duration > .o_statusbar_status > .o_arrow_button.o_arrow_button_current:not(.d-none):disabled:after,
+			        .o_field_statusbar > .o_statusbar_status > .o_arrow_button:not(.d-none):active:not(.o_first):after,
+			        .o_field_statusbar_duration > .o_statusbar_status > .o_arrow_button:not(.d-none):active:not(.o_first):after{
+			            border-left-color: <t t-out="primary_color"/> !important;
+			        }
+
+
+					<!-- Others -->
+	                .o_kanban_view.o_kanban_grouped .o_kanban_record,
+	                .o_kanban_view.o_kanban_grouped .o_kanban_quick_create {
+	                    margin-top: 3px !important;
+	                    margin-bottom: 3px !important;
+	                    border: none !important;
+	                }
+
+	                .o_kanban_view.o_kanban_grouped.o_kanban_small_column
+	                .o_kanban_group:not(.o_column_folded) {
+	                    background-color: #ebecf0 !important;
+	                }
+
+	                .o_searchview_facet .o_searchview_facet_label {
+	                    background: <t t-out="header_color"/> !important;
+	                    color: <t t-out="header_color_font"/> !important;
+	                }
+
+	                .o_controller_with_searchpanel
+	                .o_search_panel
+	                .o_search_panel_category
+	                .o_search_panel_section_icon {
+	                    color: <t t-out="header_color_font"/> !important;
+	                }
+	                .o_web_client .o_view_grid > tfoot,
+	                .o_web_client .o_view_grid .o_grid_total {
+	                    color: <t t-out="header_color_font"/> !important;
+	                    background-color: <t t-out="header_color"/> !important;
+	                    text-align: right !important;
+	                }
+			        .o_field_highlight .o_field_widget .o_input,
+			        .o_field_highlight.o_field_widget .o_input {
+                        border-color: <t t-out="primary_color"/> !important;
+					}
+	                .form-check-input:checked {
+	                    color: <t t-out="primary_color_font"/> !important;
+	                    border-color: <t t-out="primary_color"/> !important;
+	                    background-color: <t t-out="primary_color"/> !important;
+	                }
+	                .form-check:hover,
+			        .form-check:hover
+			        .form-check-input:not(:disabled), .form-select:hover, .form-select:hover .form-check-input:not(:disabled) {
+	                    border-color: <t t-out="primary_color"/> !important;
+			            color: <t t-out="primary_color"/> !important;
+	                }
+
+			        .btn-check:checked + .btn-outline-secondary, .btn-check:active + .btn-outline-secondary, .btn-outline-secondary:active, .btn-outline-secondary.active, .show > .btn-outline-secondary.dropdown-toggle{
+			            color: <t t-out="primary_color_font"/>;
+					    background-color: <t t-out="primary_color"/>;
+					    border-color: <t t-out="primary_color_font"/>;
+			        }
+			        .o_searchview:focus-within + .o-dropdown .o_searchview_dropdown_toggler{
+			            border-top-color: <t t-out="primary_color"/>;
+					    border-right-color: <t t-out="primary_color"/>;
+					    border-bottom-color: <t t-out="primary_color"/>;
+			        }
+			        .o_searchview:focus-within{
+			            border-color: <t t-out="primary_color"/> !important;
+			        }
+	                .o_form_view .oe_button_box .btn.oe_stat_button > .o_stat_info .o_stat_value,
+	                .o_form_view
+	                .oe_button_box
+	                .o_account_reports_page
+	                .oe_stat_button.oe_link_reports
+	                > .o_stat_info
+	                .o_stat_value,
+	                .o_account_reports_page
+	                .o_form_view
+	                .oe_button_box
+	                .oe_stat_button.oe_link_reports
+	                > .o_stat_info
+	                .o_stat_value,
+	                .o_form_view
+	                .oe_button_box
+	                .o_radio_hide_bullet
+	                label.oe_stat_button
+	                > .o_stat_info
+	                .o_stat_value,
+	                .o_radio_hide_bullet
+	                .o_form_view
+	                .oe_button_box
+	                label.oe_stat_button
+	                > .o_stat_info
+	                .o_stat_value,
+	                .o_form_view .oe_button_box .btn.oe_stat_button > span .o_stat_value,
+	                .o_form_view
+	                .oe_button_box
+	                .o_account_reports_page
+	                .oe_stat_button.oe_link_reports
+	                > span
+	                .o_stat_value,
+	                .o_account_reports_page
+	                .o_form_view
+	                .oe_button_box
+	                .oe_stat_button.oe_link_reports
+	                > span
+	                .o_stat_value,
+	                .o_form_view
+	                .oe_button_box
+	                .o_radio_hide_bullet
+	                label.oe_stat_button
+	                > span
+	                .o_stat_value,
+	                .o_radio_hide_bullet
+	                .o_form_view
+	                .oe_button_box
+	                label.oe_stat_button
+	                > span
+	                .o_stat_value {
+	                    color: <t t-out="header_color"/> !important;
+	                }
+
+	                .o_form_view .oe_button_box .btn.oe_stat_button > .o_stat_info .o_stat_value,
+	                .o_form_view
+	                .oe_button_box
+	                .o_account_reports_page
+	                .oe_stat_button.oe_link_reports
+	                > .o_stat_info
+	                .o_stat_value,
+	                .o_account_reports_page
+	                .o_form_view
+	                .oe_button_box
+	                .oe_stat_button.oe_link_reports
+	                > .o_stat_info
+	                .o_stat_value,
+	                .o_form_view
+	                .oe_button_box
+	                .o_radio_hide_bullet
+	                label.oe_stat_button
+	                > .o_stat_info
+	                .o_stat_value,
+	                .o_radio_hide_bullet
+	                .o_form_view
+	                .oe_button_box
+	                label.oe_stat_button
+	                > .o_stat_info
+	                .o_stat_value,
+	                .o_form_view .oe_button_box .btn.oe_stat_button > span .o_stat_value,
+	                .o_form_view
+	                .oe_button_box
+	                .o_account_reports_page
+	                .oe_stat_button.oe_link_reports
+	                > span
+	                .o_stat_value,
+	                .o_account_reports_page
+	                .o_form_view
+	                .oe_button_box
+	                .oe_stat_button.oe_link_reports
+	                > span
+	                .o_stat_value,
+	                .o_form_view
+	                .oe_button_box
+	                .o_radio_hide_bullet
+	                label.oe_stat_button
+	                > span
+	                .o_stat_value,
+	                .o_radio_hide_bullet
+	                .o_form_view
+	                .oe_button_box
+	                label.oe_stat_button
+	                > span
+	                .o_stat_value {
+	                    color: <t t-out="header_color"/> !important;
+	                }
+	                .o_loading_indicator {
+	                  background-color: <t t-out="secondary_color"/> !important;
+	                }
+	                .o_home_menu .o_menuitems .o_menuitem {
+	                    color: <t t-out="header_color_font"/> !important;
+	                }
+	                .o_web_client.o_fullscreen .o_form_view.o_workorder_tablet {
+	                    color: <t t-out="primary_color_font"/> !important;
+	                }
+			        .o_onboarding_step_title{
+			            color: <t t-out="header_color"/> !important;
+			        }
+			        .o_required_modifier{
+				        --o-input-border-color: <t t-out="primary_color"/> !important;
+	                    --o-caret-color: <t t-out="primary_color"/> !important;
+			        }
+			        .o_field_widget:focus-within{
+			            --o-input-border-color: <t t-out="header_color"/> !important;
+                        --o-caret-color: <t t-out="header_color"/> !important;
+			        }
+			        .o-form-buttonbox .oe_stat_button .o_button_icon{
+			            color: <t t-out="primary_color"/> !important;
+			        }
+			        .o-form-buttonbox .o_pie_value, .o-form-buttonbox .oe_stat_button .o_stat_info .o_stat_value, .o-form-buttonbox .oe_stat_button > span .o_stat_value, .o-form-buttonbox .oe_stat_button .o_field_statinfo .o_stat_value,
+			        .o-form-buttonbox .o_pie_text, .o-form-buttonbox .oe_stat_button .o_stat_info .o_stat_text, .o-form-buttonbox .oe_stat_button > span .o_stat_text, .o-form-buttonbox .oe_stat_button .o_field_statinfo .o_stat_text{
+			            color: <t t-out="primary_color"/> !important;
+			        }
+			        .o-form-buttonbox .oe_stat_button:hover,
+			        .o-form-buttonbox .oe_stat_button:hover .o_button_icon,
+			        .o-form-buttonbox .oe_stat_button:hover .o_stat_info,
+			        .o-form-buttonbox .oe_stat_button:hover .o_stat_value,
+			        .o-form-buttonbox .oe_stat_button:hover .o_stat_text
+			        {
+			            color: <t t-out="secondary_color_font"/> !important;
+			            background-color: <t t-out="secondary_color"/> !important;
+			        }
+	            </style>
+	        </t>
+        </xpath>
+    </template>
+</odoo>

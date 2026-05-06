@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="crm_stage_form_inherit" model="ir.ui.view">
+        <field name="name">crm.stage.form.inherit</field>
+        <field name="model">crm.stage</field>
+        <field name="inherit_id" ref="crm.crm_stage_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='is_won']" position="before">
+                <field name="is_lost"/>
+            </xpath>
+            <xpath expr="//field[@name='team_ids']" position="after">
+                <field name="type" widget="many2many_tags" options="{'no_create_edit': True,  'no_create':True}"/>
+                <field name="stage_id_type_key" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_stage_tree_inherit" model="ir.ui.view">
+        <field name="name">crm.stage.tree.inherit</field>
+        <field name="model">crm.stage</field>
+        <field name="inherit_id" ref="crm.crm_stage_tree"/>
+        <field name="arch" type="xml">
+             <xpath expr="//field[@name='is_won']" position="after">
+                <field name="type"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_stage_search_inherit" model="ir.ui.view">
+        <field name="name">crm.stage.search.inherit</field>
+        <field name="model">crm.stage</field>
+        <field name="inherit_id" ref="crm.crm_lead_stage_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="type"/>
+                <separator/>
+                <filter string="Type" name="group_type" context="{'group_by': 'type'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm.crm_stage_action" model="ir.actions.act_window">
+        <field name="name">Stages</field>
+        <field name="res_model">crm.stage</field>
+        <field name="context">{'search_default_group_type': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_meeting_mom_wizard" model="ir.ui.view">
+            <field name="name">Meeting Mom Wizard</field>
+            <field name="model">meeting.mom.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="meeting_agenda_ids" widget="many2many_tags" required="1"/>
+                            <field name="name"/>
+                            <field name="extra_participants"/>
+                            <field name="feedback"/>
+                            <field name="notes"/>
+                        </group>
+                        <group>
+                            <field name="meeting_datetime" readonly="1"/>
+                            <field name="meeting_id" readonly="1"/>
+                            <field name="owner_ids" widget="many2many_tags" readonly="1"/>
+                            <field name="participants_ids" widget="many2many_tags"/>
+                            <field name="mom_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="create_mom" string="Save" type="object" class="btn-info"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

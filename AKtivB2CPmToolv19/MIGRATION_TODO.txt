@@ -1,0 +1,52 @@
+Odoo v17 to v19 migration TODO
+Workspace rule: move an addon folder into /home/odoo/Workspace/v19/my_project/AKtivB2CPmToolv19 only after the addon is actually migrated and basic install/testing is done.
+
+Already present in v19 workspace
+- ak_access_rights
+- ak_crm
+- ak_odoo_days_contest
+- ak_project_todo
+- ak_public_holidays
+- ak_survey
+- helpdesk_extended
+- mail_template_extend
+
+Pending migration
+- aktiv_pms - in progress in staging at /tmp/AKtivB2CPmToolv19_staging/aktiv_pms
+- ak_timesheet_systray
+- ak_customer_portal
+- helpdesk_mgmt
+- auto_backup
+- muk_web_dialog
+- muk_web_colors
+- muk_web_appsbar
+- muk_web_chatter
+- muk_web_theme
+- ak_color_scheme
+- ak_web_theme
+
+Recommended order
+1. aktiv_pms
+2. ak_timesheet_systray
+3. ak_customer_portal
+4. helpdesk_mgmt
+5. auto_backup
+6. muk_web_dialog
+7. muk_web_colors
+8. muk_web_appsbar
+9. muk_web_chatter
+10. muk_web_theme
+11. ak_color_scheme
+12. ak_web_theme
+
+Current working target
+- aktiv_pms
+
+Done criteria before moving a module into v19 workspace
+- Manifest updated to v19.
+- Python imports and ORM/API usage adjusted for v19.
+- Security/data/views load without parse errors.
+- Assets/templates adjusted for v19 web stack where needed.
+- Module dependency chain available in v19.
+- Basic install/upgrade test passes on v19.
+- Core smoke tests from V17_V19_MIGRATION_BASELINE_aktiv_pms.txt pass.

@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="project_todo_tags_action" model="ir.actions.act_window">
+        <field name="name">Tags</field>
+        <field name="res_model">project.tags</field>
+        <field name="domain">[("is_sop_bank", "=", True)]</field>
+        <field name="context">{'sop_bank':True}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No tags found. Let's create one!
+          </p>
+          <p>
+            Use tags to categorize your tasks.
+          </p>
+        </field>
+    </record>
+
+    <record id="project_todo_open_task_type_form" model="ir.actions.act_window">
+        <field name="name">SOP Stages</field>
+        <field name="res_model">project.task.type</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="view_id" ref="ak_project_todo.project_todo_task_type_tree_inherited"/>
+        <field name="domain">[('sop_stage', '=', True)]</field>
+        <field name="context">{'sop_bank':True}</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No stages found. Let's create one!
+          </p><p>
+            Define the steps your tasks move through from creation to completion.
+          </p>
+        </field>
+    </record>
+
+    <menuitem
+        name="Configurations"
+        id="menu_project_todo_config"
+        parent="project_todo.menu_todo_todos"
+        groups="ak_project_todo.sop_bank_admin"
+    />
+
+    <menuitem
+        name="SOP Stages"
+        id="project.menu_project_config_project"
+        action="project_todo_open_task_type_form"
+        parent="menu_project_todo_config"
+    />
+
+    <menuitem
+        name="Tags"
+        id="menu_project_todo_tags_act"
+        parent="menu_project_todo_config"
+        action="project_todo_tags_action"
+    />
+
+    <record id="project_task_view_todo_tree" model="ir.ui.view">
+        <field name="name">project.task.todo.tree</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project_todo.project_task_view_todo_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="create_uid" string="Reported By" />
+                <!-- <field name="personal_stage_type_id" domain="[('sop_stage', '=', True)]" string="Stage"/> -->
+                 <field name="stage_id" domain="[('sop_stage', '=', True)]" string="Stage"/>
+            </xpath>
+            <xpath expr="//field[@name='user_ids']" position="replace">
+            </xpath>
+            <xpath expr="//list" position="attributes">
+                <attribute name="default_group_by"/>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="attributes">
+                <attribute name="domain">[('is_sop_bank', '=', True)]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="project_task_view_todo_form" model="ir.ui.view">
+        <field name="name">project.task.view.todo.form</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project_todo.project_task_view_todo_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='personal_stage_type_id']" position="replace">
+                <field name="stage_id" domain="[('sop_stage', '=', True)]" string="Stage" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" />
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="attributes">
+                <attribute name="domain">[('is_sop_bank', '=', True)]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='description']" position="attributes">
+                <attribute name="options">{'collaborative': false}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="project_task_view_todo_kanban_inherited" model="ir.ui.view">
+        <field name="name">project.task.kanban</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project_todo.project_task_view_todo_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">stage_id</attribute>
+            </xpath>
+            <xpath expr="//templates//field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="project_todo.project_task_action_todo" model="ir.actions.act_window">
+        <field name="name">SOP Bank</field>
+        <field name="domain">[('is_sop_bank', '=', True)]</field>
+        <field name="context">{'sop_bank': True, 'default_is_sop_bank': True, 'form_view_ref': 'ak_project_todo.project_task_view_todo_form', 'list_view_ref': 'ak_project_todo.project_task_view_todo_tree'}</field>
+    </record>
+
+    <record id="project.open_view_project_all" model="ir.actions.act_window">
+        <field name="domain">[('is_sop_bank', '=', False)]</field>
+    </record>
+
+    <menuitem
+        id="project_todo.menu_todo_todos"
+        name="SOP Bank"
+        sequence="15"
+        action="project_todo.project_task_action_todo"
+        groups="ak_project_todo.sop_bank_user"
+        web_icon="project_todo,static/description/icon.png">
+    </menuitem>
+
+</odoo>

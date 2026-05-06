@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="sop_bank_user" model="res.groups">
+        <field name="name">SOP Bank User</field>
+    </record>
+
+     <record id="sop_bank_admin" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('ak_project_todo.sop_bank_user'))]"/>
+        <field name="name">SOP Bank Admin</field>
+    </record>
+
+    <record id="sop_bank_user_access_project" model="ir.rule">
+        <field name="name">SOP Bank User access Project</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">[('is_sop_bank', '=', True)]</field>
+        <field name="groups" eval="[(4, ref('ak_project_todo.sop_bank_user'))]"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="sop_bank_admin_access" model="ir.rule">
+        <field name="name">SOP Bank Admin access</field>
+        <field name="model_id" ref="model_project_task"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('ak_project_todo.sop_bank_admin'))]"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="sop_bank_user_access" model="ir.rule">
+        <field name="name">SOP Bank User access</field>
+        <field name="model_id" ref="model_project_task"/>
+        <field name="domain_force">['|', ('user_ids', '=', user.id), ('message_partner_ids', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('ak_project_todo.sop_bank_user'))]"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

@@ -1,0 +1,291 @@
+.o_main_navbar {
+    // ==========================================================
+    // NORMAL STATE (Inside an App)
+    // Hide grid icon by default, show on hover
+    // ==========================================================
+     .o_navbar_apps_menu {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        max-width: fit-content;
+    }
+    .o_menu_toggle {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        min-width: auto !important;
+        position: relative;
+        display: flex;
+        align-items: center;
+        --NavBar-entry-padding-left: #{$o-horizontal-padding};
+        --NavBar-entry-padding-right: #{$o-horizontal-padding * .5};
+        color: var(--NavBar-menuToggle-color, #{$o-brand-odoo});
+        rect,
+        g {
+            transform-origin: 0 50%;
+            transition: all .2s ease;
+        }
+    }
+    &:not(.o_apps_menu_open) {
+        .o_menu_toggle_has_image {
+            .o_menu_toggle_icon {
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity .2s ease;
+            }
+            &:hover .o_menu_toggle_icon {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    }
+    // ==========================================================
+    // OPEN STATE — controlled by appsmenu.js
+    // ==========================================================
+    &.o_apps_menu_open {
+        .o_menu_sections {
+            display: none !important;
+        }
+        .o_menu_brand_icon,
+        .o_menu_brand {
+            display: none !important;
+        }
+        .o_menu_toggle_has_image {
+            .o_menu_toggle_icon {
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+                margin-right:10px;
+                transition: all 0.3s ease; // Enables smooth morphing
+            }
+        }
+        .o_menu_toggle_icon {
+            height: 15px;
+            width: 15px;
+        }
+        // Morph SVG into "<"
+        rect {
+            width: 6px;
+            height: 3px;
+            rx: 1;
+        }
+        #o_menu_toggle_row_0 {
+            transform: scale3d(.5, 1, 1)
+                       translate(0, 45%)
+                       skewY(-22deg);
+            + g rect {
+                width: 0;
+                height: 0;
+            }
+        }
+        #o_menu_toggle_row_2 {
+            transform: scale3d(.5, 1, 1)
+                       translate(0, -37%)
+                       skewY(22deg);
+        }
+        .o_menu_toggle {
+            transform: translateX(25%) rotateY(-180deg);
+        }
+    }
+    // ==========================================================
+    // Toggle Base Styles
+    // ==========================================================
+    .o_menu_toggle {
+        --NavBar-entry-padding-left: #{$o-horizontal-padding};
+        --NavBar-entry-padding-right: #{$o-horizontal-padding * .5};
+        color: var(--NavBar-menuToggle-color, #{$o-brand-odoo});
+        rect,
+        g {
+            transform-origin: 0 50%;
+        }
+        // JS fallback class
+        &.o_menu_toggle_back {
+            transform: translateX(25%) rotateY(-180deg);
+            rect {
+                width: 6px;
+                height: 3px;
+                rx: 1;
+            }
+            #o_menu_toggle_row_0 {
+                transform: scale3d(.5, 1, 1)
+                           translate(0, 45%)
+                           skewY(-22deg);
+                + g rect {
+                    width: 0;
+                    height: 0;
+                }
+            }
+            #o_menu_toggle_row_2 {
+                transform: scale3d(.5, 1, 1)
+                           translate(0, -37%)
+                           skewY(22deg);
+            }
+        }
+        // ======================================================
+        // Large Screen Animations
+        // ======================================================
+        @include media-breakpoint-up(lg) {
+            &.o_menu_toggle_has_image:not(.o_menu_toggle_back) {
+                .o_main_navbar:not(.o_apps_menu_open) & {
+                    &:hover {
+                        .o_menu_toggle_icon {
+                            opacity: 1;
+                            visibility: visible;
+                        }
+                        .o_menu_brand_icon {
+                            opacity: 0;
+                        }
+                    }
+                }
+            }
+            @media screen and (prefers-reduced-motion: no-preference) {
+                .o_main_navbar:not(.o_apps_menu_open) &:hover {
+                    rect {
+                        width: 6px;
+                        height: 3px;
+                        rx: 1;
+                    }
+                    #o_menu_toggle_row_0 {
+                        transform: scale3d(.5, 1, 1)
+                                   translate(0, 45%)
+                                   skewY(-22deg);
+                        + g rect {
+                            width: 0;
+                            height: 0;
+                        }
+                    }
+                    #o_menu_toggle_row_2 {
+                        transform: scale3d(.5, 1, 1)
+                                   translate(0, -37%)
+                                   skewY(22deg);
+                    }
+                }
+                &,
+                g {
+                    transition: all .3s;
+                }
+                rect {
+                    transition: all .1s;
+                }
+                &.o_menu_toggle_has_image:not(.o_menu_toggle_back) {
+                    .o_main_navbar:not(.o_apps_menu_open) & {
+                        transform: none;
+                        transition: none;
+                        .o_menu_toggle_icon,
+                        .o_menu_brand_icon,
+                        .o_menu_brand {
+                            will-change: transform;
+                            transition: all 0.1s;
+                        }
+                        .o_menu_sections {
+                            display: none;
+                        }
+                        .o_menu_toggle_icon {
+                            transform: translateX(75%);
+                        }
+                        &:hover {
+                            .o_menu_toggle_icon {
+                                transform: translateX(25%);
+                                transition: all .4s;
+                            }
+                            .o_menu_brand_icon {
+                                transform: rotateY(-90deg);
+                                transition: all .2s;
+                            }
+                            .o_menu_brand {
+                                transform: translateX(-#{map-get($spacers, 2)});
+                                transition: all .4s;
+                            }
+                        }
+                    }
+                }
+            }
+            .o_menu_brand_icon {
+                height: 72%;
+                flex-shrink: 0;
+                object-fit: contain;
+                border-radius: 4px;
+            }
+            .o_menu_brand {
+                padding-left: 10px;
+                margin-right:10px;
+                font-size: medium;
+            }
+        }
+    }
+    // Resize grid icon on hover
+    .o_menu_toggle:hover .o_menu_toggle_icon {
+        height: 15px;
+        width: 15px;
+    }
+    .o_navbar_apps_menu .dropdown-toggle {
+        padding: 0 !important;
+    }
+}
+// ============================================================
+// Superuser Fix
+// ============================================================
+body.o_is_superuser .o_menu_systray {
+    border-image-outset: map-get($border-widths, 5);
+}
+// Prevent overflow
+.mk_app_menu {
+    max-height: 100vh !important;
+}
+// Home menu background
+.o_home_menu_background {
+    background: linear-gradient(135deg, red, yellow) !important;
+}
+// ============================================================
+// App Brand Visibility & Hover Morph
+// ============================================================
+.o_main_navbar:not(.o_apps_menu_open) {
+    .o_menu_toggle {
+        // 1. DEFAULT STATE: Show Brand Name and Icon
+        .o_menu_brand_icon,
+        .o_menu_brand {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+            transition: all 0.3s ease;
+            display: inline-block; // Ensure they are visible
+        }
+        // Keep the grid icon hidden initially
+        .o_menu_toggle_icon {
+            opacity: 0;
+            position: absolute;
+            left: 10px;
+            transition: all 0.3s ease;
+        }
+        // 2. HOVER STATE: Swap Brand for the Morphing Arrow
+        &:hover {
+            // Hide the App Name and App Icon
+            .o_menu_brand_icon {
+                opacity: 0;
+                visibility: hidden;
+            }
+            .o_menu_brand {
+                transform: translateX(-15px); // Slide out to the left
+            }
+            // Show the Grid Icon (which then morphs)
+            .o_menu_toggle_icon {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(0);
+            }
+            // --- SVG Morphing Logic to create the "<" ---
+            rect {
+                width: 6px;
+                height: 3px;
+                rx: 1;
+            }
+            #o_menu_toggle_row_0 {
+                transform: scale3d(.5, 1, 1) translate(0, 45%) skewY(-22deg);
+            }
+            #o_menu_toggle_row_1 {
+                opacity: 0; // Hide the middle bar of the grid
+            }
+            #o_menu_toggle_row_2 {
+                transform: scale3d(.5, 1, 1) translate(0, -37%) skewY(22deg);
+            }
+        }
+    }
+}

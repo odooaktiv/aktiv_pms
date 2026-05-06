@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="survey_winner_view_form" model="ir.ui.view">
+		<field name="name">survey_winner_form</field>
+		<field name="model">survey.winner</field>
+		<field name="arch" type="xml">
+			<form string="Register Payment">
+				<footer>
+					<button string="Print" name="action_print_certificate" type="object" class="oe_highlight"
+					        data-hotkey="q"/>
+					<button string="Send Email and Print" name="action_send_survey_winner_email_print" type="object" class="oe_highlight"
+					        data-hotkey="q"/>
+					<button string="Cancel" class="btn btn-secondary" special="cancel" data-hotkey="z"/>
+				</footer>
+			</form>
+		</field>
+	</record>
+</odoo>

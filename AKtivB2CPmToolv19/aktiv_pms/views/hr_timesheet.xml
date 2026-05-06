@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="account_analytic_line_form_view_inherit" model="ir.ui.view">
+            <field name="name">account.analytic.line.form.inherit</field>
+            <field name="model">account.analytic.line</field>
+            <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form/*" position="before">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="approval,approved"/>
+                    </header>
+                </xpath>
+                <xpath expr="//field[@name='unit_amount']" position="after">
+                    <field name="approved_hours" widget="float_time" 
+                    	readonly="state == 'approved'"
+                           force_save="1" invisible="1"/>
+                    <!--    Add QA Timesheet it's Work on "Project QA Group" -->
+                    <field name="qa_timesheet" invisible="1"/>
+                    <field name="data_sync" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_timesheet_search_inherited" model="ir.ui.view">
+            <field name="name">account.analytic.line.select.inherit</field>
+            <field name="model">account.analytic.line</field>
+            <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+            <field eval="2" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search//filter[@name='mine']" position="after">
+                    <separator/>
+					<filter name="status_on_time" string="On Time" domain="[('status','=','on_time')]" groups="project.group_project_manager"/>
+            		<filter name="status_late" string="Late" domain="[('status','=','late')]" groups="project.group_project_manager"/>
+                    <filter string="Pending For Approval" name="pending_for_approval"
+                            domain="[('state', '=', 'approval')]"/>
+                    <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
+                    <filter string="Is Customer Project" name="customer_project"
+                            domain="[('project_id.customer_project', '=', True)]"/>
+                    <filter string="Production Bug" name="production_bug"
+                            domain="[('task_id.bugs_type', '=', 'production_bug')]"/>
+                    <filter string="Staging Bug" name="staging_bug"
+                            domain="[('task_id.bugs_type', '=', 'staging_bug')]"/>
+                    <filter string="Doesnot Remember Parent Task" name="parent_task_false"
+                            domain="[('task_id.dont_remember_parent_task', '=', True)]"/>
+                    <filter string="Bug Parent Task" name="parent_task_bug"
+                            domain="[('task_id.parent_id', '!=', False)]"/>
+                    <separator/>
+                    <filter string="Productive Hours Amends" name="productive_inconsistency"
+                            domain="[('checked', '=', 'True')]"/>
+                    <separator/>
+					<filter name="group_by_status" string="Status" context="{'group_by': 'status'}" groups="project.group_project_manager"/>
+                    <filter string="State" name="groupby_pending_for_approval" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="User Type" name="type_user" context="{'group_by': 'user_type'}"/>
+                    <filter string="QA Timesheet" name="qa_timesheet" domain="[('user_type', '=', 'qa')]"/>
+                    <filter string="Developer Timesheet" name="qa_timesheet" domain="[('user_type', '=', 'dev')]"/>
+                    <filter string="Today" name="today" domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="Yesterday" name="yesterday"
+                            domain="[('date', '=', datetime.datetime.now() - datetime.timedelta(days=1))]"/>
+                    <filter name="start_date_filter" string="This Week" domain="[
+                        ('date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                </xpath>
+                <xpath expr="//search//filter[@name='groupby_employee']" position="after">
+                    <filter name="group_by_data_sync" string="Timesheet Sync" context="{'group_by': 'data_sync'}"/>
+                </xpath>
+            </field>
+        </record>
+
+		<record id="view_account_analytic_line_tree_inherit" model="ir.ui.view">
+			<field name="name">account.analytic.line.tree.inherit</field>
+			<field name="model">account.analytic.line</field>
+			<field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+			<field name="arch" type="xml">
+				<xpath expr="//list//field[@name='unit_amount']" position="after">
+					<field name="team_leader_approval" column_invisible="1"/>
+					<field name="hide_approved_hours" column_invisible="1"/>
+					<field name="effective_hours" widget="float_time" force_save="1" sum="Effective Hours"/>
+					<field name="remaining_hours" widget="float_time"
+						readonly="team_leader_approval == True"
+					 groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_team_leader" sum="Remaining Hours"/>
+					<field name="checked" column_invisible="1" />
+					<field name="approved_hours" force_save="1" widget="float_time"
+					  readonly="state == 'approved' or team_leader_approval == True"
+					  sum="Productive Hours" groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_team_leader"/>
+					<field name="approved_hours_logs" string="Hours Amends" width="6" widget="field_productive_logs" optional="hide" groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_team_leader"/>
+					<field name="efficiency" widget="percentage" groups="project.group_project_manager" optional="show"/>
+					<field name="productivity" widget="percentage" groups="project.group_project_manager" optional="show"/>
+					<field name="utilization_rate" widget="percentage" groups="project.group_project_manager" optional="show"/>
+					<field name="state" readonly="1"/>
+				</xpath>
+				<xpath expr="//list//field[@name='unit_amount']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+				</xpath>
+				<xpath expr="//list//field[@name='employee_id']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+				</xpath>
+				<xpath expr="//list//field[@name='date']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+				</xpath>
+				<xpath expr="//list//field[@name='project_id']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+					<attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+				</xpath>
+				<xpath expr="//list//field[@name='name']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+				</xpath>
+				<xpath expr="//list//field[@name='task_id']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+					<attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+				</xpath>
+				<xpath expr="//list//field[@name='state']" position="before">
+					<field name="user_type" groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_team_leader" />
+				</xpath>
+				<xpath expr="//list//field[@name='state']" position="after">
+					<field name="hide_timesheet_approve_btn" column_invisible="1"/>
+					<field name="show_timesheet_reset_btn" column_invisible="1"/>
+					<field name="last_approver_id" column_invisible="1"/>
+					<button name="timesheet_approved" type='object' string='Approve' class="btn-info" invisible="hide_timesheet_approve_btn" groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_team_leader,aktiv_pms.group_aktiv_project_functional"/>
+					<button name="timesheet_reset" type='object' string='Reset' class="btn-info" invisible="not show_timesheet_reset_btn" groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_team_leader,aktiv_pms.group_aktiv_project_functional"/>
+				</xpath>
+				<xpath expr="//field[@name='state']" position="after">
+					<field name="status" groups="project.group_project_manager" force_save="1" />
+				</xpath>
+				<xpath expr="//field[@name='date']" position="after">
+					<field name="create_date" groups="project.group_project_manager"/>
+				</xpath>
+			</field>
+		</record>
+		<record id="view_account_analytic_line_form_inherit" model="ir.ui.view">
+			<field name="name">account.analytic.line.form.inherit</field>
+			<field name="model">account.analytic.line</field>
+			<field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//form//field[@name='project_id']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+                    <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+				</xpath>
+				<xpath expr="//form//field[@name='name']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+				</xpath>
+				<xpath expr="//form//field[@name='date']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+				</xpath>
+				<xpath expr="//form//field[@name='unit_amount']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+				</xpath>
+				<xpath expr="//form//field[@name='task_id']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+                    <attribute name="required">1</attribute>
+                    <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+				</xpath>
+			</field>
+		</record>
+		<!--        <record id="hr_timesheet.timesheet_action_all" model="ir.actions.act_window">-->
+		<!--            <field name="context">{'search_default_pending_for_approval':1}</field>-->
+		<!--        </record>-->
+		<!--        <record id="hr_timesheet.act_hr_timesheet_line" model="ir.actions.act_window">-->
+		<!--            <field name="context">{'search_default_pending_for_approval':1}</field>-->
+		<!--        </record>-->
+
+        <!-- <record id="hr_timesheet.timesheet_action_all" model="ir.actions.act_window">
+            <field name="context">{'search_default_all_timesheet':1, 'search_default_week':1}</field>
+        </record> -->
+
+        <record id="timesheet_approve_action" model="ir.actions.server">
+            <field name="name">Approve Timesheet</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="hr_timesheet.model_account_analytic_line"/>
+            <field name="state">code</field>
+            <field name="code">
+                records.bulk_timesheet_approved()
+            </field>
+        </record>
+    </data>
+</odoo>

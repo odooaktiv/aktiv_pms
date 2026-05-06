@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<templates xml:space="preserve">
+	<t t-name="ak_web_theme.AppsBar" t-inherit="muk_web_appsbar.AppsBar" t-inherit-mode="extension">
+		<xpath expr="//a" position="attributes">
+			<attribute name="t-att-title">app.name</attribute>
+		</xpath>
+	</t>
+</templates>

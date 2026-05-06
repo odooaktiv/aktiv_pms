@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="aktiv_meeting_form_view" model="ir.ui.view">
+            <field name="name">aktiv.meeting.form.view</field>
+            <field name="model">aktiv.meeting</field>
+            <field name="arch" type="xml">
+                <form delete="false">
+                    <header>
+                        <button string='Add MOM' type='object' name="action_complete" 
+                            invisible="state != 'scheduled'" class="btn-info"/>
+                        <button string='Reschedule' type='object' name="action_reschedule" 
+                            invisible="state not in ('scheduled', 'missed')" class="btn-info"/>
+                        <button string='Cancel' type='object' name="action_cancel" invisible="state not in ('scheduled', 'missed')" class="btn-info"/>
+                        <button string='Reset' type='object' name="action_reset" class="btn-info" invisible="state == 'scheduled'" />
+                        <button string='Update MOM' type='object' name="update_mom" class="btn-info"  invisible="state != 'completed'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="scheduled,rescheduled,missed,completed,cancelled"/>
+                    </header>
+                    <sheet>
+                        <div name="button_box" class="oe_button_box">
+                            <button class="oe_stat_button" type="object" name="mom_view" icon="fa-hospital-o" invisible="state != 'completed'" string="MOM">
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="local_datetime" required="1"/>
+                                <field name="cust_datetime"/>
+                                <field name="meeting_video_url" widget="url"/>
+                                <field name="meeting_cancellation_reason" invisible="state != 'cancelled'"/>
+                            </group>
+                            <group>
+                                <field name ="owner_ids" widget="many2many_tags"/>
+                                <field name ="participants_ids" widget="many2many_tags"/>
+                                <field name ="project_id" invisible="1"/>
+                                <field name ="is_rescheduled" invisible="1"/>
+                                <field name="mom_id" invisible="state != 'completed'" readonly="1"/>
+                                <field name="rescheduled_meeting_ref" invisible="state == 'scheduled'" readonly="1"/>
+                                <field name="origin_meeting_ref" invisible="not is_rescheduled" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="aktiv_meeting_tree_view" model="ir.ui.view">
+            <field name="name">aktiv.meeting.tree.view</field>
+            <field name="model">aktiv.meeting</field>
+            <field name="arch" type="xml">
+                <list default_order='local_datetime' delete="false" decoration-success="state == 'completed'" decoration-danger="state == 'cancelled'" decoration-info="state == 'rescheduled'" decoration-warning="state == 'missed'">
+                    <field name="local_datetime"/>
+                    <field name="state" invisible="1"/>
+                    <field name="cust_datetime"/>
+                    <field name ="owner_ids"/>
+                    <field name ="participants_ids"/>
+                    <field name ="project_id"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="action_aktiv_meeting" model="ir.actions.act_window">
+            <field name="name">Meeting</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">aktiv.meeting</field>
+            <field name="view_mode">list,form</field>
+        </record>
+        <menuitem id="menu_aktiv_meeting" name="Aktiv Meeting" parent="project.menu_project_config" action="action_aktiv_meeting" sequence="11"/>
+    </data>
+</odoo>

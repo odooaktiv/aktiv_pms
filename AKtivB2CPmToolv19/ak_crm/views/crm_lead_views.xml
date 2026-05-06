@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="crm_lead_view_form_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.form.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <!-- pass the ID in lead -->
+            <xpath expr="//form/sheet//div[hasclass('oe_title')]//h1" position="after">
+                <b><field name="id" invisible="type == 'opportunity'"/></b>
+            </xpath>
+
+            <xpath expr="//form/header/button[@name='%(crm.crm_lead_lost_action)d']" position="replace">
+                <button name="%(crm.crm_lead_lost_action)d" string="Lost" data-hotkey="l" title="Mark as lost" type="action" context="{'default_lead_id': id, 'form_view_lead_lost': True}" invisible="type == 'lead' or not active and probability &lt; 100 or stage_name == 'Lost'"/>
+            </xpath>
+
+            <!-- pass the ID in opportunity -->
+            <xpath expr="//form/sheet//div[hasclass('oe_title')]//h1" position="after">
+                <b><field name="id" invisible="type == 'lead'"/></b>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="crm_stage_type_id" invisible="1"/>
+                <field name="consultant_ids" widget="many2many_tags" invisible="type == 'lead'" />
+            </xpath>
+            <xpath expr="//field[@name='stage_id']" position="attributes">
+                <attribute name="domain">['|', ('team_ids', '=', False), ('team_ids', 'in', [team_id]), ('type', 'in', [crm_stage_type_id])]</attribute>
+                <attribute name="invisible">not active</attribute>
+                <attribute name="context">{'form_lost_stage':True}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='lead_priority']//field[@name='tag_ids']" position="after" invisible="type == 'opportunity'">
+                <field name="linkedin_page" widget="url" />
+                <field name="linkedin_profile" widget="url"/>
+                <field name="linkedin_id" invisible="1"/>
+                <field name="no_of_employees"/>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="after" invisible="type == 'type'">
+                <field name="linkedin_id" invisible="1"/>
+                <field name="linkedin_page" widget="url"/>
+                <field name="linkedin_profile" widget="url"/>
+                <field name="no_of_employees"/>
+            </xpath>
+            <xpath expr="//page[@name='extra']//group//group[3]" position="after">
+                <group string="Lead/Opportunity Information">
+                    <field name="lead_type" required="1"/>
+                    <field name="technology_ids" widget="many2many_tags" options="{'no_create_edit': True,  'no_create':True}"/>
+                    <field name="partnership_level" invisible="lead_type != 'b2b_inbound'"/>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='extra']"
+            position="after">
+                 <page string="Odoo Information">
+                     <group>
+                        <group>
+                             <field name="customer_using_odoo"/>
+                             <field name="odoo_version_ids" widget="many2many_tags" options="{'no_create_edit': True,  'no_create':True}"  invisible="customer_using_odoo != 'yes'"/>
+                             <field name="odoo_edition" invisible="customer_using_odoo != 'yes'"/>
+                        </group>
+                     </group>
+                 </page>
+            </xpath>
+
+            <xpath expr="//page[@name='extra']//group//group[@name='categorization']//field[@name='referred']" position="after">
+                <field name="fetched_from" readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']"
+                   position="after">
+                <field name="incoming_server_id" invisible="1"/>
+            </xpath>
+
+            <!-- Lead Page String -->
+            <xpath expr="//page[@name='extra']" position="attributes">
+                <attribute name="string">General Information</attribute>
+            </xpath>
+
+            <!-- Opportunity Page String -->
+
+            <xpath expr="//page[@name='lead']" position="replace"/>
+            <xpath expr="//page[@name='internal_notes']" position="after">
+                <page name="lead" string="General Information" invisible="type == 'lead'">
+                    <group>
+                        <group string="Contact Information">
+                            <field name="partner_name"/>
+                            <label for="street_page_lead" string="Address"/>
+                            <div class="o_address_format">
+                                <field name="street" id="street_page_lead" placeholder="Street..." class="o_address_street"/>
+                                <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                <field name="city" placeholder="City" class="o_address_city"/>
+                                <field name="state_id" class="o_address_state" placeholder="State" options='{"no_open": True}'/>
+                                <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                                <field name="country_id" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+                            </div>
+                            <field name="website" widget="url" placeholder="e.g. https://www.odoo.com"/>
+                            <field name="lang_id" options="{'no_create': True}"/>
+                        </group>
+                        <group class="mt48">
+                            <label for="contact_name_page_lead"/>
+                            <div class="o_row">
+                                <field name="contact_name" id="contact_name_page_lead"/>
+                            </div>
+                            <field name="function"/>
+                            <label for="phone_page_lead" class="oe_inline"/>
+                            <div class="o_row o_row_readonly">
+                                <button name="phone_action_blacklist_remove" class="fa fa-ban text-danger"
+                                    title="This phone number is blacklisted for SMS Marketing. Click to unblacklist."
+                                    type="object" context="{'default_phone': phone}" groups="base.group_user" invisible="phone_blacklisted == False"
+                                    />
+                                <field name="phone" id="phone_page_lead" widget="phone"/>
+                            </div>
+                        </group>
+                        <group string="Marketing">
+                            <field name="campaign_id" />
+                            <field name="medium_id" />
+                            <field name="source_id" />
+                        </group>
+                        <group string="Misc" name="Misc">
+                            <field name="day_open" groups="base.group_no_one"/>
+                            <field name="day_close" groups="base.group_no_one"/>
+                            <field name="referred"/>
+                            <field name="fetched_from" readonly="1"/>
+                            <field name="type" invisible="1"/>
+                        </group>
+                        <group string="Lead/Opportunity Information">
+                            <field name="lead_type" required="1"/>
+                            <field name="technology_ids" widget="many2many_tags" options="{'no_create_edit': True,  'no_create':True}"/>
+                            <field name="partnership_level" invisible="lead_type != 'b2b_inbound'"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <xpath expr="//field[@name='team_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='lost_reason_id']" position="replace">
+                <field name="stage_name" invisible="1"/>
+                <field name="lost_reason_id" invisible="stage_name != 'Lost' and active == True"/>
+            </xpath>
+
+            <xpath expr="//form//sheet//widget[1]" position="replace">
+                <widget name="web_ribbon" title="Lost" bg_color="bg-danger" invisible="stage_name != 'Lost' and active == True"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_crm_case_opportunities_filter_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.search.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='assigned_to_me']" position="attributes">
+                <attribute name="domain">['|', ('user_id', '=', uid), ('consultant_ids', 'in', uid)]</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_won_status_lost']" position="replace">
+                <filter string="Lost" name="filter_won_status_lost" domain="[('stage_id', '=', %(ak_crm.stage_lost)d)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Filter and Group by -->
+    <record id="view_crm_case_leads_filter_inherit" model="ir.ui.view">
+        <field name="name">view.crm.case.leads.filter.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/field[@name='name']" position="after">
+                <field name="fetched_from" string="Fetched From" filter_domain="[('fetched_from', 'ilike', self)]"/>
+            </xpath>
+            <xpath expr="//filter[@name='date_closed']" position="after">
+                <filter string="Fetched From" name="fetched_from" context="{'group_by':'fetched_from'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_case_tree_view_leads_inherit" model="ir.ui.view">
+        <field name="name">crm.case.tree.view.leads.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="fetched_from" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_case_kanban_view_leads_inherit" model="ir.ui.view">
+        <field name="name">crm.case.kanban.view.leads.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban/field[@name='stage_id']" position="attributes">
+                <attribute name="context">{'kanban_lost_stage':True}</attribute>
+            </xpath>
+            <xpath expr="//kanban//field[@name='color']" position="after">
+                <field name="stage_name"/>
+                <field name="lost_reason_id"/>
+            </xpath>
+
+            <xpath expr="//kanban//templates//t[@t-name='card']/widget[@name='web_ribbon' and @id='lost_ribbon']" position="replace">
+                <widget name="web_ribbon" id="lost_ribbon" title="Lost" bg_color="text-bg-danger" invisible="stage_name != 'Lost' and active == True"/>
+            </xpath>
+            <xpath expr="//kanban//templates//t[@t-name='menu']/div[@role='separator']" position="before">
+                <t>
+                    <a role="menuitem" name="action_lead_lost" type="object" class="dropdown-item" context="{'kanban_view_lead_lost': True}" invisible="stage_name == 'Lost'">Mark as Lost</a>
+                </t>
+            </xpath>
+        </field>
+    </record>
+</odoo>

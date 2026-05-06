@@ -1,0 +1,43 @@
+.sub_task_count {
+         text-align: left;
+        background-color: #ebebeb;
+        border-radius: 0px;
+        padding: 7px;
+}
+tr.sub_task_details:hover {
+        background-color: #DEE2E6;
+        color: #212529;
+}
+
+.bug_task_count {
+    margin-left: 10px !important;
+    max-width: 20% !important;
+    height: 100px !important;
+    margin-top: 50px !important;
+}
+.bug_solved {
+    color: green;
+    margin-top: 25px;
+}
+.bug_unsolved {
+    color: grey;
+    margin-top: 25px;
+}
+#wrapwrap.o_portal {
+    background-color: white !important;
+}
+#projects_data:hover {
+        background-color: #DEE2E6;
+        color: #212529;
+        text-decoration: none !important;
+}
+.timesheet-all:hover {
+    text-decoration: none !important;
+}
+.timesheet-summary:hover {
+    text-decoration: none !important;
+}
+.project_overview{
+    padding-top: 12px;
+    padding-bottom: 12px;
+}

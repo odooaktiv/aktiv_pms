@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="contest_certificate_report" model="ir.actions.report">
+		<field name="name">Contest Certificate</field>
+		<field name="model">survey.user_input</field>
+		<field name="report_type">qweb-pdf</field>
+		<field name="binding_model_id" ref="model_survey_user_input"/>
+        <field name="binding_type">report</field>
+		<field name="report_name">ak_survey.contest_certificate_report_view</field>
+		<field name="report_file">ak_survey.contest_certificate_report_view</field>
+		<field name="paperformat_id" ref="ak_survey.paperformat_certificate"/>
+	</record>
+</odoo>

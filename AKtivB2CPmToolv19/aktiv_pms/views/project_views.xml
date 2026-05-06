@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="project.menu_project_config" name="Configuration"
+              parent="project.menu_main_pm"
+              sequence="100"
+              groups="aktiv_pms.group_aktiv_project_manager,project.group_project_manager"/>
+    <menuitem id="project.menu_project_config_project" active="False"/>
+    <menuitem id="project.project_menu_config_activity_type" active="False"/>
+
+    <record id="view_project_tree" model="ir.ui.view">
+        <field name="name">project.project.tree.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="team_leader_ids" widget="many2many_tags"/>
+            </xpath>
+            <xpath expr="//field[@name='last_update_status']" position="after">
+                <field name="development_hours" optional="hide"
+                    groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"/>
+                <field name="consulting_hours" optional="hide"
+                    groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"/>
+                <field name="init_hours"
+                       groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager" string="Purchase Hours"/>
+                <field name="remaining_hours" string="Total Remaining Approval Hours"/>
+                       <!-- groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager" -->
+
+                <field name="total_timesheet_time" string="Total Invested Hours" optional="hide"
+                       groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"/>
+                <field name="total_planned_hours" optional="hide"
+                       groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"/>
+            </xpath>
+            <xpath expr="//field[@name='stage_id']" position="attributes">
+                <attribute name="groups">
+                    project.group_project_manager,aktiv_pms.group_aktiv_project_manager
+                </attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_start']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='last_update_status']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="string">Project Lead</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="groups">
+                    project.group_project_manager,aktiv_pms.group_aktiv_project_manager
+                </attribute>
+            </xpath>
+            <xpath expr="//list" position="attributes">
+                <attribute name="decoration-danger">remaining_hours &lt; 0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="edit_project_form" model="ir.ui.view">
+        <field name="name">project.project.form.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="customer_project"/>
+                <!-- If Deployment Type is Task Wise Go Live Date will be invisible -->
+                <field name="deployment_type"/>
+                <field name="go_live_date"
+                 invisible="deployment_type == 'task_wise'" />
+            </xpath>
+
+            <xpath expr="//header" position="inside">
+                <button name="sync_project" string="Create B2B Project" type="object"
+                        invisible="is_project_create == True"
+                        groups="aktiv_pms.group_aktiv_project_manager"/>
+            </xpath>
+
+           
+            <!-- Display Testcases Field : If checked, display task testcases on portal -->
+            <xpath expr="//group[@name='group_tasks_managment']" position="after">
+                <group name="group_display_testcases" string="Display Testcases" col="1" class="row mt16 o_settings_container" groups="aktiv_pms.group_aktiv_project_manager">
+                    <div>
+                        <setting class="col-lg-12" id="display_testcases_setting" help="Display testcases on portal">
+                            <field name="display_testcases"/>
+                        </setting>
+                    </div>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='date_start']" position="replace">
+                <field name="date_start" required="1"/>
+            </xpath>
+
+            <xpath expr="//page[@name='description']" position="after">
+                <page name="project_info" string="Project Information"
+                      groups="aktiv_pms.group_aktiv_project_manager,project.group_project_manager,aktiv_pms.group_aktiv_project_team_leader">
+                    <group>
+                        <field name="developer_ids" options="{'no_open': True}"
+                               widget="many2many_avatar_user"/>
+                        <field name="code_reviewer_ids" options="{'no_open': True}"
+                               widget="many2many_avatar_user"/>
+                        <field name="team_leader_ids" options="{'no_open': True}"
+                               widget="many2many_avatar_user"/>
+                        <field name="task_qa_ids" options="{'no_open': True}"
+                               widget="many2many_avatar_user"/>
+                        <field name="consultant_ids" options="{'no_open': True}"
+                               widget="many2many_avatar_user"/>
+                    </group>
+                    <group>
+                        <field name="basic_info_doc" widget="pdf_viewer"
+                               filename="basic_info_filename"
+                               required="1" />
+                        <field name="is_project_create" invisible="1"/>
+                        <field name="basic_info_filename" invisible="1"/>
+                        <field name="migration_doc" filename="migration_filename"/>
+                        <field name="migration_filename" invisible="1"/>
+                    </group>
+                </page>
+                <page name="communication_plan" string="Schedule Meetings">
+                    <group>
+                        <group>
+                            <field name="communication_tool_id"
+                                   widget="many2many_tags"/>
+                            <label for="frequency"/>
+                            <div class="o_row">
+                                <field name="frequency" nolabel="1"/>
+                            </div>
+                            <field name="month_weekdays_ids" widget='many2many_tags'
+                                   invisible="frequency not in ('weekly', 'byweekly')"
+                                   required="frequency in ('weekly', 'byweekly')"
+                                   options="{'no_create': True, 'no_create_edit':True}"/>
+                            <field name="month_dates_id"
+                                    invisible="frequency != 'monthly'"
+                                    required="frequency == 'monthly'"
+                                    options="{'no_create': True, 'no_create_edit':True}"/>
+                        </group>
+                        <group>
+                            <field name="generate_meeting_from"/>
+                            <label for="generate_meeting_until"/>
+                            <div class="o_row">
+                                <field name="generate_meeting_until" nolabel="1"/>
+                                <field name="generate_meeting_frequency" nolabel="1"/>
+                            </div>
+                        </group>
+                    </group>
+                    <button name="action_generate_meetings" type="object"
+                            class="oe_highlight" string="Generate Meetings"
+                            style="margin-bottom: 10px;"
+                            invisible="not frequency or not generate_meeting_from or not generate_meeting_frequency"
+                            groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"
+                            context="{'for_generate':True}"/>
+
+                    <field name="meeting_line">
+                        <list decoration-success="state == 'completed'"
+                              decoration-danger="state == 'cancelled'"
+                              decoration-info="state == 'rescheduled'"
+                              decoration-warning="state == 'missed'"
+                              default_order='local_datetime'>
+                            <field name="local_datetime"/>
+                            <field name="cust_datetime"/>
+                            <field name="owner_ids" widget="many2many_tags"/>
+                            <field name="participants_ids" widget="many2many_tags"/>
+                            <field name="rescheduled_meeting_ref" invisible="1"/>
+                            <field name="state"/>
+                            <button name="add_mom" string="Add MOM" type="object"
+                                    class="oe_highlight"
+                                    invisible="state != 'scheduled'"
+                                    groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"/>
+                            <button name="update_mom" string="Update MOM" type="object"
+                                    class="oe_highlight"
+                                    invisible="state != 'completed'"
+                                    groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"/>
+                            <button type="object" name="mom_view"
+                                    invisible="state != 'completed'"
+                                    string="MOM" class="oe_highlight"
+                                    groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager">
+                            </button>
+                        </list>
+                    </field>
+                </page>
+                <page name="support_pack" string="Support Packs"
+                      groups="aktiv_pms.group_aktiv_project_manager,project.group_project_manager">
+                    <field name="support_pack_lines" mode="list">
+                        <list string="Support Packs" editable="bottom">
+                            <field name="name" required="1"/>
+                            <field name="start_date" string="Date"/>
+                            <field name="planned_hours" required="1"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+
+            <!-- v17 had xpaths restricting project_share_wizard_action and project_collaborator_action
+                 buttons to manager groups. project_share_wizard_action still exists in v19 (project module),
+                 but project_collaborator_action was removed in v19. Block preserved as v17 reference;
+                 the printf-style xmlid lookup syntax has been escaped (double-percent) so Odoo's
+                 xmlid preprocessor does not try to resolve the missing action.
+            <xpath expr="//button[@name='%%(project.project_share_wizard_action)d']" position="attributes">
+                <attribute name="groups">aktiv_pms.group_aktiv_project_manager,project.group_project_manager
+                </attribute>
+            </xpath>
+            <xpath expr="//button[@name='%%(project.project_collaborator_action)d']" position="attributes">
+                <attribute name="groups">aktiv_pms.group_aktiv_project_manager,project.group_project_manager
+                </attribute>
+            </xpath>
+            -->
+
+            <!-- <xpath expr="//page[@name='settings']" position="attributes">
+                <attribute name="groups">project.group_project_manager,aktiv_pms.group_aktiv_project_manager
+                </attribute>
+            </xpath> -->
+
+            <!-- Added New Page for Credentials in Project -->
+            <xpath expr="//page[@name='settings']" position="after">
+                <page name="credentials" string="Credentials">
+                    <group>
+                        <group>
+                            <field name="url" widget="url"/>
+                            <field name="username"/>
+                            <field name="password"/>
+                            <field name="commit_token"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+<!-- 
+            <xpath expr="//field[@name='analytic_account_id']" position="attributes">
+                <attribute name="groups">aktiv_pms.group_aktiv_project_manager,project.group_project_manager</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="groups">aktiv_pms.group_aktiv_project_manager,project.group_project_manager</attribute>
+            </xpath> -->
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="init_hours"/>
+                <field name="version" required="1"/>
+            </xpath>
+
+            <xpath expr="//button[@name='project_update_all_action']"
+                   position="replace">
+                <button class="oe_stat_button" type="object"
+                        name="action_open_tasks_based_on_type" icon="fa-cogs"
+                        context="{'display_only_customization_task': True}">
+                        <div class="o_stat_info">
+                            <field string="Development" name="customization_task_count"
+                           widget="statinfo"/>
+                       </div>
+                </button>
+                <button class="oe_stat_button" type="object"
+                        name="action_open_tasks_based_on_type" icon="fa-comments-o"
+                        context="{'display_only_consulting_task': True}">
+                        <div class="o_stat_info">
+                            <field string="Consulting" name="consulting_task_count"
+                           widget="statinfo"/>
+                       </div>
+                </button>
+            </xpath>
+
+            <!-- v17 field name "analytic_account_id" on project.project was renamed to "account_id" in v19. -->
+            <xpath expr="//field[@name='account_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- v17 replaced project's "group_documents_analytics" group with a custom rating UI
+                 (allow_rating, rating_active, rating_status, rating_status_period) on the project form.
+                 In v19 those rating fields were moved off project.project to project.task.type (stage):
+                 the project base form no longer has a "group_documents_analytics" group, and
+                 allow_rating no longer exists as a project field. Block preserved as v17 reference.
+            <xpath expr="//group[@name='group_documents_analytics']"
+                   position="replace">
+                    <group name="group_documents_analytics" string="Analytics" col="1" class="row mt16 o_settings_container" invisible="not allow_rating">
+                        <div>
+                            <field name="allow_rating" invisible="1"/>
+                            <setting class="col-lg-12" name="analytic_div" help="Get customer feedback and evaluate the performance of your employees" groups="project.group_project_rating">
+                                <field name="rating_active"/>
+                                <div class="mt16" invisible="not rating_active">
+                                    <span class="text-muted o_row ps-1 pb-3">Send a rating request:</span>
+                                    <field name="rating_status" widget="radio" class="o_row"/>
+                                    <div  invisible="rating_status != 'periodic'"  required="rating_status == 'periodic'">
+                                        <label for="rating_status_period" string="Frequency"/>
+                                        <field class="mx-3 w-auto" name="rating_status_period"/>
+                                    </div>
+                                </div>
+                            </setting>
+                        </div>
+                    </group>
+            </xpath>
+            -->
+
+            <xpath expr="//field[@name='label_tasks']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+             <xpath expr="//field[@name='user_id']" position="replace">
+                <field name="user_id" string="Project Lead"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="project_owner_ids" widget="many2many_tags" string="Project Stackholders"/>
+                <field name="customer_success_manager_id"/>
+            </xpath>
+
+            <xpath expr="//group[@name='group_time_managment']" position="inside">
+                    <setting id="allow_effective_as_invested_hours" groups="project.group_project_manager" string="Allow Effective same as Invested" help="Timesheet Effective Hours will mirror Invested Hours (unit_amount).">
+                        <field name="allow_effective_as_invested_hours"/>
+                    </setting>
+                </xpath>
+        </field>
+    </record>
+
+    <record id="project_invoice_form_custom" model="ir.ui.view">
+        <field name="name">Custom Project Form: Hide Allocated Hours</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="hr_timesheet.project_invoice_form"/>
+        <field name="priority">25</field>
+        <field name="arch" type="xml">
+            <!-- Hide the allocated_hours field -->
+            <xpath expr="//field[@name='allocated_hours']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="project.open_view_project_all_group_stage"
+            model="ir.actions.act_window">
+        <field name="context">{'search_default_groupby_stage': 0}</field>
+    </record>
+
+    <record id="project.open_view_project_all" model="ir.actions.act_window">
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="project.open_view_project_all_group_stage"
+            model="ir.actions.act_window">
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="project.open_view_task_list_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+    </record>
+
+    <record id="project.open_view_task_list_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="0"/>
+    </record>
+
+    <record id="view_project_search_inherit" model="ir.ui.view">
+        <field name="name">project.project.search.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_project_filter"/>
+        <field name="arch" type="xml">
+            <filter name="status" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </filter>
+            <xpath expr="//filter[@name='own_projects']" position="after">
+                <filter string="Customer Project" name="customer_project" domain="[('customer_project', '=', True)]"/>
+            </xpath>
+
+            <xpath expr="//group/filter[@name='Manager']" position="attributes">
+                <attribute name="string">Project Lead</attribute>
+            </xpath>
+            <xpath expr="//group/filter[@name='Manager']" position="after">
+                <filter name="group_by_team_leader_ids" string="Lead Engineer" context="{'group_by': 'team_leader_ids'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_update_subtasks_states" model="ir.actions.server" >
+        <field name="name">Mark All task Done/Cancelled</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_update_subtasks_states()
+        </field>
+    </record>
+
+    <record id="action_update_b2b_team_members" model="ir.actions.server" >
+        <field name="name">Update B2B Team Members</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="state">code</field>
+        <field name="code">
+            records.update_b2b_team_members()
+        </field>
+        <field name="binding_model_id" ref="project.model_project_project"/>
+        <field name="binding_type">action</field>
+        <field name="group_ids" eval="[(4, ref('project.group_project_manager'))]"/>
+    </record>
+
+    <!-- <record id="res_config_settings_view_form_extend" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.project.extend</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="project.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='track_customer_satisfaction_setting']/div[hasclass('content-group')]"
+                   position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//setting[@id='project_stages']"
+                   position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record> -->
+
+    <record id="view_timesheet_line_form_effective_inherit" model="ir.ui.view">
+      <field name="name">account.analytic.line.form.effective.inherit</field>
+      <field name="model">account.analytic.line</field>
+      <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='unit_amount']" position="after">
+          <field name="effective_hours" invisible="1"/>
+        </xpath>
+      </field>
+    </record>
+</odoo>

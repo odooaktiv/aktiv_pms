@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data noupdate="1">
+		<!--base mode colors-->
+		<record id="pallet_01" model="colour.scheme.pallet">
+			<field name="name">Royal</field>
+			<field name="header_color">#03172F</field>
+			<field name="header_color_font">#EEEEEE</field>
+			<field name="primary_color">#D7B030</field>
+			<field name="primary_color_font">#093657</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#062844</field>
+			<field name="secondary_color_font">#EFD466</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">light</field>
+		</record>
+		<record id="pallet_02" model="colour.scheme.pallet">
+			<field name="name">Professional</field>
+			<field name="header_color">#2f4550</field>
+			<field name="header_color_font">#D9D9D9</field>
+			<field name="primary_color">#586f7c</field>
+			<field name="primary_color_font">#FFFFFF</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#D9D9D9</field>
+			<field name="secondary_color_font">#353535</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">light</field>
+		</record>
+		<record id="pallet_03" model="colour.scheme.pallet">
+			<field name="name">Black &amp; Yellow</field>
+			<field name="header_color">#FFD027</field>
+			<field name="header_color_font">#000000</field>
+			<field name="primary_color">#1F2A2D</field>
+			<field name="primary_color_font">#FFFFFF</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#DCE6E8</field>
+			<field name="secondary_color_font">#000000</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">light</field>
+		</record>
+		<record id="pallet_04" model="colour.scheme.pallet">
+			<field name="name">Halloween</field>
+			<field name="header_color">#242423</field>
+			<field name="header_color_font">#CFDBD5</field>
+			<field name="primary_color">#FF7247</field>
+			<field name="primary_color_font">#E8EDDF</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#333533</field>
+			<field name="secondary_color_font">#F5CB5C</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">light</field>
+		</record>
+		<record id="pallet_05" model="colour.scheme.pallet">
+			<field name="name">Vintage</field>
+			<field name="header_color">#343A40</field>
+			<field name="header_color_font">#DEE2E6</field>
+			<field name="primary_color">#495057</field>
+			<field name="primary_color_font">#E9ECEF</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#6C757D</field>
+			<field name="secondary_color_font">#F8F9FA</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">light</field>
+		</record>
+		<record id="pallet_06" model="colour.scheme.pallet">
+			<field name="name">Ocean</field>
+			<field name="header_color">#0080AA</field>
+			<field name="header_color_font">#FFFFFF</field>
+			<field name="primary_color">#1f7a8c</field>
+			<field name="primary_color_font">#DCE6E8</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#bfdbf7</field>
+			<field name="secondary_color_font">#1F2A2D</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">light</field>
+		</record>
+		<record id="pallet_07" model="colour.scheme.pallet">
+			<field name="name">Red</field>
+			<field name="header_color">#780000</field>
+			<field name="header_color_font">#FDF0D5</field>
+			<field name="primary_color">#003049</field>
+			<field name="primary_color_font">#FFFFFF</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#C1121F</field>
+			<field name="secondary_color_font">#FFFFFF</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">light</field>
+		</record>
+		<record id="pallet_08" model="colour.scheme.pallet">
+			<field name="name">Wood</field>
+			<field name="header_color">#5E503F</field>
+			<field name="header_color_font">#F9F5F3</field>
+			<field name="primary_color">#422C22</field>
+			<field name="primary_color_font">#F0E5E1</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#A9927D</field>
+			<field name="secondary_color_font">#0A0908</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">light</field>
+		</record>
+
+		<!--dark mode colors-->
+		<record id="dark_pallet_01" model="colour.scheme.pallet">
+			<field name="name">Royal (Dark)</field>
+			<field name="header_color">#03172F</field>
+			<field name="header_color_font">#FFF7B6</field>
+			<field name="primary_color">#093657</field>
+			<field name="primary_color_font">#D7B030</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#EFD466</field>
+			<field name="secondary_color_font">#062844</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">dark</field>
+
+		</record>
+		<record id="dark_pallet_02" model="colour.scheme.pallet">
+			<field name="name">Red &amp; White (Dark)</field>
+			<field name="header_color">#DDDDDD</field>
+			<field name="header_color_font">#222831</field>
+			<field name="primary_color">#F05454</field>
+			<field name="primary_color_font">#EEEEEE</field>
+			<field name="darker_primary">False</field>
+			<field name="secondary_color">#30475E</field>
+			<field name="secondary_color_font">#FDFDFD</field>
+			<field name="darker_secondary">False</field>
+			<field name="show_pallet_mode">dark</field>
+
+		</record>
+		<record id="dark_pallet_03" model="colour.scheme.pallet">
+			<field name="name">Professional (Dark)</field>
+			<field name="header_color">#27374D</field>
+			<field name="header_color_font">#9DB2BF</field>
+			<field name="primary_color">#526D82</field>
+			<field name="primary_color_font">#DDE6ED</field>
+			<field name="darker_primary">False</field>
+			<field name="secondary_color">#9DB2BF</field>
+			<field name="secondary_color_font">#636363</field>
+			<field name="darker_secondary">False</field>
+			<field name="show_pallet_mode">dark</field>
+
+		</record>
+		<record id="dark_pallet_04" model="colour.scheme.pallet">
+			<field name="name">Halloween (Dark)</field>
+			<field name="header_color">#333533</field>
+			<field name="header_color_font">#F5CB5C</field>
+			<field name="primary_color">#CFDBD5</field>
+			<field name="primary_color_font">#FF7247</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#242423</field>
+			<field name="secondary_color_font">#E8EDDF</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">dark</field>
+
+		</record>
+		<record id="dark_pallet_05" model="colour.scheme.pallet">
+			<field name="name">Red (Dark)</field>
+			<field name="header_color">#780000</field>
+			<field name="header_color_font">#FDF0D5</field>
+			<field name="primary_color">#800F2F</field>
+			<field name="primary_color_font">#FFF0F3</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#FFFFFF</field>
+			<field name="secondary_color_font">#C1121F</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">dark</field>
+
+		</record>
+		<record id="dark_pallet_06" model="colour.scheme.pallet">
+			<field name="name">Eclipse (Dark)</field>
+			<field name="header_color">#191919</field>
+			<field name="header_color_font">#FF792E</field>
+			<field name="primary_color">#464545</field>
+			<field name="primary_color_font">#FF7518</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#2F2F2F</field>
+			<field name="secondary_color_font">#FFAB3B</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">dark</field>
+
+		</record>
+		<record id="dark_pallet_07" model="colour.scheme.pallet">
+			<field name="name">Blue (Dark)</field>
+			<field name="header_color">#04293A</field>
+			<field name="header_color_font">#EEEEEE</field>
+			<field name="primary_color">#064663</field>
+			<field name="primary_color_font">#FEFEFE</field>
+			<field name="darker_primary">True</field>
+			<field name="secondary_color">#ECB365</field>
+			<field name="secondary_color_font">#555555</field>
+			<field name="darker_secondary">True</field>
+			<field name="show_pallet_mode">dark</field>
+		</record>
+	</data>
+</odoo>

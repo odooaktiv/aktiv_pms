@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="survey_user_input_view_form_inherit" model="ir.ui.view">
+		<field name="name">survey_user_input_form_inherit</field>
+		<field name="model">survey.user_input</field>
+		<field name="inherit_id" ref="survey.survey_user_input_view_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//field[@name='deadline']" position="after">
+				<field name="is_winner"/>
+			</xpath>
+		</field>
+	</record>
+
+	<record id="survey_user_input_view_tree_inherit" model="ir.ui.view">
+		<field name="name">survey.user.input.view.tree.inherit.</field>
+		<field name="model">survey.user_input</field>
+		<field name="inherit_id" ref="survey.survey_user_input_view_tree"/>
+		<field name="arch" type="xml">
+			<xpath expr="//field[@name='state']" position="after">
+				<field name="is_winner" invisible="1"/>
+			</xpath>
+			<xpath expr="//list" position="attributes">
+				<attribute name="decoration-success">is_winner == True</attribute>
+			</xpath>
+			<xpath expr="//list" position="inside">
+				<header>
+					<button name="action_declare_winner" type="object" string="Declare Winner" class="oe_highlight"/>
+				</header>
+			</xpath>
+		</field>
+	</record>
+</odoo>

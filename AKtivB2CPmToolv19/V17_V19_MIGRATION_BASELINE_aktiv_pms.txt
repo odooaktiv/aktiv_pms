@@ -1,0 +1,631 @@
+V17 to V19 migration baseline
+Source addons path: /home/odoo/Workspace/v17/my_project/Aktiv_B2C_PMTool/aktiv_pms
+Target addons path: /home/odoo/Workspace/v19/my_project/AKtivB2CPmToolv19
+Prepared on: 2026-04-27
+
+Current v17 addon list
+- ak_access_rights
+- ak_color_scheme
+- ak_crm
+- ak_customer_portal
+- ak_odoo_days_contest
+- ak_project_todo
+- ak_public_holidays
+- ak_survey
+- ak_timesheet_systray
+- ak_web_theme
+- aktiv_pms
+- auto_backup
+- helpdesk_extended
+- helpdesk_mgmt
+- mail_template_extend
+- muk_web_appsbar
+- muk_web_chatter
+- muk_web_colors
+- muk_web_dialog
+- muk_web_theme
+
+Current v19 addon list already present
+- ak_access_rights
+- ak_crm
+- ak_odoo_days_contest
+- ak_project_todo
+- ak_public_holidays
+- ak_survey
+- helpdesk_extended
+- mail_template_extend
+
+Not yet present in v19
+- ak_color_scheme
+- ak_customer_portal
+- ak_timesheet_systray
+- ak_web_theme
+- aktiv_pms
+- auto_backup
+- helpdesk_mgmt
+- muk_web_appsbar
+- muk_web_chatter
+- muk_web_colors
+- muk_web_dialog
+- muk_web_theme
+
+Recommended migration order from dependency view
+1. Verify already ported base modules: mail_template_extend, helpdesk_extended, ak_public_holidays, ak_crm.
+2. Migrate aktiv_pms next because ak_customer_portal and ak_timesheet_systray depend on it.
+3. Migrate ak_timesheet_systray and ak_customer_portal after aktiv_pms.
+4. Migrate helpdesk_mgmt, then validate helpdesk_extended against it if needed.
+5. Migrate web theme chain in this order: muk_web_dialog, muk_web_colors, muk_web_appsbar, muk_web_chatter, muk_web_theme, ak_color_scheme, ak_web_theme.
+6. Migrate auto_backup as an isolated utility module.
+7. Validate ak_odoo_days_contest, ak_survey, ak_project_todo against their v19 external dependencies.
+
+High-risk dependency notes
+- aktiv_pms depends on project, hr_timesheet, analytic, ak_crm, ak_public_holidays.
+- ak_customer_portal depends on project, website, aktiv_pms, hr_timesheet, auth_signup.
+- ak_timesheet_systray depends on web, analytic, aktiv_pms.
+- ak_web_theme depends on muk_web_theme and ak_color_scheme.
+- muk_web_theme depends on muk_web_chatter, muk_web_dialog, muk_web_appsbar, muk_web_colors.
+- ak_project_todo depends on external module project_todo. Confirm v19 availability before testing.
+- ak_survey depends on ak_odoo_days_contest.
+
+Per-module functionality and test checklist
+
+================================================================
+MODULE: ak_access_rights
+Status in v19: present, verify
+Depends: crm, mail
+Key files
+- __manifest__.py
+- models/outgoing_mail.py
+- security/outgoing_security.xml
+- views/outgoing_mail.xml
+Functionality
+- Extends outgoing mail server model ir.mail_server with custom SMTP user and password fields.
+- Adds CRM-root menu entry for outgoing mail servers.
+- Access/security behavior is controlled by security/outgoing_security.xml.
+UI / touchpoints
+- CRM menu -> Outgoing Mail Servers.
+- Mail server form/list should show SMTP credential fields.
+Smoke tests
+- Open CRM -> Outgoing Mail Servers and confirm menu visibility for intended groups.
+- Open one server and verify smtp_user and smtp_pass fields are visible and editable.
+- Save a change and confirm no access error is raised.
+
+================================================================
+MODULE: ak_color_scheme
+Status in v19: not migrated
+Depends: base_setup, web
+Key files
+- models/color_scheme_pallet.py
+- models/res_company.py
+- models/res_users.py
+- models/res_config_settings.py
+- models/http.py
+- data/pallets_data.xml
+- views/res_config_settings_views.xml
+- views/color_scheme_pallet.xml
+- views/webclient_templates.xml
+Functionality
+- Creates colour.scheme.pallet master data for predefined light/dark color palettes.
+- Adds company-level and user-level palette selection.
+- Adds settings to enable user-specific scheme and home screen background behavior.
+- Injects webclient styling through template override and ir.http hook.
+- Settings form includes reset/apply buttons for palette changes.
+UI / touchpoints
+- Settings -> custom color scheme section.
+- Administration menu -> Color Pallet Scheme.
+- Webclient colors and home menu background change after settings save.
+Smoke tests
+- Create or open a palette and confirm required color fields are stored.
+- Apply a light palette in settings and verify backend header/app/menu colors update.
+- Apply a dark palette and verify dark mode colors update.
+- Toggle Allow users to select color scheme and verify user-level selector behavior.
+- Use reset/apply buttons from settings and confirm asset regeneration works.
+
+================================================================
+MODULE: ak_crm
+Status in v19: present, verify carefully
+Depends: crm, mail
+Key files
+- models/crm_lead.py
+- models/crm_stage.py
+- models/crm_type.py
+- models/technology.py
+- models/odoo_version.py
+- models/res_partner.py
+- models/mail_thread.py
+- models/mail_message.py
+- models/mail_mail.py
+- wizard/chatter_send_mail.py
+- wizard/crm_lead_to_opportunity.py
+- wizard/crm_lead_lost.py
+- controllers/controller.py
+- views/crm_lead_views.xml
+- views/crm_menu_views.xml
+- views/crm_stage_views.xml
+- views/crm_type.xml
+- views/technology.xml
+- views/odoo_version.xml
+- views/res_partner_views.xml
+- data/crm_stage.xml
+- data/crm_type.xml
+- data/crm_technology.xml
+- data/sequence.xml
+- data/mail_template.xml
+- data/action_server.xml
+Functionality
+- Adds custom lead fields: consultant info, lead type, LinkedIn details, employee count, technology, partnership level, Odoo edition/version, incoming source info.
+- Adds crm.type, technology, and odoo.version master data/models.
+- Extends stages with type mapping and lost-stage behavior.
+- Custom lead lost flow and lead-to-opportunity conversion flow.
+- Custom chatter send-mail wizard with template, cc, attachments, message type and subtype handling.
+- Extends message/mail objects to keep CRM mail-to and CRM type context.
+- Adds menus for custom CRM lists including email leads and master data screens.
+- Exposes public POST route /projects; confirm intended integration payload when migrating.
+UI / touchpoints
+- CRM lead/opportunity form and kanban.
+- CRM menu entries for Email Leads, Technology, Odoo Version, CRM Type, Stages.
+- Partner form with LinkedIn fields.
+- Lost button and chatter send-mail wizard.
+Smoke tests
+- Create a lead and verify all custom fields save and reload correctly.
+- Change lead_type and stage, confirm onchange and stage rules still behave.
+- Convert lead to opportunity and verify custom mail/template logic still fires.
+- Mark a lead as lost and verify lost action/wizard works.
+- Open chatter mail wizard, choose a template, and confirm subject/body/recipients populate.
+- Test inbound/outbound mail related custom fields if CRM mail flow is in use.
+- If /projects integration is used, send a sample POST and verify route still creates/updates expected records.
+
+================================================================
+MODULE: ak_customer_portal
+Status in v19: not migrated
+Depends: project, website, aktiv_pms, hr_timesheet, auth_signup
+Key files
+- controllers/main.py
+- controllers/portal.py
+- views/webclient_templates.xml
+- views/project_portal_templates.xml
+- views/hr_timesheet_portal_templates.xml
+- views/reset_password_template.xml
+Functionality
+- Customizes login/signup/reset-password pages with Aktiv branding.
+- Overrides website root handling and login layout behavior.
+- Extends portal project/task/timesheet pages.
+- Adds task detail modal/subtask modal and customer-facing test case visibility.
+- Adds task timesheet report download route for project tasks.
+- Extends portal search bar, breadcrumbs, and timesheet table rendering.
+UI / touchpoints
+- Website login and reset password pages.
+- Portal -> My Projects / project tasks / task modal.
+- Route /aktiv_pms/task/report/<task>.
+Smoke tests
+- Login page branding renders correctly on v19 website/auth stack.
+- Portal user can open projects and tasks without traceback.
+- Task modal shows timesheets, notes, and test cases where expected.
+- Download task timesheet report and confirm PDF/report action works.
+- Portal breadcrumbs/search/sorting still work.
+
+================================================================
+MODULE: ak_odoo_days_contest
+Status in v19: present, verify
+Depends: survey, website
+Key files
+- models/participant_type.py
+- models/odoo_days_participant.py
+- models/odoo_days_objective.py
+- models/survey_user_input.py
+- controllers/main.py
+- views/participant_type_views.xml
+- views/odoo_days_participant_views.xml
+- views/odoo_days_objective_views.xml
+- views/survey_user_input_views.xml
+- templates/ak_odoo_days_contest_templates.xml
+Functionality
+- Adds contest participant, participant type, and objective master data.
+- Links survey submissions to contest participants.
+- Provides website contest join flow.
+UI / touchpoints
+- Website contest page with Join Contest button.
+- Backend menus for participant type, participant, objective, survey input linkage.
+Smoke tests
+- Submit contest form from website and verify participant record creation.
+- Confirm survey.user_input gets linked back to participant.
+- Open backend participant/objective/type menus and validate CRUD.
+
+================================================================
+MODULE: ak_project_todo
+Status in v19: present, verify with external dependency
+Depends: project_todo
+Key files
+- models/project.py
+- models/project_task.py
+- models/project_task_type.py
+- models/project_tags.py
+- wizard/sop_assignment_wizard.py
+- wizard/mail_wizard_invite.py
+- views/project_task_views.xml
+- views/project_todo_views.xml
+- data/project_data.xml
+- security/project_task_security.xml
+Functionality
+- Adds SOP bank flagging on projects and tags.
+- Adds old_db_id tracking fields for migration continuity.
+- Extends task stage with SOP stage flag and stage owner.
+- Adds SOP assignment wizard to bulk assign users to tasks filtered by SOP tags.
+- Extends invite wizard with discuss groups/channels.
+- Adds TODO-specific menus/actions over project/task/tag/stage.
+UI / touchpoints
+- Project/tag/stage/task forms.
+- SOP assignment wizard.
+- Project TODO menus and actions.
+Smoke tests
+- Confirm external module project_todo is installed in v19 before testing.
+- Mark a project/tag as SOP Bank and verify related logic appears on tasks.
+- Run SOP assignment wizard and confirm selected users are assigned to matching tasks.
+- Open task stages and verify Stage Owner / SOP Stage fields.
+
+================================================================
+MODULE: ak_public_holidays
+Status in v19: present, verify
+Depends: base, hr
+Key files
+- models/public_holiday.py
+- models/public_holiday_line.py
+- models/hr_employee.py
+- models/hr_employee_public.py
+- views/public_holiday_views.xml
+- views/hr_employee_views.xml
+- views/hr_employee_public_views.xml
+Functionality
+- Adds public.holiday master record with year and imported holiday lines.
+- Allows CSV/XLSX holiday file upload and line creation.
+- Adds Public Holiday List reference on employee and employee public models.
+UI / touchpoints
+- Public Holiday List menu/form.
+- Employee form and public employee view.
+Smoke tests
+- Create a holiday list manually and verify line_ids behavior.
+- Upload a holiday file and confirm line generation.
+- Assign a holiday list to an employee and confirm it appears on both employee models.
+
+================================================================
+MODULE: ak_survey
+Status in v19: present, verify
+Depends: ak_odoo_days_contest
+Key files
+- models/survey_user.py
+- wizard/survey_winner.py
+- views/survey_templates.xml
+- views/survey_user_views.xml
+- views/contest_certificate_report_template.xml
+- views/contest_certificate_report.xml
+- data/mail_template.xml
+- data/report_paperformat.xml
+Functionality
+- Adds winner flag on survey.user_input.
+- Adds Declare Winner button and winner wizard.
+- Wizard supports Print and Send Email and Print actions.
+- Overrides survey website templates and adds custom certificate report.
+UI / touchpoints
+- Survey submission flow.
+- Survey user input backend form.
+- Winner wizard and contest certificate report.
+Smoke tests
+- Complete a survey and verify custom frontend template still works.
+- Open a survey.user_input record and declare a winner.
+- Print certificate and send winner email from the wizard.
+
+================================================================
+MODULE: ak_timesheet_systray
+Status in v19: not migrated
+Depends: web, analytic, aktiv_pms
+Key files
+- models/hr_timesheet.py
+- models/project_task.py
+- static/src/*
+- static/scss/timesheet_style.scss
+Functionality
+- Pushes bus notifications when timesheets are created or when sync state changes.
+- Adds task-side method to sync unsynced timesheets to external PM tool.
+- Intended to drive a systray unsynced-timesheet counter/dropdown UX.
+UI / touchpoints
+- Backend systray widget/assets.
+- PM tool timesheet sync action path.
+Smoke tests
+- Create a timesheet and confirm bus notification updates unsynced counter.
+- Mark timesheet synced and confirm counter decreases.
+- Trigger PM tool sync and verify account.analytic.line records sync to external PM tool when configuration is valid.
+
+================================================================
+MODULE: ak_web_theme
+Status in v19: not migrated
+Depends: muk_web_theme, ak_color_scheme
+Key files
+- views/webclient_templates.xml
+- static/*
+Functionality
+- Thin webclient/theme overlay on top of MuK theme and custom color scheme modules.
+- Mostly visual/template-level behavior.
+UI / touchpoints
+- Backend webclient look and feel.
+Smoke tests
+- Install after muk_web_theme and ak_color_scheme.
+- Verify no asset/template conflict and backend renders without JS/QWeb errors.
+
+================================================================
+MODULE: aktiv_pms
+Status in v19: not migrated, main priority
+Depends: project, hr_timesheet, analytic, ak_crm, ak_public_holidays
+Key files
+- models/project.py
+- models/project_task.py
+- models/hr_timesheet.py
+- models/aktiv_meetings.py
+- models/meeting_mom.py
+- models/meeting_agenda.py
+- models/quality_analysis.py
+- models/quality_check.py
+- models/basic_guidelines.py
+- models/knowledge_bank.py
+- models/task_type.py
+- models/urgent_task.py
+- models/support_pack.py
+- models/res_user.py
+- models/res_config_settings.py
+- wizard/project_task_wizard.py
+- wizard/functional_wizard.py
+- wizard/create_project_pms.py
+- wizard/meeting_mom_wizard.py
+- wizard/meeting_reschedule_wizard.py
+- wizard/meeting_cancellation_wizard.py
+- wizard/pms_basic_guideline_mail_wizard.py
+- wizard/quality_check_points_wizard.py
+- views/project_views.xml
+- views/project_task.xml
+- views/hr_timesheet.xml
+- views/aktiv_meetings.xml
+- views/meeting_mom.xml
+- views/basic_guideline_views.xml
+- views/quality_analysis_views.xml
+- views/quality_check_views.xml
+- views/task_type_views.xml
+- views/knowledge_bank.xml
+- views/urgent_task_views.xml
+- views/res_users_view.xml
+- views/res_config_settings.xml
+- data/sequence.xml
+- data/ir_cron_data.xml
+- data/task_type_data.xml
+- data/default_res_config.xml
+- data/mail_template.xml
+- report/report_timesheet_template.xml
+Functionality
+- Extends project.project with deployment type, go-live, team roles, customer docs, communication tools, meeting generation schedule, support pack lines, PM tool connection fields, project sync flags, project lead ownership, and time summary fields.
+- Extends project.task heavily with custom lifecycle states, QA/development planning and approval fields, developers/QA/reviewer roles, urgent flag, bug flags, PM tool mapping, quality analysis linkage, timesheet approval/sync actions, and task-level workflow buttons.
+- Extends account.analytic.line with approval state, approved/effective hours, productivity/efficiency/utilization metrics, PM tool sync state, approval logs, team lead approval, and manager approval buttons.
+- Adds meeting scheduling, MOM management, agenda management, reschedule/cancel/reset flow, and meeting video URL handling.
+- Adds basic guidelines with version/file/link content and email update wizard by user role.
+- Adds knowledge bank entries tied to Odoo versions and users.
+- Adds quality analysis test cases and quality check confirmation points.
+- Adds task type and urgent task configuration models.
+- Adds PM tool configuration parameters in settings and cron jobs for review reminders, PM-tool timesheet sync, and revoke-group-access logic.
+- Adds create-project wizard for B2B project creation/sync.
+Primary buttons and actions to preserve
+- Project form: Create B2B Project, Generate Meetings, Add MOM, Update MOM, MOM stat/open actions, task counters by type.
+- Task form: Sync Timesheet to PM Tool, Waiting For CA, Start Task, Code Review, QA Testing / Testing QA Bugs / Re-Development / Customer Review / Done / Cancel / Ready for Deployment / On Hold / Open Quality Analysis / Approve / Reset.
+- Meetings: Add MOM, Reschedule, Cancel, Reset, Update MOM, MOM smart button.
+- Basic Guidelines: Update Users.
+- Quality Check wizard: Confirm QC.
+UI / touchpoints
+- Project form, task form, timesheet tree/form, settings, users form, meeting menus, MOM menu, quality analysis menu, quality check menu, knowledge bank menu, basic guidelines menu.
+Smoke tests
+- Create a project and verify all custom role fields, docs, meeting settings, and PM tool settings save.
+- Use Create B2B Project or sync action and validate external PM tool integration path if active.
+- Generate meetings from project and verify recurring meeting records are created correctly.
+- Open a meeting and complete/reschedule/cancel/reset it; verify MOM creation and linkage.
+- Create a task and walk it through the custom state buttons in expected user roles.
+- Enter timesheets, approve/reset them, and confirm approved/effective hour metrics update.
+- Verify task QA lines / quality analysis records can be created and linked.
+- Run Quality Check confirmation flow and ensure required checkpoints block or allow task confirmation correctly.
+- Open Basic Guidelines and test Update Users mail wizard for each supported user type.
+- Verify cron jobs exist and can run without traceback in v19 after migration.
+- Validate user/group logic in res.users extensions, especially revocation behavior tied to settings.
+
+================================================================
+MODULE: auto_backup
+Status in v19: not migrated
+Depends: mail
+Key files
+- models/db_backup.py
+- data/ir_cron.xml
+- data/mail_message_subtype.xml
+- view/db_backup_view.xml
+Functionality
+- Adds db.backup configuration model with local/SFTP backup options.
+- Supports SFTP connection test.
+- Supports one-off backup, backup all, and scheduled backup.
+- Uses chatter/mail tracking.
+UI / touchpoints
+- Backup configuration form/list.
+- Scheduled action for backups.
+Smoke tests
+- Create a backup config and test connection.
+- Run manual backup and confirm file creation/upload behavior.
+- Run scheduler on a safe test config and verify retention rules.
+
+================================================================
+MODULE: helpdesk_extended
+Status in v19: present, verify
+Depends: mail
+Key files
+- data/helpdesk_template.xml
+Functionality
+- Overrides helpdesk closed ticket mail template body_html with branded header/footer layout.
+UI / touchpoints
+- Mail template helpdesk_mgmt.closed_ticket_template.
+Smoke tests
+- Trigger closed-ticket email and verify branded HTML body is used.
+
+================================================================
+MODULE: helpdesk_mgmt
+Status in v19: not migrated
+Depends: mail, portal
+Key files
+- models/helpdesk_ticket.py
+- models/helpdesk_ticket_team.py
+- models/helpdesk_ticket_stage.py
+- models/helpdesk_ticket_category.py
+- models/helpdesk_ticket_channel.py
+- models/helpdesk_ticket_tag.py
+- models/res_partner.py
+- models/res_company.py
+- models/res_config_settings.py
+- models/res_users.py
+- controllers/main.py
+- controllers/myaccount.py
+- views/helpdesk_ticket_menu.xml
+- views/helpdesk_ticket_views.xml
+- views/helpdesk_dashboard_views.xml
+- views/helpdesk_ticket_templates.xml
+- views/helpdesk_ticket_team_views.xml
+- views/helpdesk_ticket_stage_views.xml
+- views/helpdesk_ticket_category_views.xml
+- views/helpdesk_ticket_channel_views.xml
+- views/helpdesk_ticket_tag_views.xml
+- views/res_partner_views.xml
+- views/res_config_settings_views.xml
+- data/helpdesk_data.xml
+Functionality
+- Adds full custom helpdesk app with tickets, teams, stages, categories, channels, and tags.
+- Uses mail.thread and mail.alias.mixin on teams and mail.thread/activity/portal mixins on tickets.
+- Generates ticket sequence numbers and stage-driven closed/unattended behavior.
+- Adds ticket assignment dates, closed dates, priority, kanban state, attachments, and duplicate ticket action.
+- Adds partner smart button/counts for tickets.
+- Adds dashboard and reporting actions.
+- Adds portal listing, portal detail page, portal create-ticket flow, and close-ticket route.
+- Settings allow portal team/category selection rules.
+- Data includes email templates for assignment, closed ticket, and stage change.
+UI / touchpoints
+- Helpdesk backend menus and dashboard.
+- Ticket form/kanban/list.
+- Portal -> My Tickets and Create Ticket.
+- Partner helpdesk stat button.
+Smoke tests
+- Create teams, stages, categories, channels, and tags.
+- Create a ticket from backend and verify sequence, default stage, assignee dates, chatter, attachments.
+- Move ticket to closed stage and verify email template behavior.
+- Create and close ticket from portal and confirm permissions and stage rules.
+- Open dashboard and reporting actions without JS/QWeb errors.
+
+================================================================
+MODULE: mail_template_extend
+Status in v19: present, verify
+Depends: mail
+Key files
+- data/mail_templates_email_layouts.xml
+Functionality
+- Inherits mail.mail_notification_layout and removes footer area with xpath replace.
+UI / touchpoints
+- Any standard Odoo email notification layout.
+Smoke tests
+- Send any mail notification and confirm footer section is removed.
+
+================================================================
+MODULE: muk_web_appsbar
+Status in v19: not migrated
+Depends: base_setup, web
+Key files
+- models/res_company.py
+- models/res_users.py
+- models/res_config_settings.py
+- models/ir_http.py
+- templates/webclient.xml
+- static/src/webclient/*
+Functionality
+- Adds backend apps bar behavior and assets.
+- Stores app bar image at company/settings level.
+- Stores sidebar type on user.
+- Hooks webclient rendering through ir.http and template/assets.
+UI / touchpoints
+- Backend top/side apps bar and settings/user preferences.
+Smoke tests
+- Install and open backend; verify apps bar renders.
+- Change sidebar type and app bar image and confirm frontend updates.
+
+================================================================
+MODULE: muk_web_chatter
+Status in v19: not migrated
+Depends: mail
+Key files
+- models/res_users.py
+- models/ir_http.py
+- views/res_users.xml
+- static/src/*
+Functionality
+- Adds user preference for chatter position and frontend assets to render custom chatter placement.
+UI / touchpoints
+- User preferences and form view chatter layout.
+Smoke tests
+- Change chatter position and verify form chatter moves accordingly.
+
+================================================================
+MODULE: muk_web_colors
+Status in v19: not migrated
+Depends: base_setup, web_editor
+Key files
+- models/res_config_settings.py
+- models/web_editor_assets.py
+- templates/webclient.xml
+- views/res_config_settings.xml
+Functionality
+- Adds detailed light/dark brand, primary, success, info, warning, and danger color settings.
+- Injects color asset changes into backend/editor assets.
+- Settings include reset buttons for light and dark color assets.
+UI / touchpoints
+- Settings -> MuK Colors section.
+Smoke tests
+- Change light and dark colors and verify asset output changes.
+- Use reset buttons and confirm assets revert cleanly.
+
+================================================================
+MODULE: muk_web_dialog
+Status in v19: not migrated
+Depends: web
+Key files
+- models/res_users.py
+- models/ir_http.py
+- views/res_users.xml
+- static/src/core/dialog/*
+Functionality
+- Adds dialog size preference on user and frontend dialog overrides/assets.
+UI / touchpoints
+- User preferences and backend dialog windows.
+Smoke tests
+- Change dialog size preference and open form dialogs/popups to confirm sizing change.
+
+================================================================
+MODULE: muk_web_theme
+Status in v19: not migrated
+Depends: muk_web_chatter, muk_web_dialog, muk_web_appsbar, muk_web_colors
+Key files
+- models/res_company.py
+- models/res_config_settings.py
+- models/ir_http.py
+- templates/web_layout.xml
+- views/res_config_settings.xml
+- static/src/webclient/*
+Functionality
+- Provides backend theme assets and layout overrides.
+- Adds theme favicon and background image settings plus multiple theme color settings.
+- Includes reset action for theme color assets.
+UI / touchpoints
+- Settings -> backend theme section.
+- Global backend layout, app bar, form/chatter visuals.
+Smoke tests
+- Upload favicon/background image and confirm assets render.
+- Change theme colors and verify backend layout updates.
+- Use reset action and confirm asset regeneration works.
+
+Migration focus for next step
+- Main next target should be aktiv_pms.
+- Before coding aktiv_pms migration, first verify v19 copies of ak_public_holidays and ak_crm install cleanly because aktiv_pms depends on both.
+- After aktiv_pms is stable, move to ak_timesheet_systray and ak_customer_portal.

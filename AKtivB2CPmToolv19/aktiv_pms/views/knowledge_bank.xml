@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--     Add a menu named Knowledge Bank in Project Menu. This menu should be visisble to all the Users.
+    Create a tree view which will have the following fields  1) Name - Char 2) User - Html field -->
+
+    <record id="form_knowledge_bank" model="ir.ui.view">
+        <field name="name">form.knowledge.bank</field>
+        <field name="model">knowledge.bank</field>
+        <field name="arch" type="xml">
+            <form string="Knowledge Bank">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="version_ids" widget="many2many_tags"/>
+                        <field name="user_ids" widget="many2many_tags"/>
+                        <field name="code"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="tree_basic_guidelines" model="ir.ui.view">
+        <field name="name">tree.knowledge.bank</field>
+        <field name="model">knowledge.bank</field>
+        <field name="arch" type="xml">
+            <list string="Knowledge Bank">
+                <field name="name"/>
+                <field name="user_ids" widget="many2many_tags"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_knowledge_bank" model="ir.actions.act_window">
+        <field name="name">Knowledge Bank</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">knowledge.bank</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem name="Knowledge Bank" id="menu_knowledge_bank" parent='project.menu_main_pm' action="action_knowledge_bank"/>
+
+</odoo>

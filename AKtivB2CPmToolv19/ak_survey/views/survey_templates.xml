@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<template id="survey_fill_form_start" inherit_id="survey.survey_fill_form_start">
+			<xpath expr="//div[hasclass('o_survey_start')]" position="replace">
+				<t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+				<div class="survey_start_wrapper">
+					<div class="survey_start_logo">
+						<img t-attf-src="#{base_url}/ak_survey/static/description/icon.png"
+						     class="survey_start_logo_img"/>
+					</div>
+					<h1 class="pt16 text-center survey_start_title">
+						Welcome to Odoo Days Contest!
+					</h1>
+					<div class="survey_start_image_wrapper">
+						<img t-attf-src="#{base_url}/ak_survey/static/image/survey_start_image.png"
+						     class="survey_start_image"/>
+					</div>
+					<div class="survey_type_content_wrapper">
+						<div class="survey_type_logo">
+							<img t-attf-src="#{base_url}/ak_survey/static/image/start_business_owners.svg"
+							     class="survey_type_logo_image"/>
+						</div>
+						<h2 class="survey_type_heading">
+							<strong>For Business Owners</strong>
+						</h2>
+						<div class="survey_type_content">
+							<p>
+								This is an opportunity to share valuable insight about your
+								business and how you use Odoo to drive success.
+								Let's get started with the questionnaire.
+							</p>
+						</div>
+					</div>
+					<div class="survey_type_content_wrapper">
+						<div class="survey_type_logo">
+							<img t-attf-src="#{base_url}/ak_survey/static/image/start_techno_expert.svg"
+							     class="survey_type_logo_image"/>
+						</div>
+						<h2 class="survey_type_heading">
+							<strong>For Techno-Functional Expert</strong>
+						</h2>
+						<div class="survey_type_content">
+							<p>
+								Get ready to test your Odoo expertise in our quiz contest.
+							</p>
+						</div>
+					</div>
+					<div class="survey_start_btn_wrapper">
+						<button type="submit" value="start" class="btn btn-primary btn-lg survey_start_btn">
+							Let's get started
+						</button>
+					</div>
+				</div>
+			</xpath>
+		</template>
+
+		<!-- Finished (taken and finished) survey page -->
+		<template id="survey_fill_form_done" inherit_id="survey.survey_fill_form_done">
+			<xpath expr='.' position="replace">
+				<div class="wrap">
+					<div class="o_survey_finished">
+						<t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+						<div class="survey_end_wrapper">
+							<div class="survey_end_logo">
+								<img t-attf-src="#{base_url}/ak_survey/static/description/icon.png"
+									 class="survey_end_logo_img"/>
+							</div>
+							<div class="survey_end_banner">
+								<img t-attf-src="#{base_url}/ak_survey/static/image/survey_end_banner.png"
+									 class="survey_end_banner_img"/>
+							</div>
+							<p class="survey_end_content_1">
+								Thank you for participating in the Odoo Days Contest.
+								Your submission has been successfully recorded, and our team will review it shortly.
+							</p>
+							<p class="survey_end_content_2">
+								Ensure to keep an eye on your Email and WhatsApp for results.
+							</p>
+							<h2 class="survey_end_heading">
+								Why Choose Us?
+							</h2>
+							<div class="why_choose_us_bg_wrapper">
+								<div class="why_choose_us_wrapper">
+									<div class="why_choose_us_block">
+										<img t-attf-src="#{base_url}/ak_survey/static/image/experts_icon.svg"
+											 class="why_choose_us_icon"/>
+										<h3 class="why_choose_us_count">
+											70<sup>+</sup>
+										</h3>
+										<div class="why_choose_us_content">
+											Odoo Experts
+										</div>
+									</div>
+									<div class="why_choose_us_block">
+										<img t-attf-src="#{base_url}/ak_survey/static/image/certified_icon.svg"
+											 class="why_choose_us_icon"/>
+										<h3 class="why_choose_us_count">
+											10<sup>+</sup>
+										</h3>
+										<div class="why_choose_us_content">
+											Functional Certified
+										</div>
+									</div>
+									<div class="why_choose_us_block">
+										<img t-attf-src="#{base_url}/ak_survey/static/image/customers_icon.svg"
+											 class="why_choose_us_icon"/>
+										<h3 class="why_choose_us_count">
+											25<sup>+</sup>
+										</h3>
+										<div class="why_choose_us_content">
+											Happy Customers
+										</div>
+									</div>
+									<div class="why_choose_us_block">
+										<img t-attf-src="#{base_url}/ak_survey/static/image/partners_icon.svg"
+											 class="why_choose_us_icon"/>
+										<h3 class="why_choose_us_count">
+											50<sup>+</sup>
+										</h3>
+										<div class="why_choose_us_content">
+											Satisfied Partners
+										</div>
+									</div>
+									<div class="why_choose_us_block">
+										<img t-attf-src="#{base_url}/ak_survey/static/image/training_icon.svg"
+											 class="why_choose_us_icon"/>
+										<div class="why_choose_us_content">
+											Specialized Training Programme for Freshers
+										</div>
+									</div>
+								</div>
+							</div>
+							<h2 class="survey_end_heading">
+								Recognized by
+							</h2>
+							<div class="recognized_by_wrapper">
+								<img t-attf-src="#{base_url}/ak_survey/static/image/recognized_by.png"
+									 class="recognized_by_img"/>
+							</div>
+							<div class="survey_end_footer">
+								<p class="survey_end_footer_text">
+									Browse through our website and social media to
+									stay updated on all things Odoo and Aktiv Software.
+								</p>
+								<div class="survey_end_social_wrapper">
+									<div class="survey_end_social_block">
+										<a href="https://www.linkedin.com/company/aktiv-software/" class="survey_end_social_link">
+											<img t-attf-src="#{base_url}/ak_survey/static/image/linkedin_icon.svg" class="survey_end_social_icon"/>
+										</a>
+									</div>
+									<div class="survey_end_social_block">
+										<a href="https://twitter.com/Aktiv_Software" class="survey_end_social_link">
+											<img t-attf-src="#{base_url}/ak_survey/static/image/twitter_icon.svg" class="survey_end_social_icon"/>
+										</a>
+									</div>
+									<div class="survey_end_social_block">
+										<a href="https://www.instagram.com/aktiv.software" class="survey_end_social_link">
+											<img t-attf-src="#{base_url}/ak_survey/static/image/instagram_icon.svg" class="survey_end_social_icon"/>
+										</a>
+									</div>
+									<div class="survey_end_social_block">
+										<a href="mailto:odoo@aktivsoftware.com" class="survey_end_social_link">
+											<img t-attf-src="#{base_url}/ak_survey/static/image/email_icon.svg" class="survey_end_social_icon"/>
+										</a>
+									</div>
+									<div class="survey_end_social_block">
+										<a href="https://www.aktivsoftware.com/" class="survey_end_social_link">
+											<img t-attf-src="#{base_url}/ak_survey/static/image/globe_icon.svg" class="survey_end_social_icon"/>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</xpath>
+		</template>
+
+		<template id="survey_layout" inherit_id="survey.layout">
+			<xpath expr="//div[@class='py-3 m-0 p-0 text-end']" position="replace"/>
+		</template>
+
+		<template id="survey_page_fill" inherit_id="survey.survey_page_fill">
+			<xpath expr="//t[@t-call='survey.survey_fill_header']" position="replace"/>
+			<xpath expr="//div[hasclass('o_survey_form')]" position="attributes">
+				<attribute name="class" add="container-fluid" remove="container" separator=" "/>
+			</xpath>
+		</template>
+
+		<template id="survey_fill_form_in_progress" inherit_id="survey.survey_fill_form_in_progress">
+			<xpath expr="." position="replace">
+				<div class="container">
+					<t t-call="survey.survey_fill_header" />
+					<div class="o_survey_form_content_data d-none"
+						t-att-data-question-time-limit-reached="answer.question_time_limit_reached"
+						t-att-data-has-answered="bool(has_answered)"
+						t-att-data-is-page-description="bool(question and question.is_page and not is_html_empty(question.description))"
+						t-att-data-server-time="server_time"
+						t-att-data-timer="timer_start"
+						t-att-data-time-limit-minutes="time_limit_minutes"/>
+					<t t-if="survey.questions_layout == 'one_page'">
+						<t t-foreach='survey.question_and_page_ids' t-as='question'>
+							<h2 t-if="question.is_page" t-field='question.title' class="o_survey_title pb16 text-break" />
+							<div t-if="question.is_page" t-field='question.description' class="text-break"/>
+							<t t-if="not question.is_page and question in answer.predefined_question_ids" t-call="survey.question_container"/>
+						</t>
+
+						<div class="text-center mt16 mb256">
+							<button type="submit" value="finish" class="btn btn-primary">
+								Submit</button><span class="font-weight-bold text-muted ml-2 d-none d-md-inline">or press Enter</span>
+						</div>
+					</t>
+
+					<t t-if="survey.questions_layout == 'page_per_section'">
+						<h2 t-field='page.title' class="o_survey_title pb16 text-break" />
+						<div t-field='page.description' class="oe_no_empty text-break"/>
+
+						<input type="hidden" name="page_id" t-att-value="page.id" />
+						<t t-foreach='page.question_ids' t-as='question'>
+							<t t-if="question in answer.predefined_question_ids" t-call="survey.question_container"/>
+						</t>
+
+						<div class="row">
+							<div class="col-12 text-center mt16">
+								<button type="submit" t-att-value="'next' if not survey_last else 'finish'" class="btn btn-primary">
+									<t t-if="not survey_last">Continue</t>
+									<t t-else="">Submit</t>
+								</button><span class="font-weight-bold text-muted ml-2 d-none d-md-inline"> or press Enter</span>
+							</div>
+						</div>
+					</t>
+
+					<!-- If we have a choice question and less than 6 options, we want minimized display.
+					Minimized display means we display the choices vertically (instead of optimized based on screen space).
+					An exception is made for options with images, where we always want to optimize screen space.
+					Numeric, date and datetime questions are also displayed "minimized", with a smaller screen width.-->
+					<t t-set="minimized_display" t-value="survey.questions_layout == 'page_per_question' and len(question.suggested_answer_ids) &lt;= 5 and not any(suggestion.value_image for suggestion in question.suggested_answer_ids)" />
+					<div t-if="survey.questions_layout == 'page_per_question'"
+						t-attf-class="o_survey_page_per_question o_survey_#{question.question_type} #{'o_survey_minimized_display' if minimized_display else ''}">
+						<input type="hidden" name="question_id" t-att-value="question.id" />
+						<!-- User has already answered for this session -->
+						<t t-if="answer.is_session_answer and (has_answered or answer.question_time_limit_reached)">
+							<fieldset disabled="disabled">
+								<t t-set="survey_form_readonly" t-value="True" />
+								<div class="mt-5">
+									<t t-call="survey.question_container" />
+								</div>
+							</fieldset>
+							<div t-if="answer.question_time_limit_reached and not has_answered" class="font-weight-bold">Sorry, you have not been fast enough.</div>
+							<div t-else="" class="font-weight-bold">We have registered your answer! Please wait for the host to go to the next question.</div>
+						</t>
+						<t t-elif="answer.is_session_answer and question.is_page and not is_html_empty(question.description)">
+							<div class="font-weight-bold mt-5">Pay attention to the host screen until the next question.</div>
+						</t>
+						<t t-else="">
+							<div class="mt-5">
+								<t t-call="survey.question_container"/>
+							</div>
+
+							<div class="row">
+								<div class="col-12 text-center mt16">
+									<button type="submit" t-att-value="'next' if not survey_last else 'finish'" class="btn btn-primary">
+										<t t-if="answer.is_session_answer or survey_last">Submit</t>
+										<t t-else="">Continue</t>
+									</button>
+									<span class="font-weight-bold text-muted ml-2 d-none d-md-inline">
+										<span t-if="question.question_type == 'text_box'">or press CTRL+Enter</span>
+										<span t-else="">or press Enter</span>
+									</span>
+								</div>
+							</div>
+						</t>
+					</div>
+				</div>
+			</xpath>
+		</template>
+	</data>
+</odoo>

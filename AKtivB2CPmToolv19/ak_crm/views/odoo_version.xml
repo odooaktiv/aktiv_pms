@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="odoo_version_form_view" model="ir.ui.view">
+        <field name="name">odoo.version.form.view</field>
+        <field name="model">odoo.version</field>
+        <field name="arch" type="xml">
+            <form delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" required="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="odoo_version_tree_view" model="ir.ui.view">
+        <field name="name">odoo.version.tree.view</field>
+        <field name="model">odoo.version</field>
+        <field name="arch" type="xml">
+            <list editable="top">
+                <field name="name" required="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_odoo_version" model="ir.actions.act_window">
+        <field name="name">Odoo Version</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">odoo.version</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+    id="menu_odoo_version"
+    name="Odoo Version"
+    parent="crm.menu_crm_config_lead"
+    action="ak_crm.action_odoo_version"
+    sequence="8"/>
+</odoo>

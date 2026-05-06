@@ -1,0 +1,19 @@
+.custom-css .o_list_table tbody > tr > td:not(.o_list_record_selector):not(.o_handle_cell):not(.o_list_button):not(.o_state_selection_cell) {
+  white-space: inherit;
+}
+
+.custom_class .o_list_view .o_list_table thead > tr > th:not(.o_list_record_selector) {
+    white-space: inherit !important;
+  }
+
+
+/*.o_list_view .o_list_table thead > tr > th:not(.o_list_record_selector){
+    border-left: 1px solid #dfdfdf;
+    display: table-cell;
+    max-width: 100%;
+    white-space: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+}
+*/

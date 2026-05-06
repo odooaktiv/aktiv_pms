@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_res_config_form_inherit" model="ir.ui.view">
+            <field name="name">res.config.view.inherit</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="project.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <!-- v17 anchored "PM Tool Info" after block[@name='analytic']; v19 project settings
+                     no longer exposes an analytic block (the analytic accounting setting moved to the
+                     accounting module's res_config_settings). Anchoring on block[@name='project_time']
+                     (Time Management) keeps the PM Tool Info block visible inside the Project section. -->
+                <xpath expr="//block[@name='project_time']" position="after">
+                    <block title="PM Tool Info" name="pm_tool_info_block">
+                    <settings name="pm_tool_info" string="PM Tool Info" groups="base.group_no_one">
+                        <div class="content-group">
+                            <div class="row mt16">
+                                <div class="col-6">
+                                    <label for="ip_addr" string="IP Address" class="col-lg-3 o_light_label"/>
+                                    <field name="ip_addr"/>
+                                </div>
+                                <div class="col-6">
+                                    <label for="db_name" string="DB Name" class="col-lg-3 o_light_label"/>
+                                    <field name="db_name"/>
+                                </div>
+                            </div>
+                            <div class="row mt16">
+                                <div class="col-6">
+                                    <label for="master_uid" string="Master UID" class="col-lg-3 o_light_label"/>
+                                    <field name="master_uid"/>
+                                </div>
+                                <div class="col-6">
+                                    <label for="master_pwd" string="Master Password" class="col-lg-3 o_light_label"/>
+                                    <field name="master_pwd" password="True"/>
+                                </div>
+                            </div>
+                        </div>
+                    </settings>
+                </block>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_timesheet_config_settings_inherit" model="ir.ui.view">
+            <field name="name">res.config.settings.inherit.timesheet</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="hr_timesheet.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='section_leaves']" position="after">
+                    <div name="section_timesheet_locking">
+                        <block title="Timesheet Locking Period" name="timesheet_locking_period_block">
+                            <setting id="timesheet_locking_period_setting"
+                                     help="Lock timesheets from being modified after the configured number of days.">
+                                <field name="timesheet_locking_period" placeholder="e.g. 3"/>
+                            </setting>
+                        </block>
+                    </div>
+                    <div name="section_revoke_group_access">
+                        <block title="Revoke Group Access" name="revoke_group_access_block">
+                            <setting id="revoke_group_access_setting"
+                                     help="Remove group access for Allow Approval of Old Timesheets
+                                     and Allow Edit Old Timesheets after the configured number of days.">
+                                <field name="revoke_group_access" placeholder="e.g. 1"/>
+                            </setting>
+                        </block>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

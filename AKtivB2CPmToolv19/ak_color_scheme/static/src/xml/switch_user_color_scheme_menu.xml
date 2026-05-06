@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="ak_color_scheme.SwitchUserColorSchemeMenu">
+        <Dropdown position="'bottom-end'"
+                  menuClass="'o_switch_user_color_scheme_menu_dropdown'"
+                  t-if="userColorSchemeService.allowUserColorScheme">
+            <button class="o_switch_user_color_scheme_menu_btn">
+                <img src="/ak_color_scheme/static/description/systray_icon.png"
+                     style="height: 25px !important; width: 25px !important;"/>
+            </button>
+
+            <t t-set-slot="content">
+
+                <!-- Default option -->
+                <DropdownItem class="'p-0'">
+                    <div class="d-flex" data-menu="color" t-att-data-color-id="false">
+                        <div role="button"
+                             tabindex="0"
+                             class="d-flex flex-grow-1 align-items-center py-0 ps-2"
+                             t-att-class="!userColorSchemeService.currentUserColorScheme ? 'alert-primary' : ''"
+                             t-on-click="() => this.toggleUserColorSchemeDefault()">
+                            <span class="color_scheme_label pe-3"
+                                  t-att-class="!userColorSchemeService.currentUserColorScheme ? 'fw-bold' : ''">
+                                Default
+                            </span>
+                        </div>
+                    </div>
+                </DropdownItem>
+
+                <!-- Dynamic schemes -->
+                <t t-foreach="Object.values(userColorSchemeService.userColorSchemes)"
+                   t-as="color"
+                   t-key="color.id">
+                    <SwitchUserColorSchemeItem color="color" level="0"/>
+                </t>
+
+            </t>
+        </Dropdown>
+    </t>
+
+    <t t-name="ak_color_scheme.SwitchUserColorSchemeItem">
+        <DropdownItem class="'p-0'">
+            <div class="d-flex" data-menu="color" t-att-data-color-id="props.color.id">
+                <div role="button"
+                     tabindex="0"
+                     class="d-flex flex-grow-1 align-items-center py-0 ps-2"
+                     t-att-class="isUserColorSchemeCurrent ? 'alert-primary' : 'btn fw-normal border-0'"
+                     t-on-click="() => this.toggleUserColorScheme()">
+
+                    <span class="color_scheme_label pe-3"
+                          t-att-class="isUserColorSchemeCurrent ? 'fw-bold' : ''">
+                        <t t-out="props.color.name"/>
+                    </span>
+
+                </div>
+            </div>
+        </DropdownItem>
+    </t>
+</templates>

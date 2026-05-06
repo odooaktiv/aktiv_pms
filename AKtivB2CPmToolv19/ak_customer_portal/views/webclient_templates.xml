@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- v17 inherited auth_signup.fields, which contained login/password/confirm_password/name inputs.
+         v19 split that template: auth_signup.fields now only has password/confirm_password, while login
+         and name moved to auth_signup.signup. We split the customization into two templates that still
+         inject the same Font Awesome icons next to each input. -->
+    <template id="aktiv_signup" inherit_id="auth_signup.fields">
+        <xpath expr="//input[@name='password']" position="inside">
+            <i class="fa fa-key custom_icon_2"></i>
+        </xpath>
+        <xpath expr="//input[@name='confirm_password']" position="inside">
+            <i class="fa fa-key custom_icon_3"></i>
+        </xpath>
+    </template>
+    <template id="aktiv_signup_main" inherit_id="auth_signup.signup">
+        <xpath expr="//input[@name='login']" position="inside">
+            <i class="fa fa-envelope custom_icon_1"></i>
+        </xpath>
+        <xpath expr="//div[hasclass('field-name')]/input[@name='name']" position="inside">
+            <i class="fa fa-address-book custom_icon_4"></i>
+        </xpath>
+    </template>
+    <template id="aktiv_login_background" name="Aktiv Login Background">
+        <t t-set="background_type" t-value="'image' if website.login_bg_img else 'color'"/>
+        <div class="login_background_container h-100 p-4 d-flex justify-content-center align-items-center"
+             t-att-style="'background-%s: %s;' % (background_type, 'url(%s)' % website.image_url(website, 'login_bg_img') if background_type == 'image' else website.login_bg_right_color)">
+            <span class="login_background_html" t-raw="website.login_bg_html"/>
+        </div>
+    </template>
+
+    <template id="aktiv_login_layout" inherit_id="web.login_layout" name="Aktiv Login Layout">
+        <xpath expr="//t[@t-set='body_classname']" position="attributes">
+            <attribute name="t-value">'bg-white aktiv_login'</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('container')]" position="attributes">
+            <attribute name="class">container h-100 m-auto</attribute>
+        </xpath>
+        <xpath expr="//div[hasclass('container')]/div" position="attributes">
+            <attribute name="id">login_card</attribute>
+            <attribute name="t-attf-class" add="#{'custom_bg_color' if website.login_bg_left_color else ''}"
+                       separator=" "/>
+        </xpath>
+        <xpath expr="//div[hasclass('container')]" position="inside">
+            <div class="row h-100">
+                <div class="col-md-4 login_card_container p-0"
+                     t-attf-style="website.image_url(website, 'login_bg_img')"/>
+                <div class="col-md-8 p-0 login_background"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="aktiv_login_layout_website" inherit_id="website.login_layout" name="Aktiv Website Login Layout"
+              priority="20">
+        <xpath expr="//t[@t-call='website.layout']" position="inside">
+            <t t-set="body_classname" t-value="'aktiv_login'"/>
+            <t t-set="no_header" t-value="True"/>
+            <t t-set="no_footer" t-value="True"/>
+        </xpath>
+        <xpath expr="//div[hasclass('oe_website_login_container')]" position="replace">
+            <div class="oe_website_login_container container h-100">
+                <div class="row h-100">
+                    <div class="col-md-12  p-0 login_background d-flex align-items-center"
+                         style="background-image:url('/ak_customer_portal/static/src/image/aktiv_bg.jpg');flex-direction: row-reverse;background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;">
+
+                        <div class="login_card_container col-md-4 float-right">
+                            <p class="text-center custom_p_class member_login">Login</p>
+                            <div id="login_card" class=" d-none ghost_div"/>
+                            <t t-raw="0"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="aktiv_login_website" inherit_id="web.login">
+        <xpath expr="//button[@name='redirect']" position="replace"/>
+        <xpath expr="//div[hasclass('field-login')]/label" position="replace"/>
+        <xpath expr="//label[@for='password']" position="replace"/>
+
+        <xpath expr="//input[@name='login']" position="inside">
+            <i class="fa fa-envelope custom_icon"></i>
+        </xpath>
+
+        <xpath expr="//input[@name='password']/.." position="attributes">
+            <attribute name="class">field-password</attribute>
+        </xpath>
+
+        <xpath expr="//input[@name='password']" position="inside">
+            <i class="fa fa-key custom_icon"></i>
+        </xpath>
+
+
+
+    </template>
+
+    <template id="aktiv_login" inherit_id="auth_signup.login">
+        <xpath expr="//a[@t-if='reset_password_enabled']" position="attributes">
+            <attribute name="t-attf-class">#{'reset_password_text_center'}</attribute>
+        </xpath>
+    </template>
+
+    <template id="aktiv_login_layout_main" inherit_id="web.login_layout" name="Aktiv Login Layout Main"
+              priority="21">
+
+        <xpath expr="//div[hasclass('login_card_container')]" position="inside">
+            <xpath expr="//div[@id='login_card']" position="move"/>
+            <div class="social_media_icon">
+                <center>
+                    <div class="social_sharing">
+                        <div class="s_share no_icon_color" data-snippet="s_share"
+                             data-name="Social Media">
+                            <h5 class="s_share_title d-none">Follow us</h5>
+                            <a href="/website/social/facebook" class="s_share_facebook" target="_blank">
+                                <i class="fa fa-facebook m-1"/>
+                            </a>
+                            <a href="/website/social/twitter" class="s_share_twitter" target="_blank">
+                                <i class="fa fa-twitter m-1"/>
+                            </a>
+                            <a href="/website/social/linkedin" class="s_share_linkedin" target="_blank">
+                                <i class="fa fa-linkedin m-1"/>
+                            </a>
+                            <a href="/website/social/instagram" class="s_share_instagram" target="_blank">
+                                <i class="fa fa-instagram m-1"/>
+                            </a>
+                        </div>
+                    </div>
+                </center>
+            </div>
+            <input type="hidden" name="redirect" t-att-value="redirect"/>
+        </xpath>
+    </template>
+</odoo>

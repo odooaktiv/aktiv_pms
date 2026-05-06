@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- <record id="project.group_project_manager" model="res.groups">
+        <field name="name">Project Manager</field>
+    </record> -->
+
+    <!-- Privilege grouping for Aktiv PMS groups (v19 replacement for category_id on res.groups) -->
+    <record id="res_groups_privilege_aktiv_pms" model="res.groups.privilege">
+        <field name="name">Aktiv PMS</field>
+        <field name="category_id" ref="base.module_category_services_project"/>
+    </record>
+
+    <!--Project Manager Group-->
+    <record id="group_aktiv_project_manager" model="res.groups">
+        <field name="name">Project Lead</field>
+        <field name="user_ids"
+               eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <field name="implied_ids" eval="[(4, ref('project.group_project_user')), (4, ref('hr_timesheet.group_hr_timesheet_approver'))]"/>
+        <field name="privilege_id" ref="res_groups_privilege_aktiv_pms"/>
+    </record>
+
+    <!--Project QA Group-->
+    <record id="group_aktiv_project_QA" model="res.groups">
+        <field name="name">Project QA</field>
+        <field name="user_ids"
+               eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="privilege_id" ref="res_groups_privilege_aktiv_pms"/>
+    </record>
+
+    <!--Project User Group-->
+    <record id="project.group_project_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('hr_timesheet.group_hr_timesheet_user'))]"/>
+    </record>
+
+    <!--Project functional group -->
+    <record id="group_aktiv_project_functional" model="res.groups">
+        <field name="name">Project Functional</field>
+        <field name="user_ids"
+               eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="privilege_id" ref="res_groups_privilege_aktiv_pms"/>
+    </record>
+
+    <record id="group_aktiv_project_team_leader" model="res.groups">
+        <field name="name">Lead Engineer</field>
+        <field name="user_ids"
+               eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <field name="implied_ids" eval="[(4, ref('hr_timesheet.group_hr_timesheet_approver'))]"/>
+        <field name="privilege_id" ref="res_groups_privilege_aktiv_pms"/>
+    </record>
+
+    <!-- Group: Allow Edit Old Timesheets -->
+    <record id="group_allow_edit_old_timesheets" model="res.groups">
+        <field name="name">Allow Edit Old Timesheets</field>
+    </record>
+
+    <!-- Group: Allow Approval of Old Timesheets -->
+    <record id="group_allow_approve_old_timesheets" model="res.groups">
+        <field name="name">Allow Approval of Old Timesheets</field>
+    </record>
+
+    <record id="project.project_public_members_rule" model="ir.rule">
+        <field name="active" eval="False"/>
+    </record>
+
+    <!-- Rule for users to show the projects which are assignees to them -->
+    <record id="project_user_rule" model="ir.rule">
+        <field name="name">Project: user: see his/her project</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">['|', '|', '|',
+            ('developer_ids', 'in', user.id),
+            ('task_qa_ids', 'in', user.id),
+            ('code_reviewer_ids', 'in', user.id),
+            ('consultant_ids', 'in', user.id),
+            ]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="groups" eval="[(4, ref('project.group_project_user'))]"/>
+    </record>
+
+    <!-- Rule for Project Lead to show his own projects -->
+    <record id="project_owner_own_project_rule" model="ir.rule">
+        <field name="name">Project: Project Lead: Can view and edit their own project</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">['|', '|', '|',
+            ('user_id', '=', user.id),
+            ('project_owner_ids', 'in', user.id),
+            ('consultant_ids', 'in', user.id),
+            ('customer_success_manager_id', '=', user.id)]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+        <field name="groups" eval="[(4, ref('aktiv_pms.group_aktiv_project_manager')), (4, ref('aktiv_pms.group_aktiv_project_functional'))]"/>
+    </record>
+
+    <record id="project_user_rule_tech_lead" model="ir.rule">
+        <field name="name">Project: Lead Engineer: Can see his/her project</field>
+        <field name="model_id" ref="model_project_project"/>
+        <field name="domain_force">['|',
+            ('team_leader_ids', 'in', user.id),
+            ('project_owner_ids', 'in', user.id)]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+        <field name="groups" eval="[(4,ref('aktiv_pms.group_aktiv_project_team_leader'))]"/>
+    </record>
+
+    <record id="project_team_leader_project_visibility_rule" model="ir.rule">
+        <field name="name">Project Task: Lead Engineer: can view and edit their own project tasks</field>
+        <field name="model_id" ref="model_project_task"/>
+        <field name="domain_force">['|',
+            ('project_id.team_leader_ids', 'in', user.id),
+            ('project_id.project_owner_ids', 'in', user.id)]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+        <field name="groups" eval="[(4, ref('aktiv_pms.group_aktiv_project_team_leader'))]"/>
+    </record>
+
+    <!-- Rule for manager for visibility of all task -->
+    <record id="project_manager_task_visibility_rule" model="ir.rule">
+        <field name="name">Project Task: Project Lead: Can view all the tasks</field>
+        <field name="model_id" ref="model_project_task"/>
+        <field name="domain_force">['|', '|', '|',
+            ('project_id.user_id', '=', user.id),
+            ('project_id.project_owner_ids', 'in', user.id),
+            ('project_id.consultant_ids', 'in', user.id),
+            ('project_id.customer_success_manager_id', '=', user.id)]
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+        <field name="groups" eval="[(4,ref('aktiv_pms.group_aktiv_project_manager')), (4, ref('aktiv_pms.group_aktiv_project_functional'))]"/>
+    </record>
+
+     <record id="project_user_task_visibility_rule" model="ir.rule">
+        <field name="name">Project Task: Project User: Can view only assigned tasks</field>
+        <field name="model_id" ref="model_project_task"/>
+        <field name="domain_force">
+            ('user_ids', '=', user.id),
+        </field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="groups" eval="[(4,ref('project.group_project_user'))]"/>
+    </record>
+
+    <!-- Rule for user to show his own task -->
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'project'), ('name', '=', 'ir_rule_private_task')]"/>
+        </function>
+        <value eval="{'noupdate': False}"/>
+    </function>
+
+    <record id="project.ir_rule_private_task" model="ir.rule">
+        <field name="domain_force">[
+                ('project_id', '!=', False),
+                '|', '|',
+                ('user_ids', '=', user.id),
+                ('task_qa_ids', '=', user.id),
+                ('code_reviewer_ids', '=', user.id),]</field>
+    </record>
+
+    <record id="timesheet_line_rule_tech_lead" model="ir.rule">
+        <field name="name">Timesheet: Lead Engineer: </field>
+        <field name="model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="domain_force">[
+            '|', '|',
+                ('project_id.code_reviewer_ids', 'in', user.id),
+                ('project_id.team_leader_ids', 'in', user.id),
+                ('project_id.project_owner_ids', 'in', user.id)
+            ]
+        </field>
+        <field name="groups" eval="[(4, ref('aktiv_pms.group_aktiv_project_team_leader')), (4, ref('hr_timesheet.group_hr_timesheet_approver'))]"/>
+    </record>
+
+    <record id="timesheet_line_rule_project_owner" model="ir.rule">
+        <field name="name">Timesheet: Project Lead: Can view all the members timesheet</field>
+        <field name="model_id" ref="analytic.model_account_analytic_line"/>
+        <field name="domain_force">[
+                '|', '|', '|',
+                ('project_id.user_id', '=', user.id),
+                ('project_id.project_owner_ids', 'in', user.id),
+                ('project_id.consultant_ids', 'in', user.id),
+                ('project_id.customer_success_manager_id', '=', user.id)
+            ]
+        </field>
+        <field name="groups" eval="[(4, ref('aktiv_pms.group_aktiv_project_manager')), (4, ref('hr_timesheet.group_hr_timesheet_approver'))]"/>
+    </record>
+
+   <!--  <record id="hr_timesheet.timesheet_line_rule_user" model="ir.rule">
+        <field name="domain_force">[
+                '|', '|', '|', '|',
+                ('project_id.developer_ids', 'in', user.id),
+                ('project_id.task_qa_ids', 'in', user.id),
+                ('project_id.code_reviewer_ids', 'in', user.id),
+            ]
+        </field>
+    </record> -->
+
+
+    <function name="write" model="ir.model.data">
+        <function name="search" model="ir.model.data">
+            <value eval="[('module', '=', 'project'), ('name', '=', 'ir_rule_private_task')]"/>
+        </function>
+        <value eval="{'noupdate': True}"/>
+    </function>
+
+    <!--    <record id = "project_project_user_rule" model = "ir.rule">
+           <field name = "name"> User can see her/his data </field>
+           <field name = "model_id" ref = "model_project_project" />
+           <field name = "groups" eval = "[(4, ref ('aktiv_pms.group_aktiv_project_manager'))]" />
+           <field name = "perm_read" eval = "True" />
+           <field name = "perm_write" eval = "True" />
+           <field name = "perm_create" eval = "True" />
+           <field name = "perm_unlink" eval = "True" />
+           <field name = "domain_force"> [('user_id', '=', user.id)] </field>
+        </record>-->
+</odoo>
