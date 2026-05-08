@@ -1,3 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-ak_color_scheme.access_colour_scheme_pallet,access_colour_scheme_pallet,ak_color_scheme.model_colour_scheme_pallet,,1,1,1,0
-ak_color_scheme.access_colour_scheme_pallet_admin,access_colour_scheme_pallet_admin,ak_color_scheme.model_colour_scheme_pallet,base.group_system,1,1,1,1

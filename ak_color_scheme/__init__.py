@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo, Aktiv Software.
-# See LICENSE file for full copyright & licensing details.
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from . import models

@@ -10,8 +10,8 @@ class AktivMeetings(models.Model):
     _description = "Meetings"
 
     name = fields.Char(string="Name", compute="_compute_meeting_name", store=True)
-    local_datetime = fields.Datetime(_("Local DateTime"))
-    cust_datetime = fields.Datetime(_("Customer DateTime"))
+    local_datetime = fields.Datetime("Local DateTime")
+    cust_datetime = fields.Datetime("Customer DateTime")
     owner_ids = fields.Many2many("res.users")
     participants_ids = fields.Many2many("res.partner", string="Participants")
     project_id = fields.Many2one("project.project", "Project")

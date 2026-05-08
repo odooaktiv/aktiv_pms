@@ -73,7 +73,7 @@
 			<field name="model">account.analytic.line</field>
 			<field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
 			<field name="arch" type="xml">
-				<xpath expr="//tree//field[@name='unit_amount']" position="after">
+				<xpath expr="//list//field[@name='unit_amount']" position="after">
 					<field name="team_leader_approval" column_invisible="1"/>
 					<field name="hide_approved_hours" column_invisible="1"/>
 					<field name="effective_hours" widget="float_time" force_save="1" sum="Effective Hours"/>
@@ -90,30 +90,30 @@
 					<field name="utilization_rate" widget="percentage" groups="project.group_project_manager" optional="show"/>
 					<field name="state" readonly="1"/>
 				</xpath>
-				<xpath expr="//tree//field[@name='unit_amount']" position="attributes">
+				<xpath expr="//list//field[@name='unit_amount']" position="attributes">
 					<attribute name="readonly">state == 'approved'</attribute>
 				</xpath>
-				<xpath expr="//tree//field[@name='employee_id']" position="attributes">
+				<xpath expr="//list//field[@name='employee_id']" position="attributes">
 					<attribute name="readonly">state == 'approved'</attribute>
 				</xpath>
-				<xpath expr="//tree//field[@name='date']" position="attributes">
+				<xpath expr="//list//field[@name='date']" position="attributes">
 					<attribute name="readonly">state == 'approved'</attribute>
 				</xpath>
-				<xpath expr="//tree//field[@name='project_id']" position="attributes">
-					<attribute name="readonly">state == 'approved'</attribute>
-					<attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
-				</xpath>
-				<xpath expr="//tree//field[@name='name']" position="attributes">
-					<attribute name="readonly">state == 'approved'</attribute>
-				</xpath>
-				<xpath expr="//tree//field[@name='task_id']" position="attributes">
+				<xpath expr="//list//field[@name='project_id']" position="attributes">
 					<attribute name="readonly">state == 'approved'</attribute>
 					<attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
 				</xpath>
-				<xpath expr="//tree//field[@name='state']" position="before">
+				<xpath expr="//list//field[@name='name']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+				</xpath>
+				<xpath expr="//list//field[@name='task_id']" position="attributes">
+					<attribute name="readonly">state == 'approved'</attribute>
+					<attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+				</xpath>
+				<xpath expr="//list//field[@name='state']" position="before">
 					<field name="user_type" groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_team_leader" />
 				</xpath>
-				<xpath expr="//tree//field[@name='state']" position="after">
+				<xpath expr="//list//field[@name='state']" position="after">
 					<field name="hide_timesheet_approve_btn" column_invisible="1"/>
 					<field name="show_timesheet_reset_btn" column_invisible="1"/>
 					<field name="last_approver_id" column_invisible="1"/>

@@ -19,9 +19,9 @@
   - Carolina Fernandez
   - Carlos Roca
   - Juan Carlos Oñate
-- [ID42 Sistemas](https://www.id42.com.br):
+  - David Bañón Gil
+- [Escodoo](https://escodoo.com.br):
   - Marcel Savegnago
-  - Eduardo Aparício
 - [Obertix](https://www.obertix.net):
   - Vicent Cubells
 - [Solvos](https://www.solvos.es):
@@ -29,3 +29,5 @@
   - Dante Pereyra
 - [XCG Consulting](https://xcg-consulting.fr):
   - Houzéfa Abbasbhay
+- [Kencove](https://kencove.com):
+  - Mohamed Alkobrosli

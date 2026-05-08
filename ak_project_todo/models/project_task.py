@@ -28,14 +28,15 @@ class ProjectTask(models.Model):
         # Assign the default personal stage for those that are missing
         pass
 
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         context = self.env.context
-        fields = vals[0].keys()
+        fields = vals_list[0].keys()
         if context.get('sop_bank', False) and 'project_id' not in fields:
-            for val in vals:
+            for val in vals_list:
                 val['project_id'] = self.env.ref('ak_project_todo.project_sop_bank').id
             self = self.sudo()
-        return super(ProjectTask, self).create(vals)
+        return super().create(vals_list)
 
     @api.model
     def read_group(

@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- v17 inherited auth_signup.fields, which contained login/password/confirm_password/name inputs.
+         v19 split that template: auth_signup.fields now only has password/confirm_password, while login
+         and name moved to auth_signup.signup. We split the customization into two templates that still
+         inject the same Font Awesome icons next to each input. -->
     <template id="aktiv_signup" inherit_id="auth_signup.fields">
-        <xpath expr="//input[@name='login']" position="inside">
-            <i class="fa fa-envelope custom_icon_1"></i>
-        </xpath>
         <xpath expr="//input[@name='password']" position="inside">
             <i class="fa fa-key custom_icon_2"></i>
         </xpath>
         <xpath expr="//input[@name='confirm_password']" position="inside">
             <i class="fa fa-key custom_icon_3"></i>
+        </xpath>
+    </template>
+    <template id="aktiv_signup_main" inherit_id="auth_signup.signup">
+        <xpath expr="//input[@name='login']" position="inside">
+            <i class="fa fa-envelope custom_icon_1"></i>
         </xpath>
         <xpath expr="//div[hasclass('field-name')]/input[@name='name']" position="inside">
             <i class="fa fa-address-book custom_icon_4"></i>

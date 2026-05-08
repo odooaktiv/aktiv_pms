@@ -1,7 +1,6 @@
-/** @odoo-module **/
-
 import { url } from '@web/core/utils/urls';
 import { useService } from '@web/core/utils/hooks';
+import { user } from "@web/core/user";
 
 import { Component, onWillUnmount } from '@odoo/owl';
 
@@ -9,13 +8,12 @@ export class AppsBar extends Component {
 	static template = 'muk_web_appsbar.AppsBar';
     static props = {};
 	setup() {
-		this.companyService = useService('company');
         this.appMenuService = useService('app_menu');
-    	if (this.companyService.currentCompany.has_appsbar_image) {
+    	if (user.activeCompany.has_appsbar_image) {
             this.sidebarImageUrl = url('/web/image', {
                 model: 'res.company',
                 field: 'appbar_image',
-                id: this.companyService.currentCompany.id,
+                id: user.activeCompany.id,
             });
     	}
     	const renderAfterMenuChange = () => {
@@ -29,5 +27,8 @@ export class AppsBar extends Component {
             	'MENUS:APP-CHANGED', renderAfterMenuChange
             );
         });
+    }
+    _onAppClick(app) {
+        return this.appMenuService.selectApp(app);
     }
 }

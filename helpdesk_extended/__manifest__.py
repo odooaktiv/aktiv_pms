@@ -2,12 +2,12 @@
 
 {
     'name': "Helpdesk Email Template Changes",
-    'version': '17.0.1.0.0',
+    'version': '19.0.1.0.0',
     'summary': 'Mail',
     'description': """
         Inherited Helpdesk Closed Email Template
         """,
-    'depends': ['mail'],
+    'depends': ['mail', 'helpdesk_mgmt'],
     'data': [
             'data/helpdesk_template.xml'
         ],

@@ -6,7 +6,11 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="project.res_config_settings_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//block[@name='analytic']" position="after">
+                <!-- v17 anchored "PM Tool Info" after block[@name='analytic']; v19 project settings
+                     no longer exposes an analytic block (the analytic accounting setting moved to the
+                     accounting module's res_config_settings). Anchoring on block[@name='project_time']
+                     (Time Management) keeps the PM Tool Info block visible inside the Project section. -->
+                <xpath expr="//block[@name='project_time']" position="after">
                     <block title="PM Tool Info" name="pm_tool_info_block">
                     <settings name="pm_tool_info" string="PM Tool Info" groups="base.group_no_one">
                         <div class="content-group">

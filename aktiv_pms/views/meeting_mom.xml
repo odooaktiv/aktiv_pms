@@ -32,13 +32,13 @@
             <field name="name">meeting.mom.tree.view</field>
             <field name="model">meeting.mom</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="name"/>
                     <field name="meeting_datetime"/>
                     <field name ="extra_participants"/>
                     <field name ="feedback"/>
                     <field name ="notes"/>
-                </tree>
+                </list>
             </field>
         </record>
 
@@ -46,7 +46,7 @@
             <field name="name">Meeting MOM</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">meeting.mom</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
         </record>
         <menuitem id="menu_meeting_mom" name="MOM" parent="project.menu_project_config" action="action_meeting_mom" sequence="10"/>
     </data>

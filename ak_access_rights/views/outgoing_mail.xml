@@ -1,7 +1,8 @@
-﻿<odoo>
+<odoo>
     <menuitem
         id="base.menu_mail_servers"
         parent="crm.crm_menu_root"
         action="base.action_ir_mail_server_list"
-        sequence="90" groups="base.group_user,base.group_portal,base.group_system,base.group_erp_manager"/>
+        sequence="90"
+        groups="base.group_user,base.group_portal,base.group_system,base.group_erp_manager"/>
 </odoo>

@@ -5,6 +5,18 @@ from odoo.http import request
 
 
 class AktivOdooDays(http.Controller):
+    """
+    Controller Aktiv Odoo Days exposes the public website endpoints
+    used to render and process the Odoo Days contest registration
+    form.
+
+    The controller is responsible for rendering the registration
+    page, validating user submissions, creating the participant
+    record together with an associated survey user input, and
+    finally redirecting the participant to the start of their
+    assigned survey.
+    """
+
     @http.route(
         "/odoo/days/contest",
         type="http",
@@ -15,6 +27,38 @@ class AktivOdooDays(http.Controller):
         sitemap=False,
     )
     def odoo_days_contest(self, **kw):
+        """Define: Odoo Days Contest Registration
+        Route: /odoo/days/contest
+
+        Renders the Odoo Days contest registration form on GET and
+        processes the submitted data on POST.
+
+        On POST, the method parses the JSON-encoded list of
+        objectives from the form payload, validates that all
+        required fields are present, and then:
+
+        1. Creates a new `odoo.days.participant` record with the
+           submitted name, email, mobile, objectives and participant
+           type.
+        2. Creates a new `survey.user_input` record for the survey
+           that is linked to the selected participant type, pre
+           populating one empty input line per survey question.
+        3. Stores the created survey user input on the participant
+           and redirects the visitor to the survey start URL.
+
+        On GET (or when the submission is invalid), the method loads
+        the available participant types and objectives and renders
+        the `ak_odoo_days_contest.ak_odoo_days_contest` template,
+        passing along any error message produced during validation.
+
+        :param kw: Keyword arguments coming from the HTTP request,
+            expected to contain `name`, `email`, `mobile`,
+            `participant_type` and `objectives` on POST.
+        :return: A redirect response to the survey start URL on a
+            successful submission, otherwise a rendered response of
+            the registration template.
+        :raise: None
+        """
         fields = ['name', 'email', 'mobile', 'participant_type', 'objectives']
         if request.httprequest.method == 'POST':
             if kw:

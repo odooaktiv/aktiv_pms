@@ -25,7 +25,7 @@
                     <field name="code_reviewer_ids" widget="many2many_avatar_user"
                            context="{'for_cr':project_id}"
                            readonly="is_user and not is_team_leader"
-                           invisible="task_type_name in ('Consulting', 'Communication/Calls')"
+                            invisible="task_type_name in ('Consulting', 'Communication/Calls')"
                            required="state in 'state'" />
                     <field name="task_type_name" invisible="1"/>
                     <field name="hide_approved_hours" invisible="1"/>
@@ -33,7 +33,7 @@
                            context="{'for_qa':project_id}"
                            options="{'no_create_edit': True,  'no_create':True}"
                            readonly="is_user and not is_team_leader"
-                           invisible="task_type_name in ('Consulting', 'Communication/Calls')"
+                            invisible="task_type_name in ('Consulting', 'Communication/Calls')"
                            required="state == 'qa'"
                            />
                     <field name="task_state_count"
@@ -109,7 +109,7 @@
                     <button type="object" name="action_cus_review" class="oe_highlight"
                             string="Send for Customer Review"
                             invisible="not is_qa or state not in ('qa', 'call_consult') or is_bug"
-                            groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager, aktiv_pms.group_aktiv_project_QA"/>
+                            groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_QA"/>
                     <button type="object" name="action_done" class="oe_highlight"
                             string="Done"
                             invisible="state not in ('cust_review','ready_deploy')"
@@ -220,7 +220,7 @@
                     </group>
                 </xpath>
 
-                <xpath expr="//page[@name='sub_tasks_page']//field[@name='child_ids']//tree" position="attributes">
+                <xpath expr="//page[@name='sub_tasks_page']//field[@name='child_ids']//list" position="attributes">
                     <attribute name="editable"/>
                 </xpath>
                 <!--Test Cases Page-->
@@ -241,8 +241,8 @@
                                 <field name="post_failed_test_case"/>
                             </group>
                         </group>
-                        <field name="qa_ids" widget="section_and_note_one2many" mode="tree" readonly="state == 'cancel'">
-                            <tree string="Quality Analysis" editable="bottom"
+                        <field name="qa_ids" widget="section_and_note_one2many" mode="list" readonly="state == 'cancel'">
+                            <list string="Quality Analysis" editable="bottom"
                                   decoration-success="outcomes == 'expected'"
                                   decoration-danger="outcomes == 'bug'">
                                 <control>
@@ -268,7 +268,7 @@
                                         column_invisible="parent.qa_state_count &lt; 2 or parent.state != 'qa'"/>
                                 <field name="is_updated" column_invisible="1"/>
                                 <field name="is_new" column_invisible="1"/>
-                            </tree>
+                            </list>
                         </field>
                     </page>
                     <page string="Remarks For QA From Developer">
@@ -356,7 +356,7 @@
                     <attribute name="required">repeat_type == 'until'
                     </attribute>
                 </xpath>
-                <xpath expr="//field[@name='child_ids']/tree/field[@name='date_deadline']"
+                <xpath expr="//field[@name='child_ids']/list/field[@name='date_deadline']"
                        position="before">
                     <field name="state" column_invisible="1"/>
                     <field name="is_user" column_invisible="1"/>
@@ -373,17 +373,22 @@
 
                 </xpath>
      -->
-                <xpath expr="//field[@name='child_ids']/tree/field[@name='date_deadline']"
+                <xpath expr="//field[@name='child_ids']/list/field[@name='date_deadline']"
                        position="attributes">
                     <attribute name="required">task_type_name == 'Development'</attribute>
                 </xpath>
 
                 <!--Extra Info Page-->
+                <!-- v17 had an xpath here making the analytic_account_id field on project.task readonly
+                     when the user is a regular user (not a team leader). v19 project.task no longer
+                     exposes analytic_account_id (or account_id) directly on the task form view, so
+                     there is no field to target. Block kept as a v17 reference, disabled.
                 <xpath expr="//field[@name='analytic_account_id']"
                        position="attributes">
                     <attribute name="readonly">is_user and not is_team_leader</attribute>
                 </xpath>
-                
+                -->
+
                 <xpath expr="//field[@name='email_cc']" position="attributes">
                     <attribute name="readonly">is_user and not is_team_leader</attribute>
                 </xpath>
@@ -407,24 +412,30 @@
                 <xpath expr="//field[@name='working_days_close']" position="attributes">
                     <attribute name="readonly">is_user and not is_team_leader</attribute>
                 </xpath>
-                <xpath expr="//field[@name='child_ids']/tree/field[@name='stage_id']"
+                <xpath expr="//field[@name='child_ids']/list/field[@name='stage_id']"
                        position="attributes">
                     <attribute name="column_invisible">1</attribute>
                 </xpath>
-                <xpath expr="//field[@name='child_ids']/tree/field[@name='priority']"
+                <xpath expr="//field[@name='child_ids']/list/field[@name='priority']"
                        position="attributes">
                     <attribute name="column_invisible">1</attribute>
-                </xpath><xpath expr="//field[@name='child_ids']/tree/field[@name='state']"
+                </xpath><xpath expr="//field[@name='child_ids']/list/field[@name='state']"
                        position="attributes">
                     <attribute name="column_invisible">1</attribute>
                 </xpath>
-                <xpath expr="//field[@name='depend_on_ids']/tree/field[@name='stage_id']"
+                <xpath expr="//field[@name='depend_on_ids']/list/field[@name='stage_id']"
                        position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//field[@name='depend_on_ids']/tree/field[@name='stage_id']"
+                <xpath expr="//field[@name='depend_on_ids']/list/field[@name='stage_id']"
                        position="after">
                     <field name="state"/>
+                </xpath>
+                <!-- Replace v19 project_task_state_selection widget (expects standard v19 state
+                     values) with plain selection, since aktiv_pms uses custom state values. -->
+                <xpath expr="//field[@name='state'][@widget='project_task_state_selection']" position="attributes">
+                    <attribute name="widget">selection</attribute>
+                    <attribute name="options">{}</attribute>
                 </xpath>
                 <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
                     <button type="object"
@@ -436,6 +447,19 @@
                             </div>
 
                     </button>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Replace project_task_state_selection in the main task list base view -->
+        <record id="project_task_view_tree_main_base_inherit" model="ir.ui.view">
+            <field name="name">project.task.tree.main.base.state.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.project_task_view_tree_main_base"/>
+            <field name="arch" type="xml">
+                <xpath expr="//list/field[@name='state'][@widget='project_task_state_selection']" position="attributes">
+                    <attribute name="widget">selection</attribute>
+                    <attribute name="options">{}</attribute>
                 </xpath>
             </field>
         </record>
@@ -460,7 +484,13 @@
                        position="attributes">
                        <attribute name="readonly">state == 'new'</attribute>
                 </xpath>
-                <xpath expr="//page[@id='timesheets_tab']//group" position="before">
+                <!-- v17 used //page[@id='timesheets_tab']//group as the anchor, which targeted the
+                     "timesheet_error" group inside that page in v17. In v19 the timesheet_error group
+                     was moved out of the timesheets_tab page (see hr_timesheet/views/project_task_views.xml),
+                     so the page now contains only field[@name='timesheet_ids']. Anchoring on the field
+                     keeps the original v17 intent: insert QA/Dev Details groups above the timesheet list,
+                     scoped to the project.task model context (not the embedded analytic.line form). -->
+                <xpath expr="//page[@id='timesheets_tab']/field[@name='timesheet_ids']" position="before">
                     <group  invisible="task_type_name in ('Consulting', 'Communication/Calls')">
                         <group id='qa_details' string="QA Details">
                             <field name="qa_start_date"/>
@@ -490,12 +520,12 @@
                     <attribute name="invisible">1</attribute>
                 </xpath> -->
 
-                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='name']"
+                <xpath expr="//field[@name='timesheet_ids']/list/field[@name='name']"
                        position="attributes">
                     <attribute name="required">1</attribute>
                 </xpath>
 
-                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='unit_amount']"
+                <xpath expr="//field[@name='timesheet_ids']/list/field[@name='unit_amount']"
                        position="after">
                     <field name="team_leader_approval" column_invisible="1"/>
                     <field name="hide_approved_hours" column_invisible="1"/>
@@ -507,7 +537,7 @@
                     <field name="approved_hours" widget="float_time" force_save="1"
                         column_invisible="parent.hide_approved_hours == True"
                         readonly="state == 'approved' or team_leader_approval == True"/>
-                    <field name="user_type" groups="aktiv_pms.group_aktiv_project_manager, aktiv_pms.group_aktiv_project_team_leader" column_invisible="1"/>
+                    <field name="user_type" groups="aktiv_pms.group_aktiv_project_manager,aktiv_pms.group_aktiv_project_team_leader" column_invisible="1"/>
                     <field name="state" readonly="1"/>
                     <field name="data_sync"  optional="hide"/>
                     <field name="hide_timesheet_approve_btn" column_invisible="1"/>
@@ -525,19 +555,19 @@
                     </span>
                     <field name="approved_hours" nolabel="1" widget="float_time"/>
                 </xpath>
-                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='name']"
+                <xpath expr="//field[@name='timesheet_ids']/list/field[@name='name']"
                        position="attributes">
                        <attribute name="readonly">state == 'approved'</attribute>
                 </xpath>
-                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='date']"
+                <xpath expr="//field[@name='timesheet_ids']/list/field[@name='date']"
                        position="attributes">
                        <attribute name="readonly">state == 'approved'</attribute>
                 </xpath>
-                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='employee_id']"
+                <xpath expr="//field[@name='timesheet_ids']/list/field[@name='employee_id']"
                        position="attributes">
                        <attribute name="readonly">state == 'approved'</attribute>
                 </xpath>
-                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='unit_amount']"
+                <xpath expr="//field[@name='timesheet_ids']/list/field[@name='unit_amount']"
                        position="attributes">
                        <attribute name="readonly">state == 'approved'</attribute>
                 </xpath>
@@ -548,7 +578,7 @@
                 <xpath expr="//page[@id='timesheets_tab']//group//field[@name='subtask_effective_hours']"  position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <xpath expr="//field[@name='timesheet_ids']/tree/field[@name='state']"
+                <xpath expr="//field[@name='timesheet_ids']/list/field[@name='state']"
                        position="after">
                    <field name="status" groups="project.group_project_manager"
                       force_save="1"/>
@@ -561,7 +591,7 @@
         </record>
 
         <record id="project.act_project_project_2_project_task_all" model="ir.actions.act_window">
-            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+            <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
             <field name="context">{'pivot_row_groupby':['user_ids'],'default_project_id': active_id,'show_project_update': True}</field>
             <field name="domain">[('project_id', '=', active_id)]</field>
         </record>
@@ -634,47 +664,47 @@
             <field name="inherit_id" ref="project.view_task_tree2"/>
             <field eval="2" name="priority"/>
             <field name="arch" type="xml">
-                <xpath expr="//tree" position="attributes">
+                <xpath expr="//list" position="attributes">
                     <attribute name="default_group_by"></attribute>
                 </xpath>
 
-                <xpath expr="//tree/field[@name='name']" position="attributes">
+                <xpath expr="//list/field[@name='name']" position="attributes">
                     <attribute name="string">Name</attribute>
                 </xpath>
-                <!-- <xpath expr="//tree/field[@name='progress']" position="attributes">
+                <!-- <xpath expr="//list/field[@name='progress']" position="attributes">
                     <attribute name="column_invisible">1</attribute>
                 </xpath>
-                <xpath expr="//tree/field[@name='effective_hours']" position="attributes">
+                <xpath expr="//list/field[@name='effective_hours']" position="attributes">
                     <attribute name="string">Invested Hours</attribute>
                 </xpath> -->
 
-                <xpath expr="//tree/field[@widget='project_task_progressbar']" position="attributes">
+                <xpath expr="//list/field[@widget='project_task_progressbar']" position="attributes">
                     <attribute name="column_invisible">1</attribute>
                 </xpath>
-                <xpath expr="//tree/field[@widget='timesheet_uom']" position="attributes">
+                <xpath expr="//list/field[@widget='timesheet_uom']" position="attributes">
                     <attribute name="string">Invested Hours</attribute>
                 </xpath>
 
-                <xpath expr="//tree/field[@name='effective_hours']" position="before">
+                <xpath expr="//list/field[@name='effective_hours']" position="before">
                     <field name="planned_hours" sum="Planned Hours" />
                 </xpath>
-                <xpath expr="//tree/field[@name='effective_hours']" position="after">
+                <xpath expr="//list/field[@name='effective_hours']" position="after">
                     <field name="productive_hours_on_sub_task" sum="Productive Hours on Sub-tasks"  optional="hide"/>
                     <field name="subtask_planned_hours" sum="Planned Hours on Sub-tasks"  optional="hide"/>
                 </xpath>
-                <xpath expr="//tree/field[@name='project_id']" position="attributes">
+                <xpath expr="//list/field[@name='project_id']" position="attributes">
                     <attribute name="column_invisible">context.get('default_project_id')</attribute>
                 </xpath>
-                <xpath expr="//tree/field[@name='activity_ids']" position="attributes">
+                <xpath expr="//list/field[@name='activity_ids']" position="attributes">
                     <attribute name="column_invisible">1</attribute>
                 </xpath>
-                <xpath expr="//tree/field[@name='tag_ids']" position="attributes">
+                <xpath expr="//list/field[@name='tag_ids']" position="attributes">
                     <attribute name="column_invisible">1</attribute>
                 </xpath>
-                <xpath expr="//tree/field[@name='stage_id']" position="attributes">
+                <xpath expr="//list/field[@name='stage_id']" position="attributes">
                     <attribute name="column_invisible">1</attribute>
                 </xpath>
-                <xpath expr="//tree/field[@name='stage_id']" position="after">
+                <xpath expr="//list/field[@name='stage_id']" position="after">
                     <field name="task_completion" column_invisible="1"/>
                     <field name="hide_approved_hours" column_invisible="1"/>
                     <field groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"
@@ -685,7 +715,7 @@
                            string="Developer Approved Hours"/>
                     <field name="state"/>
                 </xpath>
-                <xpath expr="//tree/field[@name='name']" position="after">
+                <xpath expr="//list/field[@name='name']" position="after">
                     <field name="tag_ids" widget="many2many_tags" optional="hide"/>
                 </xpath>
             </field>

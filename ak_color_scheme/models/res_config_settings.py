@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo, Aktiv Software.
-# See LICENSE file for full copyright & licensing details.
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, api
-
 
 class ResConfigSettings(models.TransientModel):
     _inherit = "res.config.settings"
@@ -98,6 +96,13 @@ class ResConfigSettings(models.TransientModel):
 
     @api.onchange("colour_scheme_pallet_id")
     def _onchange_colour_scheme_pallet_id(self):
+        """
+        Update wizard and company colors when a color pallet is selected.
+
+        When the user selects a different color scheme pallet in the wizard,
+        this method applies the pallet’s color values to the wizard fields
+        and updates the corresponding company color scheme.
+        """
         for wizard in self:
             pallet = wizard.colour_scheme_pallet_id
             wizard.company_id.colour_scheme_pallet_id = pallet
@@ -116,6 +121,13 @@ class ResConfigSettings(models.TransientModel):
 
     @api.onchange("dark_colour_scheme_pallet_id")
     def _onchange_dark_colour_scheme_pallet_id(self):
+        """
+        Update wizard and company dark mode colors when a dark pallet is selected.
+
+        When the user selects a dark color scheme pallet in the wizard,
+        this method applies the pallet’s color values to the wizard’s
+        dark mode fields and updates the company’s dark color scheme.
+        """
         for wizard in self:
             pallet = wizard.dark_colour_scheme_pallet_id
             wizard.company_id.dark_colour_scheme_pallet_id = pallet
@@ -133,11 +145,22 @@ class ResConfigSettings(models.TransientModel):
             )
 
     def create_color_scheme_pallet(self):
+        """
+        Open the Color Scheme Pallet configurator form.
+
+        This method returns an action that opens a modal form view for
+        creating a new color scheme pallet. The default company and
+        pallet mode (light or dark) are determined based on
+        context.
+
+        :return: Action dictionary to open the pallet configurator form
+        :rtype: dict
+        """
         self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id(
             "ak_color_scheme.action_color_scheme_pallet_configurator"
         )
-        dark_color_pallet = self._context.get("dark_color_pallet", False)
+        dark_color_pallet = self.env.context.get("dark_color_pallet", False)
         action.update(
             {
                 "name": "Create Color Scheme Pallet",
@@ -163,11 +186,21 @@ class ResConfigSettings(models.TransientModel):
         return action
 
     def update_color_scheme_pallet(self):
+        """
+        Open the Color Scheme Pallet configurator in edit mode.
+
+        This method returns an action that opens the existing color scheme
+        pallet in form view for updating. The pallet (light or dark)
+        is selected based on the current context.
+
+        :return: Action dictionary to open the pallet configurator form
+        :rtype: dict
+        """
         action = self.env["ir.actions.actions"]._for_xml_id(
             "ak_color_scheme.action_color_scheme_pallet_configurator"
         )
         res_id = self.env.company.colour_scheme_pallet_id.id
-        if self._context.get("dark_color_pallet", False):
+        if self.env.context.get("dark_color_pallet", False):
             res_id = self.env.company.dark_colour_scheme_pallet_id.id
         action.update(
             {
@@ -188,6 +221,13 @@ class ResConfigSettings(models.TransientModel):
         return action
 
     def reset_color_scheme_pallet(self):
+        """
+        Reset company color scheme settings to default.
+
+        This method clears both light and dark color scheme pallets,
+        disables user-level color scheme selection, and removes the
+        configured home screen background.
+        """
         self.colour_scheme_pallet_id = False
         self.dark_colour_scheme_pallet_id = False
         self.allow_user_scheme = False

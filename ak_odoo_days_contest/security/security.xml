@@ -3,8 +3,7 @@
     <data noupdate="1">
         <record id="group_odoo_days_contest" model="res.groups">
             <field name="name">Odoo Days Contest</field>
-            <field name="category_id" ref="base.module_category_hidden"/>
-            <field name="users" eval="[Command.link(ref('base.user_admin'))]"/>
+            <field name="implied_by_ids" eval="[Command.link(ref('base.user_admin'))]"/>
         </record>
     </data>
 </odoo>

@@ -4,31 +4,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 17.0\n"
+"Project-Id-Version: Odoo Server 19.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-30 10:07+0000\n"
-"PO-Revision-Date: 2023-11-30 10:07+0000\n"
+"POT-Creation-Date: 2026-01-05 12:48+0000\n"
+"PO-Revision-Date: 2026-01-05 12:48+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
-
-#. module: muk_web_colors
-#: model:ir.model,name:muk_web_colors.model_ir_asset
-msgid "Asset"
-msgstr ""
-
-#. module: muk_web_colors
-#: model:ir.model,name:muk_web_colors.model_web_editor_assets
-msgid "Assets Utils"
-msgstr ""
-
-#. module: muk_web_colors
-#: model:ir.model,name:muk_web_colors.model_ir_attachment
-msgid "Attachment"
-msgstr ""
 
 #. module: muk_web_colors
 #: model_terms:ir.ui.view,arch_db:muk_web_colors.view_res_config_settings_form
@@ -48,7 +33,12 @@ msgstr "Marke helle Farbe"
 #. module: muk_web_colors
 #: model_terms:ir.ui.view,arch_db:muk_web_colors.view_res_config_settings_form
 msgid "Branding"
-msgstr "Branding"
+msgstr ""
+
+#. module: muk_web_colors
+#: model:ir.model,name:muk_web_colors.model_muk_web_colors_color_assets_editor
+msgid "Color Assets Utils"
+msgstr "Farbvermögen-Utils"
 
 #. module: muk_web_colors
 #: model:ir.model,name:muk_web_colors.model_res_config_settings
@@ -83,22 +73,34 @@ msgstr "Gefahr helle Farbe"
 #. module: muk_web_colors
 #: model_terms:ir.ui.view,arch_db:muk_web_colors.view_res_config_settings_form
 msgid "Dark Mode Colors"
-msgstr "Farben dunkler Modus"
+msgstr "Dunkelmodus Farben"
+
+#. module: muk_web_colors
+#: model:ir.model.fields,field_description:muk_web_colors.field_muk_web_colors_color_assets_editor__display_name
+#: model:ir.model.fields,field_description:muk_web_colors.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "Anzeigename"
+
+#. module: muk_web_colors
+#: model:ir.model.fields,field_description:muk_web_colors.field_muk_web_colors_color_assets_editor__id
+#: model:ir.model.fields,field_description:muk_web_colors.field_res_config_settings__id
+msgid "ID"
+msgstr ""
 
 #. module: muk_web_colors
 #: model_terms:ir.ui.view,arch_db:muk_web_colors.view_res_config_settings_form
 msgid "Info"
-msgstr "Information"
+msgstr ""
 
 #. module: muk_web_colors
 #: model:ir.model.fields,field_description:muk_web_colors.field_res_config_settings__color_info_dark
 msgid "Info Dark Color"
-msgstr "Information dunkle Farbe"
+msgstr "Info dunkle Farbe"
 
 #. module: muk_web_colors
 #: model:ir.model.fields,field_description:muk_web_colors.field_res_config_settings__color_info_light
 msgid "Info Light Color"
-msgstr "Information helle Farbe"
+msgstr "Info helle Farbe"
 
 #. module: muk_web_colors
 #: model_terms:ir.ui.view,arch_db:muk_web_colors.view_res_config_settings_form
@@ -123,12 +125,12 @@ msgstr "Primäre helle Farbe"
 #. module: muk_web_colors
 #: model_terms:ir.ui.view,arch_db:muk_web_colors.view_res_config_settings_form
 msgid "Reset Dark Colors"
-msgstr "dunkle Farbe zurücksetzen"
+msgstr "Dunkle Farben zurücksetzen"
 
 #. module: muk_web_colors
 #: model_terms:ir.ui.view,arch_db:muk_web_colors.view_res_config_settings_form
 msgid "Reset Light Colors"
-msgstr "helle Farbe zurücksetzen"
+msgstr "Helle Farben zurücksetzen"
 
 #. module: muk_web_colors
 #: model_terms:ir.ui.view,arch_db:muk_web_colors.view_res_config_settings_form

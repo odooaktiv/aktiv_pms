@@ -1,33 +1,27 @@
-/** @odoo-module **/
-
 import { useEffect } from "@odoo/owl";
+import { user } from "@web/core/user";
 import { url } from "@web/core/utils/urls";
 import { useBus, useService } from "@web/core/utils/hooks";
 
 import { Dropdown } from "@web/core/dropdown/dropdown";
 
 export class AppsMenu extends Dropdown {
-	static template = 'muk_web_theme.AppsMenu';
-    static props = {
-    	...Dropdown.props
-    };
     setup() {
     	super.setup();
     	this.commandPaletteOpen = false;
         this.commandService = useService("command");
-    	this.companyService = useService('company');
-    	if (this.companyService.currentCompany.has_background_image) {
-            this.backgroundImageUrl = url('/web/image', {
+    	if (user.activeCompany.has_background_image) {
+            this.imageUrl = url('/web/image', {
                 model: 'res.company',
                 field: 'background_image',
-                id: this.companyService.currentCompany.id,
+                id: user.activeCompany.id,
             });
     	} else {
-    		this.backgroundImageUrl = '/muk_web_theme/static/src/img/background.png';
+    		this.imageUrl = '/muk_web_theme/static/src/img/background.png';
     	}
         useEffect(
-            (open) => {
-            	if (open) {
+            (isOpen) => {
+            	if (isOpen) {
             		const openMainPalette = (ev) => {
             	    	if (
             	    		!this.commandServiceOpen && 
@@ -49,8 +43,18 @@ export class AppsMenu extends Dropdown {
 	                }
             	}
             },
-            () => [this.state.open]
-        );
-    	useBus(this.env.bus, "ACTION_MANAGER:UI-UPDATED", this.close);
+            () => [this.state.isOpen]
+		);
+    	useBus(this.env.bus, "ACTION_MANAGER:UI-UPDATED", () => {
+			if (this.state.close) {
+				this.state.close();
+			}
+		});
+    }
+    onOpened() {
+		super.onOpened();
+		if (this.menuRef && this.menuRef.el) {
+			this.menuRef.el.style.backgroundImage = `url('${this.imageUrl}')`;
+		}
     }
 }

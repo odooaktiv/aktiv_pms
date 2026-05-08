@@ -6,7 +6,7 @@
         <field name="model">project.task.type</field>
         <field name="inherit_id" ref="project.task_type_tree_inherited"/>
         <field name="arch" type="xml">
-            <xpath expr="//tree" position="attributes">
+            <xpath expr="//list" position="attributes">
                 <attribute name="default_group_by"></attribute>
             </xpath>
             <xpath expr="//field[@name='project_ids']" position="attributes">

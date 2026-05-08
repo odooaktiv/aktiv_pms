@@ -3,25 +3,27 @@
 import { Dropdown } from "@web/core/dropdown/dropdown";
 import { DropdownItem } from "@web/core/dropdown/dropdown_item";
 import { registry } from "@web/core/registry";
-
 import { Component, useChildSubEnv, useState } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
-class userColorSchemeSelector {
-    constructor(userColorSchemeService, toggleDelay) {
+
+class UserColorSchemeSelector {
+    constructor(userColorSchemeService) {
         this.userColorSchemeService = userColorSchemeService;
     }
 
-    switchUserColorScheme(schemeId) {
-		this.userColorSchemeService.setUserColorScheme(schemeId)
+    async switchUserColorScheme(schemeId = false) {
+        await this.userColorSchemeService.setUserColorScheme(schemeId);
     }
 }
 
+
 export class SwitchUserColorSchemeItem extends Component {
     static template = "ak_color_scheme.SwitchUserColorSchemeItem";
-    static components = { DropdownItem, SwitchUserColorSchemeItem };
+    static components = { DropdownItem };
+
     static props = {
-		color: {},
+        color: { type: Object },
         level: { type: Number },
     };
 
@@ -31,28 +33,41 @@ export class SwitchUserColorSchemeItem extends Component {
     }
 
     get isUserColorSchemeCurrent() {
-        return this.props.color.id === this.userColorSchemeService.currentUserColorScheme[0];
+        return (
+            this.userColorSchemeService.currentUserColorScheme &&
+            this.userColorSchemeService.currentUserColorScheme[0] === this.props.color.id
+        );
     }
 
-    toggleUserColorScheme() {
-        this.userColorSchemeSelector.switchUserColorScheme(this.props.color.id);
+    async toggleUserColorScheme() {
+        await this.userColorSchemeSelector.switchUserColorScheme(this.props.color.id);
+        window.location.reload();
     }
 }
+
 
 export class SwitchUserColorSchemeMenu extends Component {
     static template = "ak_color_scheme.SwitchUserColorSchemeMenu";
     static components = { Dropdown, DropdownItem, SwitchUserColorSchemeItem };
-    static props = {};
-    static toggleDelay = 1000;
 
     setup() {
-        this.userColorSchemeService = useService("user_color_scheme")
-        this.userColorSchemeSelector = useState(new userColorSchemeSelector(this.userColorSchemeService, this.constructor.toggleDelay));
+        this.userColorSchemeService = useService("user_color_scheme");
+
+        this.userColorSchemeSelector = useState(
+            new UserColorSchemeSelector(this.userColorSchemeService)
+        );
+
         useChildSubEnv({ userColorSchemeSelector: this.userColorSchemeSelector });
     }
-    toggleUserColorSchemeDefault() {
-        this.userColorSchemeSelector.switchUserColorScheme();
-    }
-};
 
-registry.category("systray").add("SwitchUserColorSchemeMenu", {Component: SwitchUserColorSchemeMenu}, { sequence: 2 });
+    async toggleUserColorSchemeDefault() {
+        await this.userColorSchemeSelector.switchUserColorScheme(false);
+        window.location.reload();
+    }
+}
+
+registry.category("systray").add(
+    "ak_color_scheme.SwitchUserColorSchemeMenu",
+    { Component: SwitchUserColorSchemeMenu },
+    { sequence: 2 }
+);

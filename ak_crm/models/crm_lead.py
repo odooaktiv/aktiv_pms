@@ -164,53 +164,53 @@ class Lead(models.Model):
             if team_ids:
                 search_domain = [
                     "|",
-                    ("team_id", "=", False),
-                    ("team_id", "in", list(team_ids)),
+                    ("team_ids", "=", False),
+                    ("team_ids", "in", list(team_ids)),
                     ("type", "=", self.env.ref("ak_crm.crm_type_opportunity").id),
                 ]
             else:
                 search_domain = [
                     "|",
-                    ("team_id", "=", False),
+                    ("team_ids", "=", False),
                     ("type", "=", self.env.ref("ak_crm.crm_type_opportunity").id),
                 ]
         if self._context.get("email_leads"):
             if team_ids:
                 search_domain = [
                     "|",
-                    ("team_id", "=", False),
-                    ("team_id", "in", list(team_ids)),
+                    ("team_ids", "=", False),
+                    ("team_ids", "in", list(team_ids)),
                     ("type", "=", self.env.ref("ak_crm.crm_type_lead").id),
                 ]
             else:
                 search_domain = [
                     "|",
-                    ("team_id", "=", False),
+                    ("team_ids", "=", False),
                     ("type", "=", self.env.ref("ak_crm.crm_type_lead").id),
                 ]
         if self._context.get("outbound_leads"):
             if team_ids:
                 search_domain = [
                     "|",
-                    ("team_id", "=", False),
-                    ("team_id", "in", list(team_ids)),
+                    ("team_ids", "=", False),
+                    ("team_ids", "in", list(team_ids)),
                     ("type", "=", self.env.ref("ak_crm.crm_type_outbound_lead").id),
                 ]
             else:
                 search_domain = [
                     "|",
-                    ("team_id", "=", False),
+                    ("team_ids", "=", False),
                     ("type", "=", self.env.ref("ak_crm.crm_type_outbound_lead").id),
                 ]
         if self._context.get("default_type") == "lead":
             if team_ids:
                 search_domain = [
                     "|",
-                    ("team_id", "=", False),
-                    ("team_id", "in", list(team_ids)),
+                    ("team_ids", "=", False),
+                    ("team_ids", "in", list(team_ids)),
                 ]
             else:
-                search_domain = [("team_id", "=", False)]
+                search_domain = [("team_ids", "=", False)]
 
         if domain:
             search_domain += list(domain)
@@ -218,9 +218,9 @@ class Lead(models.Model):
         return self.env["crm.stage"].search(search_domain, order=order, limit=limit)
 
     @api.model
-    def _read_group_stage_ids(self, stages, domain, order):
+    def _read_group_stage_ids(self, stages, domain):
         """Used this method group for leads and opportunity"""
-        group_stages = super(Lead, self)._read_group_stage_ids(stages, domain, order)
+        group_stages = super()._read_group_stage_ids(stages, domain)
         if self._context.get("email_leads", False):
             group_stages = group_stages.filtered(
                 lambda stage: self.env.ref("ak_crm.crm_type_lead").id

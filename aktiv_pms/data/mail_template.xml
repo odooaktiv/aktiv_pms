@@ -321,7 +321,7 @@
                                         <td valign="top" style="font-size: 16px;">
                                             <div>
                                                 This task has been assigned to you for <t
-                                                    t-out="ctx['state'] or ''"></t>.
+                                                    t-out="ctx.get('state') or ''"></t>.
                                                 <div style="margin: 16px 0px 16px 0px;">
                                                     <a t-att-href="object.get_task_url()"
                                                        style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; font-size:13px;">
@@ -403,7 +403,7 @@
                                         <td valign="top" style="font-size: 16px;">
                                             <div>
                                                 This task is <t
-                                                    t-out="ctx['state'] or ''"></t>.
+                                                    t-out="ctx.get('state') or ''"></t>.
                                                 <div style="margin: 16px 0px 16px 0px;">
                                                     <a t-att-href="object.get_task_url()"
                                                        style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; font-size:13px;">
@@ -486,11 +486,17 @@
                                 <td valign="top" style="font-size: 13px;">
                                     We appreciate your feedback. It helps us to improve
                                     continuously.
-                                    <t t-if="object.rating_status == 'periodic'">
+                                    <!-- v17 referenced project-level rating_status / rating_status_period;
+                                         in v19 those fields moved off project.project to project.task.type
+                                         (stage). We now check across the project's stages: if any stage is
+                                         in periodic mode, the project sends periodic rating emails, and we
+                                         take that stage's rating_status_period as the displayed frequency. -->
+                                    <t t-set="rating_periodic_stage" t-value="object.type_ids.filtered(lambda t: t.rating_status == 'periodic')[:1]"/>
+                                    <t t-if="rating_periodic_stage">
                                         <br/>
                                         <span style="margin: 0px 0px 0px 0px; font-size: 12px; opacity: 0.5; color: #454748;">
                                             This customer survey is sent
-                                            <b t-out="object.rating_status_period or ''">
+                                            <b t-out="rating_periodic_stage.rating_status_period or ''">
                                                 Weekly
                                             </b>
                                             as long as the project is in not done.

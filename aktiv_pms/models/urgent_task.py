@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 
 
 class UrgentTask(models.Model):
@@ -14,7 +14,7 @@ class UrgentTask(models.Model):
         "task_consult_rel",
         "task_id",
         "user_id",
-        string=_("Consultant"),
+        string="Consultant",
         tracking=True,
     )
     task_affected = fields.Text(string="Task Affected")

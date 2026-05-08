@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo, Aktiv Software.
-# See LICENSE file for full copyright & licensing details.
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models
 
@@ -34,6 +33,13 @@ class ResCompany(models.Model):
     )
 
     def _compute_web_enterprise_installed(self):
+        """
+        Compute whether the Web Enterprise module is installed.
+
+        This method checks if the `web_enterprise` module is currently
+        installed in the system. If installed, the boolean field
+        `is_web_enterprise` is set to True; otherwise, it remains False.
+        """
         for rec in self:
             web_enterprise = self.env["ir.module.module"].search(
                 [("state", "=", "installed"), ("name", "=", "web_enterprise")]

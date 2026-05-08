@@ -7,9 +7,10 @@ class ProjectTags(models.Model):
 	is_sop_bank = fields.Boolean(string="SOP Bank")
 	old_db_id = fields.Integer(string="Old DB ID", copy=False)
 
-	def create(self, vals):
+	@api.model_create_multi
+	def create(self, vals_list):
 		context = self.env.context
 		if context.get('sop_bank'):
-			vals.update({"is_sop_bank": True})
-		res = super().create(vals)
-		return res
+			for vals in vals_list:
+				vals.update({"is_sop_bank": True})
+		return super().create(vals_list)

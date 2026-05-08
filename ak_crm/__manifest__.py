@@ -1,8 +1,21 @@
+# -*- coding: utf-8 -*-
+# Part of Odoo, AIC, Aktiv Software
+# See LICENSE file for full copyright & licensing details.
+
+# Author: Aktiv Software.
+# mail: sales@aktivsoftware.com
+# Copyright (C) 2015-Present Aktiv Software PVT. LTD.
+# Contributions:
+# Aktiv Software:
+#    - Shivani Shah
+#    - Yash Vandra
+#
+
 {
     "name": "Aktiv CRM",
     "category": "Services/Project",
     "author": "Aktiv Software",
-    "version": "17.0.1.0.0",
+    "version": "19.0.1.0.0",
     "license": "OPL-1",
     "depends": ["crm", "mail"],
     "data": [
@@ -29,8 +42,8 @@
     ],
     "assets": {
         "web.assets_backend": [
-            "ak_crm/static/src/core/web/chatter.js",
-            "ak_crm/static/src/core/web/chatter.xml",
+            "ak_crm/static/src/chatter/web/chatter.js",
+            "ak_crm/static/src/chatter/web/chatter.xml",
         ],
     },
     "installable": True,

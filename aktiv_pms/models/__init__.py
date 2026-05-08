@@ -4,6 +4,8 @@ from . import (
     aktiv_meetings,
     communication_tool,
     project,
+    project_report,
+    hr_timesheet_report,
     project_task,
     quality_analysis,
     quality_check,

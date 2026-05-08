@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.tools import is_html_empty
 from odoo.tools.misc import clean_context
 
@@ -11,29 +11,29 @@ class ChatterSendMail(models.TransientModel):
     _mail_flat_thread = True
 
     email_to = fields.Char(
-        string=_("Email To"),
+        string="Email To",
         default=lambda self: self.env["crm.lead"]
         .browse(self._context.get("default_res_id"))
         .email_from,
     )
     email_cc = fields.Char(
-        string=_("Email CC"),
+        string="Email CC",
         default=lambda self: self.env["crm.lead"]
         .browse(self._context.get("default_res_id"))
         .email_cc,
     )
     subject = fields.Char(
-        string=_("Subject"),
+        string="Subject",
         compute='_compute_subject', readonly=False, store=True,
     )
     body = fields.Html(
-        string=_("Contents"), render_engine="qweb", sanitize_style=True,
+        string="Contents", render_engine="qweb", sanitize_style=True,
         compute='_compute_body', readonly=False, store=True
     )
-    attachment_ids = fields.Many2many("ir.attachment", string=_("Attachments"))
+    attachment_ids = fields.Many2many("ir.attachment", string="Attachments")
     template_id = fields.Many2one(
         "mail.template",
-        string=_("Template"),
+        string="Template",
         index=True,
         domain="[('model', '=', 'crm.lead')]",
     )

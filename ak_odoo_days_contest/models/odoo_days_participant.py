@@ -2,6 +2,18 @@ from odoo import fields, models
 
 
 class OdooDaysParticipant(models.Model):
+    """
+    Model Odoo Days Participant stores the registration details of a
+    person who signs up for the Odoo Days contest through the public
+    website form.
+
+    A participant record captures the personal contact information
+    (name, email, mobile), the participant type (which drives the
+    survey to be answered), the list of chosen objectives, and a
+    reference to the generated survey user input that holds the
+    participant's answers.
+    """
+
     _name = "odoo.days.participant"
     _description = "Odoo Days Participant"
 

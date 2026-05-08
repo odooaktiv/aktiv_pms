@@ -9,7 +9,7 @@
             <xpath expr="//field[@name='is_won']" position="before">
                 <field name="is_lost"/>
             </xpath>
-            <xpath expr="//field[@name='team_id']" position="after">
+            <xpath expr="//field[@name='team_ids']" position="after">
                 <field name="type" widget="many2many_tags" options="{'no_create_edit': True,  'no_create':True}"/>
                 <field name="stage_id_type_key" invisible="1"/>
             </xpath>
@@ -34,9 +34,8 @@
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
                 <field name="type"/>
-                <group expand="1" string="Group By">
-                    <filter string="Type" name="group_type" context="{'group_by':'type'}"/>
-                </group>
+                <separator/>
+                <filter string="Type" name="group_type" context="{'group_by': 'type'}"/>
             </xpath>
         </field>
     </record>

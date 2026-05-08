@@ -1,14 +1,27 @@
+# -*- coding: utf-8 -*-
+# Part of Odoo, AIC, Aktiv Software
+# See LICENSE file for full copyright & licensing details.
+
+# Author: Aktiv Software.
+# mail: sales@aktivsoftware.com
+# Copyright (C) 2015-Present Aktiv Software PVT. LTD.
+# Contributions:
+# Aktiv Software:
+#    - Shivani Shah
+#    - Yash Vandra
+#
+
 {
-    "name": "AIC Web Theme",
+    "name": "Web Theme",
     "summary": "Add Enterprise Web Theme",
     "description": """
         This module adds enterprise web theme to PMS
     """,
-    "version": "17.0.1.0.0",
+    "version": "19.0.1.0.0",
     "category": "Extra Tools",
-    "license": "LGPL-3",
+    "license": "OPL-1",
     "author": "Aktiv Software",
-    "website": "http://www.aktivsoftware.com",
+    "website": "https://aktivsoftware.com",
     "depends": ["muk_web_theme", "ak_color_scheme"],
     "excludes": [
         "web_enterprise",

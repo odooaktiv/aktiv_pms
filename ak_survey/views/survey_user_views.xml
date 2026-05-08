@@ -19,10 +19,10 @@
 			<xpath expr="//field[@name='state']" position="after">
 				<field name="is_winner" invisible="1"/>
 			</xpath>
-			<xpath expr="//tree" position="attributes">
+			<xpath expr="//list" position="attributes">
 				<attribute name="decoration-success">is_winner == True</attribute>
 			</xpath>
-			<xpath expr="//tree" position="inside">
+			<xpath expr="//list" position="inside">
 				<header>
 					<button name="action_declare_winner" type="object" string="Declare Winner" class="oe_highlight"/>
 				</header>

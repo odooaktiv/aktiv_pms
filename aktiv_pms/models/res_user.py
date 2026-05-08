@@ -60,21 +60,26 @@ class ResUser(models.Model):
 
 
     def write(self, vals):
-        group_edit = self.env.ref('aktiv_pms.group_allow_edit_old_timesheets')
-        group_approve = self.env.ref('aktiv_pms.group_allow_approve_old_timesheets')
+        group_edit = self.env.ref('aktiv_pms.group_allow_edit_old_timesheets', raise_if_not_found=False)
+        group_approve = self.env.ref('aktiv_pms.group_allow_approve_old_timesheets', raise_if_not_found=False)
 
         res = super(ResUser, self).write(vals)
 
-        for user in self:
-            if group_edit in user.groups_id and not user.edit_access_grant_date:
-                user.write({'edit_access_grant_date': fields.Date.today()})
-            elif group_edit not in user.groups_id and user.edit_access_grant_date:
-                user.write({'edit_access_grant_date': False})
+        if not group_edit and not group_approve:
+            return res
 
-            if group_approve in user.groups_id and not user.approve_access_grant_date:
-                user.write({'approve_access_grant_date': fields.Date.today()})
-            elif group_approve not in user.groups_id and user.approve_access_grant_date:
-                user.write({'approve_access_grant_date': False})
+        for user in self:
+            if group_edit:
+                if group_edit in user.group_ids and not user.edit_access_grant_date:
+                    user.write({'edit_access_grant_date': fields.Date.today()})
+                elif group_edit not in user.group_ids and user.edit_access_grant_date:
+                    user.write({'edit_access_grant_date': False})
+
+            if group_approve:
+                if group_approve in user.group_ids and not user.approve_access_grant_date:
+                    user.write({'approve_access_grant_date': fields.Date.today()})
+                elif group_approve not in user.group_ids and user.approve_access_grant_date:
+                    user.write({'approve_access_grant_date': False})
 
         return res
 
@@ -98,10 +103,10 @@ class ResUser(models.Model):
                              ])
         for user in users:
             if user.edit_access_grant_date and user.edit_access_grant_date <= cutoff:
-                if group_edit in user.groups_id:
-                    user.groups_id = [(3, group_edit.id)]
+                if group_edit in user.group_ids:
+                    user.group_ids = [(3, group_edit.id)]
                 user.edit_access_grant_date = False
             if user.approve_access_grant_date and user.approve_access_grant_date <= cutoff:
-                if group_approve in user.groups_id:
-                    user.groups_id = [(3, group_approve.id)]
+                if group_approve in user.group_ids:
+                    user.group_ids = [(3, group_approve.id)]
                 user.approve_access_grant_date = False

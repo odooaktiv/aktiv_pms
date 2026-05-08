@@ -13,9 +13,12 @@ class ProjectTaskType(models.Model):
     def _compute_user_id(self):
         pass
 
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         context = self.env.context
         if context.get('sop_bank'):
-            vals['project_ids'] = [(6, 0, [self.env.ref('ak_project_todo.project_sop_bank').id])]
-            vals['sop_stage'] = True
-        return super(ProjectTaskType, self).create(vals)
+            sop_project_id = self.env.ref('ak_project_todo.project_sop_bank').id
+            for vals in vals_list:
+                vals['project_ids'] = [(6, 0, [sop_project_id])]
+                vals['sop_stage'] = True
+        return super().create(vals_list)

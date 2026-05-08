@@ -20,17 +20,19 @@
 	    <xpath expr="//h4[hasclass('modal-title')]" position="attributes">
 	    	<attribute name="class" add="flex-shrink-0 w-75" separator=" " />
 	    </xpath>
-	    <xpath expr="//t[@t-if='!fullscreen']/button" position="before">
-	    	<div class="w-100">
-		    	<button 
-		    		t-if="!fullscreen"
-		    		type="button" 
-		    		class="btn float-end me-2 mk_btn_dialog_size" 
-		    		t-on-click="() => this.env.dialogData.size = this.env.dialogData.size === 'fs' ? this.env.dialogData.initalSize : 'fs'"
-		    	>
-		            <i t-attf-class="fa fa-lg {{ this.env.dialogData.size === 'fs' ? 'fa-compress' : 'fa-expand' }}" />
-		        </button>
-	        </div>
+	    <xpath expr="//button[@t-on-click='onExpand']" position="attributes">
+	    	<attribute name="class">fa fa-lg fa-external-link btn o_expand_button</attribute>
+	    	<attribute name="style">margin-top: 2px !important;</attribute>
+	    </xpath>
+	    <xpath expr="//t[@t-if='!fullscreen']" position="before">
+	    	<button 
+				t-if="!fullscreen"
+				type="button" 
+				class="btn float-end me-1 mk_btn_dialog_size" 
+				t-on-click="() => this.onClickDialogSizeToggle()"
+			>
+				<i t-attf-class="fa fa-lg {{ this.data?.size === 'fs' ? 'fa-compress' : 'fa-expand' }}" />
+			</button>
 	    </xpath>
 	</t>
 	

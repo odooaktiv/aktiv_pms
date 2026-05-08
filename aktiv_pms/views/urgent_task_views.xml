@@ -4,21 +4,21 @@
             <field name="name">urgent.task.tree.tree</field>
             <field name="model">urgent.task</field>
             <field name="arch" type="xml">
-                <tree string="Urgent Task" class="custom-css custom_class" editable="top">
+                <list string="Urgent Task" class="custom-css custom_class" editable="top">
                     <field name="name"/>
                     <field name="project_id"/>
                     <field name="consultant_ids" widget="many2many_avatar_user" context="{'urgent_task':project_id}"/>
                     <field name="task_affected"/>
                     <field name="date_assign"/>
                     <field name="remark"/>
-                </tree>
+                </list>
             </field>
         </record>
         <record id="action_urgent_task" model="ir.actions.act_window">
             <field name="name">Urgent Task</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">urgent.task</field>
-            <field name="view_mode">tree</field>
+            <field name="view_mode">list</field>
         </record>
        <!--  <menuitem name="Urgent Task" id="urgent_task_menu"
             parent='aktiv_pms.menu_weekly_forcast_main' action="action_urgent_task"/> -->

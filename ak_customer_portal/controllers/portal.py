@@ -9,7 +9,6 @@ from odoo.addons.portal.controllers.portal import CustomerPortal
 from odoo.addons.portal.controllers.portal import pager as portal_pager  # pylint: disable=E0401
 from odoo.exceptions import AccessError, MissingError  # pylint: disable=E0401
 from odoo.http import request  # pylint: disable=E0401
-from odoo.osv.expression import AND  # pylint: disable=E0401
 from odoo.tools import date_utils
 from odoo.tools import groupby as groupbyelem  # pylint: disable=E0401
 
@@ -206,12 +205,7 @@ class TimesheetCustomerPortalCustom(TimesheetCustomerPortal):
                 self._get_project_timesheet_ids(),
             )
         ]
-        domain = AND(
-            [
-                domain,
-                searchbar_filters[filterby]["domain"],
-            ],
-        )
+        domain += searchbar_filters[filterby]["domain"]
         if search and search_in:
             domain += self._get_search_domain(search_in, search)
 
@@ -469,7 +463,7 @@ class ProjectCustomerPortal(CustomerPortal):
     #         project, access_token, values, "my_projects_history", False, **kwargs
     #     )
 
-    @http.route("/project/task/<int:task_id>", type="json", website=True, auth="user")
+    @http.route("/project/task/<int:task_id>", type="jsonrpc", website=True, auth="user")
     def portal_project_task(self, task_id, **post):  # pylint: disable=W0613
         """Search for timesheets of task, of approved state and approved
         hours greater than zero"""
@@ -729,7 +723,7 @@ class ProjectCustomerPortal(CustomerPortal):
         return request.render("project.portal_my_project", values)
 
     @http.route(
-        "/project/sub_task/<int:task_id>", type="json", website=True, auth="user"
+        "/project/sub_task/<int:task_id>", type="jsonrpc", website=True, auth="user"
     )
     def portal_project_sub_task(self, task_id, **post):  # pylint: disable=W0613
         """Display list of sub-tasks"""

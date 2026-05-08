@@ -8,7 +8,6 @@ import pytz
 from lxml import etree
 from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.osv import expression
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DF
 
 from ..utils import get_connection
@@ -52,7 +51,7 @@ class ProjectTask(models.Model):
         help="Use to make Go Live Date field readonly if Deployment Type (In Project) is Phase Wise", store=True)
     qa_ids = fields.One2many("quality.analysis", "task_id", string="Quality Analysis")
     state = fields.Selection(
-        selection=[
+        selection_add=[
             ("new", "Planned"),
             ("approval", "Customer Approval"),
             ("dev", "Development"),
@@ -61,12 +60,23 @@ class ProjectTask(models.Model):
             ("qa", "QA Testing"),
             ("redevelop", "Re-Development"),
             ("cust_review", "Customer Review"),
-            ("done", "Done"),
-            ("cancel", "Cancel"),
             ("on_hold", "On Hold"),
             ("ready_deploy", "Ready for Deployment"),
-            ("apps", "Apps")
+            ("apps", "Apps"),
         ],
+        ondelete={
+            "new": "set default",
+            "approval": "set default",
+            "dev": "set default",
+            "call_consult": "set default",
+            "cd_review": "set default",
+            "qa": "set default",
+            "redevelop": "set default",
+            "cust_review": "set default",
+            "on_hold": "set default",
+            "ready_deploy": "set default",
+            "apps": "set default",
+        },
         default="new",
         group_expand="_group_expand_states",
     )
@@ -89,16 +99,16 @@ class ProjectTask(models.Model):
         "Failed", compute="_compute_test_case_count", store=True
     )
     post_performed_test_case = fields.Integer(
-        "Post Performed Task", compute="_compute_test_case_count",
+        "Post Performed Task", compute="_compute_test_case_count", compute_sudo=True,
     )
     post_passed_test_case = fields.Integer(
-        "Post Passed Task", compute="_compute_test_case_count",
+        "Post Passed Task", compute="_compute_test_case_count", compute_sudo=True,
     )
     post_failed_test_case = fields.Integer(
-        "Post Failed Task", compute="_compute_test_case_count",
+        "Post Failed Task", compute="_compute_test_case_count", compute_sudo=True,
     )
     post_test_ratio = fields.Float(
-        "Post Success Test Case", compute="_compute_test_case_count",
+        "Post Success Test Case", compute="_compute_test_case_count", compute_sudo=True,
     )
     is_delete = fields.Boolean(string="Is qa line deleted?", default=False)
     qa_line_length = fields.Integer(string="Length of QA Lines", default=0)
@@ -149,11 +159,11 @@ class ProjectTask(models.Model):
     qa_hours = fields.Float(string="QA Planned Hours", default=0.0)
 
     # Compute fields
-    qa_spent_hr = fields.Float(string="QA Spent Hours", compute="_compute_qa_hours")
+    qa_spent_hr = fields.Float(string="QA Spent Hours", compute="_compute_qa_hours", compute_sudo=True)
     qa_approved_hr = fields.Float(
         string="QA Approved Hours", compute="_compute_qa_hours", store=True
     )
-    qa_remain_hr = fields.Float(string="QA Remaining Approval Hours", compute="_compute_qa_hours")
+    qa_remain_hr = fields.Float(string="QA Remaining Approval Hours", compute="_compute_qa_hours", compute_sudo=True)
 
     # Developer related fields for timesheets.
     dev_deadline = fields.Date(string="Dev Deadline")
@@ -165,6 +175,7 @@ class ProjectTask(models.Model):
     dev_spent_hr = fields.Float(
         string="Dev Spent Hours",
         compute="_compute_qa_hours",
+        compute_sudo=True,
     )
     dev_approved_hr = fields.Float(
         string="Dev Approved Hours", compute="_compute_qa_hours", store=True
@@ -172,6 +183,7 @@ class ProjectTask(models.Model):
     dev_remain_hr = fields.Float(
         string="Remaining Approval Hours",
         compute="_compute_qa_hours",
+        compute_sudo=True,
     )
 
     tech_description = fields.Html()
@@ -182,11 +194,11 @@ class ProjectTask(models.Model):
         "task_cr_rel",
         "task_id",
         "user_id",
-        string=_("Code Reviewer"),
+        string="Code Reviewer",
         tracking=True,
     )
     task_qa_ids = fields.Many2many(
-        "res.users", "task_qa_rel", "task_id", "user_id", string=_("QA"), tracking=True
+        "res.users", "task_qa_rel", "task_id", "user_id", string="QA", tracking=True
     )
     is_qa = fields.Boolean(string="Is QA", compute="_compute_qa", default=False, compute_sudo=True)
     is_developer = fields.Boolean(
@@ -224,7 +236,7 @@ class ProjectTask(models.Model):
 
     """ Added fields for branch name """
     development_branch_name = fields.Char(
-        string=_("Developer Branch")
+        string="Developer Branch"
     )
     qa_branch_name = fields.Char(
         string="QA Branch"
@@ -286,7 +298,7 @@ class ProjectTask(models.Model):
     def _onchange_project_id(self):
         """Method to call when there is change in the start Date"""
         user = self.env.user
-        user_groups = set(user.groups_id.get_external_id().values())
+        user_groups = set(user.group_ids.get_external_id().values())
         restricted_groups = set(user._get_restricted_manager_group())
         if self.project_id and not self.project_id.is_sop_bank:
             if user != self.env.ref("base.user_admin"):
@@ -405,6 +417,7 @@ class ProjectTask(models.Model):
             task.productive_hours_on_sub_task = sum(child_task.approved_hours for child_task in task.child_ids)
 
     @api.depends('timesheet_ids.unit_amount', 'timesheet_ids.approved_hours')
+    @api.depends('timesheet_ids.unit_amount', 'timesheet_ids.approved_hours')
     def _compute_qa_hours(self):
         self.qa_approved_hr, self.qa_spent_hr, self.qa_remain_hr = 0.0, 0.0, 0.0
         self.dev_approved_hr, self.dev_spent_hr, self.dev_remain_hr = 0.0, 0.0, 0.0
@@ -515,7 +528,7 @@ class ProjectTask(models.Model):
     @api.constrains('project_id', 'pm_tool_task_id')
     def _check_pm_tool_task_id(self):
         user = self.env.user
-        user_groups = set(user.groups_id.get_external_id().values())
+        user_groups = set(user.group_ids.get_external_id().values())
         restricted_groups = set(user._get_restricted_manager_group())
         if user != self.env.ref("base.user_admin"):
             if not restricted_groups.intersection(user_groups) and self.env.user.id not in self.project_id.team_leader_ids.ids and self.env.user.id not in self.project_id.consultant_ids.ids:
@@ -561,12 +574,11 @@ class ProjectTask(models.Model):
 
         return super(ProjectTask, self).write(vals)
 
-    @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
         default = dict(default or {})
         res = super(ProjectTask, self).copy(default)
         user = self.env.user
-        user_groups = set(user.groups_id.get_external_id().values())
+        user_groups = set(user.group_ids.get_external_id().values())
         restricted_groups = set(user._get_restricted_manager_group())
         if self.project_id and not self.project_id.is_sop_bank:
             if user != self.env.ref("base.user_admin"):
@@ -834,7 +846,7 @@ class ProjectTask(models.Model):
                 self |= sub_tasks
         self.write({"state": "done"})
 
-    def _group_expand_states(self, states, domain, order):
+    def _group_expand_states(self, states, domain):
         return [key for key, val in type(self).state.selection]
 
     def _log_logging(self, message, function_name):

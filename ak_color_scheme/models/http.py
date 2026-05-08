@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo, Aktiv Software.
-# See LICENSE file for full copyright & licensing details.
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import models
 from odoo.http import Response, request
 
-
 def render(self):
+    """
+    Render the template with the appropriate company context.
+
+    This method injects the current HTTP request into the template
+    context and determines the active company based on the `cids`
+    cookie. If a valid company ID is found, it is added to the
+    rendering context as `active_id`.
+
+    :return: Rendered template output
+    :rtype: str
+    """
     self.qcontext["request"] = request
     cids = request.httprequest.cookies.get("cids") or []
     if cids:
@@ -21,14 +30,28 @@ def render(self):
         self.template, self.qcontext
     )
 
-
 Response.render = render
-
 
 class IrHttp(models.AbstractModel):
     _inherit = "ir.http"
 
     def session_info(self):
+        """
+        Extend session information with color scheme configuration.
+
+        This method enhances the default session data by adding available
+        color scheme pallets, the currently selected light and dark schemes
+        for the user, and company-level configuration that controls whether
+        users can change their color scheme.
+
+        The active company is determined from the `cids` cookie, and the
+        visible color schemes are filtered based on the `color_scheme`
+        cookie (light or dark mode).
+
+        :return: Updated session information dictionary
+        :rtype: dict
+        :return:
+        """
         session_info = super().session_info()
         user = self.env.user
         schemes = request.env["colour.scheme.pallet"].search([])

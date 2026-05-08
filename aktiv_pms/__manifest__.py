@@ -1,8 +1,21 @@
+# -*- coding: utf-8 -*-
+# Part of Odoo, AIC, Aktiv Software
+# See LICENSE file for full copyright & licensing details.
+
+# Author: Aktiv Software.
+# mail: sales@aktivsoftware.com
+# Copyright (C) 2015-Present Aktiv Software PVT. LTD.
+# Contributions:
+# Aktiv Software:
+#    - Shivani Shah
+#    - Yash Vandra
+#
+
 {
     "name": "Aktiv PMS",
     "category": "Services/Project",
     "author": "Aktiv Software",
-    "version": "17.0.1.0.2",
+    "version": "19.0.1.0.0",
     "license": "OPL-1",
     "depends": ["project", "hr_timesheet", "analytic", "ak_crm","ak_public_holidays"],
     "data": [
@@ -50,6 +63,7 @@
             'aktiv_pms/static/src/legacy/js/fields/*',
             'aktiv_pms/static/src/legacy/scss/*',
             'aktiv_pms/static/src/legacy/xml/field_productive_logs.xml',
+            "aktiv_pms/static/src/js/project_task_state_patch.js",
         ],
     },
     "installable": True,

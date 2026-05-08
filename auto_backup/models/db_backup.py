@@ -13,7 +13,9 @@ from glob import iglob
 
 from odoo import _, api, exceptions, fields, models, tools
 from odoo.exceptions import UserError
+from odoo.models import Constraint
 from odoo.service import db
+
 
 _logger = logging.getLogger(__name__)
 try:
@@ -21,20 +23,24 @@ try:
 except ImportError:  # pragma: no cover
     _logger.debug("Cannot import pysftp")
 
-
 class DbBackup(models.Model):
     _description = "Database Backup"
     _name = "db.backup"
     _inherit = "mail.thread"
 
-    _sql_constraints = [
-        ("name_unique", "UNIQUE(name)", "Cannot duplicate a configuration."),
-        (
-            "days_to_keep_positive",
-            "CHECK(days_to_keep >= 0)",
-            "I cannot remove backups from the future. Ask Doc for that.",
-        ),
-    ]
+    # Odoo 19.0: _sql_constraints list is deprecated.
+    # SQL constraints are now declared as named class attributes using
+    # models.Constraint(sql_definition, message).
+    # The attribute name becomes the PostgreSQL constraint name and
+    # MUST start with '_' (enforced by the ORM metaclass in 19.0).
+    _name_unique = Constraint(
+        "UNIQUE(name)",
+        "Cannot duplicate a configuration.",
+    )
+    _days_to_keep_positive = Constraint(
+        "CHECK(days_to_keep >= 0)",
+        "I cannot remove backups from the future. Ask Doc for that.",
+    )
 
     name = fields.Char(
         compute="_compute_name",
@@ -86,7 +92,6 @@ class DbBackup(models.Model):
         help="Path to the private key file. Only the Odoo user should have "
         "read permissions for that file.",
     )
-
     backup_format = fields.Selection(
         [
             ("zip", "zip (includes filestore)"),
@@ -156,14 +161,14 @@ class DbBackup(models.Model):
             with rec.backup_log():
                 # Directory must exist
                 try:
-                    os.makedirs(rec.folder)
+                    os.makedirs(rec.folder, exist_ok=True)
                 except OSError as exc:
                     _logger.exception("Action backup - OSError: %s" % exc)
 
                 with open(os.path.join(rec.folder, filename), "wb") as destiny:
                     # Copy the cached backup
                     if backup:
-                        with open(backup) as cached:
+                        with open(backup, "rb") as cached:
                             shutil.copyfileobj(cached, destiny)
                     # Generate new backup
                     else:
@@ -275,7 +280,7 @@ class DbBackup(models.Model):
             self.message_post(  # pylint: disable=translation-required
                 body="<p>%s</p><pre>%s</pre>"
                 % (_("Cleanup of old database backups failed."), escaped_tb),
-                subtype_id=self.env.ref("auto_backup.failure").id,
+                subtype_id=self.env.ref("auto_backup.mail_message_subtype_failure").id,
             )
         else:
             _logger.info(

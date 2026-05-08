@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-	<template id="base_colour_template" name="Colour Scheme Template"
-	          inherit_id="web.layout">
-		<xpath expr="//head" position='inside'>
+	<template id="base_colour_template" name="Colour Scheme Template" inherit_id="web.webclient_bootstrap">
+		<xpath expr="." position='inside'>
 			<t t-if="not o" t-set="o" t-value="doc"/>
 			<t t-if="not company">
 				<t t-if="company_id">
@@ -55,11 +54,11 @@
 		        <style>
 			        <!-- Home menu background-->
 			        <t t-if="home_screen_background and home_screen_background_style">
-				        .o_home_menu_background .o_app_icon {
+				        .mk_app_menu .o_app_icon {
 				        background: rgba(255, 255, 255, 0.05) !important;
 				        border: 2px solid <t t-out="primary_color"/>
 				        }
-				        .o_home_menu_background:not(.o_home_menu_background_custom) .o_main_navbar {
+				        .mk_app_menu:not(.mk_app_menu_custom) .o_main_navbar {
 		                    background-color: transparent !important;
 		                    border-color: transparent !important;
 		                }
@@ -67,19 +66,22 @@
 		                    color: <t t-out="header_color_font"/> !important;
 		                }
 				        <t t-if="home_screen_background_style == 'gradiant'">
-					        .o_home_menu_background {
+					        .mk_app_menu {
 			                    background: linear-gradient(135deg,<t t-out="header_color"/>,<t t-out="primary_color"/>) !important ;
 			                }
 				        </t>
 				        <t t-if="home_screen_background_style == 'solid'">
-					        .o_home_menu_background {
+					        .mk_app_menu {
 			                    background: <t t-out="header_color"/> !important ;
 			                }
 				        </t>
 			        </t>
 			        .o_main_navbar,
+			        .o_main_navbar > a,
 			        .o_main_navbar > a > .o_menu_brand,
+			        .o_main_navbar > .o_navbar_apps_menu > .o-dropdown > i,
 			        .o_main_navbar > .o_menu_sections > a,
+			        .o_main_navbar > .o_menu_sections > button,
 			        .o_main_navbar > .o_menu_sections > .o-dropdown > button,
 			        .o-mail-MessagingMenu > * > button.fw-bold,
 					.o_navbar .alert-primary, .o_navbar .alert-primary .company_label,
@@ -94,6 +96,8 @@
 	                    color: <t t-out="secondary_color_font"/> !important;
 					}
 	                .o_main_navbar > .o_menu_sections > a:hover,
+	                .o_main_navbar > .o_menu_sections > button:hover,
+					.o_main_navbar > .o_navbar_apps_menu:hover,
 	                .o_main_navbar > .o_menu_sections > .o-dropdown > button:hover,
 	                .o_main_navbar > .o_menu_sections > .o-dropdown > .o-dropdown--menu > .dropdown-item:hover,
 			        .o-mail-MessagingMenu > * > .o-mail-NotificationItem.o-important:hover,

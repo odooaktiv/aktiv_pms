@@ -19,7 +19,7 @@
     <record id="project_todo_open_task_type_form" model="ir.actions.act_window">
         <field name="name">SOP Stages</field>
         <field name="res_model">project.task.type</field>
-        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_mode">list,kanban,form</field>
         <field name="view_id" ref="ak_project_todo.project_todo_task_type_tree_inherited"/>
         <field name="domain">[('sop_stage', '=', True)]</field>
         <field name="context">{'sop_bank':True}</field>
@@ -65,7 +65,7 @@
             </xpath>
             <xpath expr="//field[@name='user_ids']" position="replace">
             </xpath>
-            <xpath expr="//tree" position="attributes">
+            <xpath expr="//list" position="attributes">
                 <attribute name="default_group_by"/>
             </xpath>
             <xpath expr="//field[@name='tag_ids']" position="attributes">
@@ -111,7 +111,7 @@
     <record id="project_todo.project_task_action_todo" model="ir.actions.act_window">
         <field name="name">SOP Bank</field>
         <field name="domain">[('is_sop_bank', '=', True)]</field>
-        <field name="context">{'sop_bank': True, 'default_is_sop_bank': True, 'form_view_ref': 'ak_project_todo.project_task_view_todo_form', 'tree_view_ref': 'ak_project_todo.project_task_view_todo_tree'}</field>
+        <field name="context">{'sop_bank': True, 'default_is_sop_bank': True, 'form_view_ref': 'ak_project_todo.project_task_view_todo_form', 'list_view_ref': 'ak_project_todo.project_task_view_todo_tree'}</field>
     </record>
 
     <record id="project.open_view_project_all" model="ir.actions.act_window">
@@ -122,7 +122,7 @@
         id="project_todo.menu_todo_todos"
         name="SOP Bank"
         sequence="15"
-        action="project_todo.project_task_preload_action_todo"
+        action="project_todo.project_task_action_todo"
         groups="ak_project_todo.sop_bank_user"
         web_icon="project_todo,static/description/icon.png">
     </menuitem>

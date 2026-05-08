@@ -1,7 +1,19 @@
 # -*- coding: utf-8 -*-
+# Part of Odoo, AIC, Aktiv Software
+# See LICENSE file for full copyright & licensing details.
+
+# Author: Aktiv Software.
+# mail: sales@aktivsoftware.com
+# Copyright (C) 2015-Present Aktiv Software PVT. LTD.
+# Contributions:
+# Aktiv Software:
+#    - Shivani Shah
+#    - Yash Vandra
+#
+
 {
     "name": "Aktiv Survey",
-    "version": "17.0.1.0.0",
+    "version": "19.0.1.0.0",
     "summary": "Survey modifications",
     "description": """""",
     "author": "Aktiv Software",

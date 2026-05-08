@@ -32,7 +32,7 @@ class Project(models.Model):
     )
 
     total_planned_hours = fields.Float(
-        string=_("Task Planned Hours"),
+        string="Task Planned Hours",
         compute="_compute_planned_total_hours",
         default=0,
     )
@@ -41,7 +41,7 @@ class Project(models.Model):
         "project_developer_rel",
         "project_id",
         "user_id",
-        string=_("Developer"),
+        string="Developer",
         tracking=True,
     )
     task_qa_ids = fields.Many2many(
@@ -49,7 +49,7 @@ class Project(models.Model):
         "project_qa_rel",
         "project_id",
         "user_id",
-        string=_("QA"),
+        string="QA",
         tracking=True,
     )
     code_reviewer_ids = fields.Many2many(
@@ -57,7 +57,7 @@ class Project(models.Model):
         "project_cr_rel",
         "project_id",
         "user_id",
-        string=_("Code Reviewer"),
+        string="Code Reviewer",
         tracking=True,
     )
     team_leader_ids = fields.Many2many(
@@ -65,8 +65,8 @@ class Project(models.Model):
         "project_tl_rel",
         "project_id",
         "user_id",
-        domain=lambda self: [("groups_id", "=", self.env.ref("aktiv_pms.group_aktiv_project_team_leader").id)],
-        string=_("Lead Engineer"),
+        domain=lambda self: [("group_ids", "=", self.env.ref("aktiv_pms.group_aktiv_project_team_leader").id)],
+        string="Lead Engineer",
         tracking=True,
     )
     consultant_ids = fields.Many2many(
@@ -74,13 +74,13 @@ class Project(models.Model):
         "project_consult_rel",
         "project_id",
         "user_id",
-        string=_("Consultant"),
+        string="Consultant",
         tracking=True,
     )
     is_project_create = fields.Boolean('Is Project Create', copy=False)
-    basic_info_doc = fields.Binary(string=_("Basic Customer Info"))
+    basic_info_doc = fields.Binary(string="Basic Customer Info")
     basic_info_filename = fields.Char("Basic Info File Name")
-    migration_doc = fields.Binary(string=_("Data Migration Template"))
+    migration_doc = fields.Binary(string="Data Migration Template")
     migration_filename = fields.Char("Data Migration File Name")
     communication_tool_id = fields.Many2many(
         "communication.tool", string="Communication Plan/Tool"
@@ -117,7 +117,7 @@ class Project(models.Model):
     )
     support_pack_lines = fields.One2many("support.pack", "project_id")
     timesheet_approved_hours = fields.Float(
-        string=_("Timesheet Approved Hours"), default=0
+        string="Timesheet Approved Hours", default=0
     )
     total_timesheet_time = fields.Float(
         compute="_compute_total_timesheet_time",
@@ -135,10 +135,10 @@ class Project(models.Model):
     #                                             compute="_compute_portal_customer_task_count")
 
     # Added field for Credentials page
-    url = fields.Char(string=_("URL"))
-    username = fields.Char(string=_("User Name"))
-    password = fields.Char(string=_("Password"))
-    commit_token = fields.Char(string=_("Commit Token"))
+    url = fields.Char(string="URL")
+    username = fields.Char(string="User Name")
+    password = fields.Char(string="Password")
+    commit_token = fields.Char(string="Commit Token")
     customer_project = fields.Boolean('Is Customer Project?')
     pm_tool_project_id = fields.Char(string='PM Tool Project ID')
     pm_tool_task_id = fields.Char(string='PM Tool Task ID')
@@ -256,6 +256,8 @@ class Project(models.Model):
 
     def _compute_remaining_hours(self):
         """Method to calculate remaining hours from initial hours"""
+        # Let the parent assign effective_hours and is_project_overtime (v19 requirement).
+        super()._compute_remaining_hours()
         self.timesheet_approved_hours = 0.0
         for project in self:
             for task in project.tasks:
@@ -302,7 +304,6 @@ class Project(models.Model):
         """To set the default values"""
         result = super(Project, self).default_get(fields)
         result["privacy_visibility"] = "followers"
-        result["rating_status"] = "periodic"
         return result
 
     def get_meeting_end_date(self):
@@ -407,11 +408,11 @@ class Project(models.Model):
     # noinspection PyInterpreter
     def _send_customer_review_mail(self):
         """Send Customer Project Review Mail."""
+        # In v19, rating_active/rating_status moved from project.project to project.task.type;
+        # use show_ratings (computed True when any stage has rating_active=True) as the filter.
         projects = self.search(
             [
-                ("rating_active", "=", True),
-                ("rating_status", "=", "periodic"),
-                ("rating_request_deadline", "<=", fields.Datetime.now()),
+                ("show_ratings", "=", True),
             ]
         )
         template_id = self.env.ref(
@@ -469,40 +470,25 @@ class Project(models.Model):
 
     @api.depends("timesheet_ids")
     def _compute_total_timesheet_time(self):
-        timesheets_read_group = self.env["account.analytic.line"].read_group(
+        # In v19, uom.uom.factor is the absolute conversion factor (e.g. days=8, hours=1).
+        # To convert to reference unit: unit_amount * source.factor
+        # To convert reference to encode UoM: total /= encode_uom.factor
+        timesheets_read_group = self.env["account.analytic.line"]._read_group(
             [("project_id", "in", self.ids)],
-            ["project_id", "unit_amount", "product_uom_id"],
             ["project_id", "product_uom_id"],
-            lazy=False,
+            ["unit_amount:sum"],
         )
         timesheet_time_dict = defaultdict(list)
-        uom_ids = set(self.timesheet_encode_uom_id.ids)
+        for project, product_uom, unit_amount_sum in timesheets_read_group:
+            timesheet_time_dict[project.id].append((product_uom, unit_amount_sum))
 
-        for result in timesheets_read_group:
-            uom_id = result["product_uom_id"] and result["product_uom_id"][0]
-            if uom_id:
-                uom_ids.add(uom_id)
-            timesheet_time_dict[result["project_id"][0]].append(
-                (uom_id, result["unit_amount"])
-            )
-
-        uoms_dict = {uom.id: uom for uom in self.env["uom.uom"].browse(uom_ids)}
         for project in self:
-            # Timesheets may be stored in a different unit of measure, so first
-            # we convert all of them to the reference unit
-            # if the timesheet has no product_uom_id then we take the one of the project
-            total_time = sum(
-                [
-                    unit_amount
-                    * uoms_dict.get(
-                        product_uom_id, project.timesheet_encode_uom_id
-                    ).factor_inv
-                    for product_uom_id, unit_amount in timesheet_time_dict[project.id]
-                ],
-                0.0,
-            )
-            # Now convert to the proper unit of measure set in the settings
-            total_time *= project.timesheet_encode_uom_id.factor
+            total_time = 0.0
+            for product_uom, unit_amount in timesheet_time_dict[project.id]:
+                factor = (product_uom or project.timesheet_encode_uom_id).factor
+                total_time += unit_amount * (1.0 if project.encode_uom_in_days else factor)
+            # Convert from reference unit to the encode UoM set in settings
+            total_time /= project.timesheet_encode_uom_id.factor
             project.total_timesheet_time = total_time
 
     # @api.depends("task_ids")
@@ -597,4 +583,3 @@ class Project(models.Model):
             return filtered_result
 
         return result
-

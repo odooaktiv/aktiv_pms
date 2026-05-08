@@ -7,7 +7,7 @@ from odoo import _, api, fields, models
 class Invite(models.TransientModel):
     """ Wizard to invite partners (or channels) and make them followers. """
 
-    _inherit = "mail.wizard.invite"
+    _inherit = "mail.followers.edit"
 
     group_ids = fields.Many2many("discuss.channel", string="Groups/Channels")
 

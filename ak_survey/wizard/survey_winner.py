@@ -27,12 +27,10 @@ class SurveyWinner(models.TransientModel):
             self._context.get("active_ids", False)
         )
         if email_template and survey_user_input_ids:
-            contest_certificate = self.env.ref(
-                "ak_survey.contest_certificate_report"
-            )
             if survey_user_input_ids:
-                generated_report = contest_certificate._render_qweb_pdf(
-                    survey_user_input_ids[0].id
+                generated_report = self.env["ir.actions.report"]._render_qweb_pdf(
+                    "ak_survey.contest_certificate_report",
+                    res_ids=[survey_user_input_ids[0].id],
                 )
                 data_record = base64.b64encode(generated_report[0])
                 ir_values = {

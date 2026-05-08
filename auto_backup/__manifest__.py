@@ -6,7 +6,7 @@
 {
     "name": "Database Auto-Backup",
     "summary": "Backups database",
-    "version": "17.0.1.0.0",
+    "version": "19.0.1.0.0",
     "author": "Yenthe Van Ginneken, "
     "Agile Business Group, "
     "Grupo ESOC Ingenieria de Servicios, "
@@ -18,9 +18,9 @@
     "category": "Tools",
     "depends": ["mail"],
     "data": [
+        "security/ir.model.access.csv",
         "data/ir_cron.xml",
         "data/mail_message_subtype.xml",
-        "security/ir.model.access.csv",
         "view/db_backup_view.xml",
     ],
     "installable": True,

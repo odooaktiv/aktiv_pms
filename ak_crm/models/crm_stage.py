@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -11,7 +11,7 @@ class Stage(models.Model):
 
     type = fields.Many2many("crm.type", string="Type")
     stage_id_type_key = fields.Char(compute="compute_stage_id_type_key", store=True)
-    is_lost = fields.Boolean(string=_("Is Lost Stage"))
+    is_lost = fields.Boolean(string="Is Lost Stage")
 
     @api.depends("type", "type.key")
     def compute_stage_id_type_key(self):

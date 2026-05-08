@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <template id="custom_mail_notification_layout" inherit_id="mail.mail_notification_layout">
-        <xpath expr="//div[@style='margin-top:32px;']" position="replace"/>
-    </template>
+    <!-- Odoo 19 mail_notification_invite still anchors on the footer block, so
+         removing it here breaks the upstream mail layout inheritance chain. -->
 </odoo>

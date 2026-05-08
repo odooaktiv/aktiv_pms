@@ -48,9 +48,9 @@ class AccountAnalyticLine(models.Model):
     hide_timesheet_approve_btn= fields.Boolean(compute="_compute_hide_timesheet_approve_btn")
     show_timesheet_reset_btn= fields.Boolean(compute="_compute_hide_timesheet_approve_btn")
     is_approved = fields.Boolean(help="Becomes True when timesheet approved for first time")
-    productivity = fields.Float(string="Productivity(%)", compute="_compute_productivity", store=True, group_operator="avg")
-    efficiency = fields.Float(string="Efficiency(%)", compute="_compute_efficiency", store=True, group_operator="avg")
-    utilization_rate = fields.Float(string="Utilization Rate(%)", compute="_compute_utilization", store=True, group_operator="avg")
+    productivity = fields.Float(string="Productivity(%)", compute="_compute_productivity", store=True, aggregator="avg")
+    efficiency = fields.Float(string="Efficiency(%)", compute="_compute_efficiency", store=True, aggregator="avg")
+    utilization_rate = fields.Float(string="Utilization Rate(%)", compute="_compute_utilization", store=True, aggregator="avg")
     status = fields.Selection([
         ('on_time', 'On Time'),
         ('late', 'Late')
@@ -117,7 +117,7 @@ class AccountAnalyticLine(models.Model):
         for timesheet in self:
             timesheet.hide_approved_hours = False
 
-            user_groups = set(self.env.user.groups_id.get_external_id().values())
+            user_groups = set(self.env.user.group_ids.get_external_id().values())
             restricted_groups = set(self.env.user._get_restricted_manager_group())
 
             if self.env.user.id != self.env.ref("base.user_admin").id:
@@ -138,7 +138,7 @@ class AccountAnalyticLine(models.Model):
             user_id = employee.user_id
 
             if user_id:
-                user_groups = set(user_id.groups_id.mapped('category_id').mapped('xml_id'))
+                user_groups = set(user_id.group_ids.mapped('category_id').mapped('xml_id'))
                 restricted_groups = user_id._get_restricted_group()
 
                 if "project.group_project_user" in user_groups:

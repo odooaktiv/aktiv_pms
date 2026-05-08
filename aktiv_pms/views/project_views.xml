@@ -31,9 +31,7 @@
                        groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"/>
             </xpath>
             <xpath expr="//field[@name='stage_id']" position="attributes">
-                <attribute name="groups">
-                    project.group_project_manager,aktiv_pms.group_aktiv_project_manager
-                </attribute>
+                <attribute name="groups">project.group_project_manager,aktiv_pms.group_aktiv_project_manager</attribute>
             </xpath>
             <xpath expr="//field[@name='date_start']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -48,11 +46,9 @@
                 <attribute name="string">Project Lead</attribute>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="attributes">
-                <attribute name="groups">
-                    project.group_project_manager,aktiv_pms.group_aktiv_project_manager
-                </attribute>
+                <attribute name="groups">project.group_project_manager,aktiv_pms.group_aktiv_project_manager</attribute>
             </xpath>
-            <xpath expr="//tree" position="attributes">
+            <xpath expr="//list" position="attributes">
                 <attribute name="decoration-danger">remaining_hours &lt; 0</attribute>
             </xpath>
         </field>
@@ -153,7 +149,7 @@
                             context="{'for_generate':True}"/>
 
                     <field name="meeting_line">
-                        <tree decoration-success="state == 'completed'"
+                        <list decoration-success="state == 'completed'"
                               decoration-danger="state == 'cancelled'"
                               decoration-info="state == 'rescheduled'"
                               decoration-warning="state == 'missed'"
@@ -177,33 +173,36 @@
                                     string="MOM" class="oe_highlight"
                                     groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager">
                             </button>
-                        </tree>
+                        </list>
                     </field>
                 </page>
                 <page name="support_pack" string="Support Packs"
                       groups="aktiv_pms.group_aktiv_project_manager,project.group_project_manager">
-                    <field name="support_pack_lines" mode="tree">
-                        <tree string="Support Packs" editable="bottom">
+                    <field name="support_pack_lines" mode="list">
+                        <list string="Support Packs" editable="bottom">
                             <field name="name" required="1"/>
                             <field name="start_date" string="Date"/>
                             <field name="planned_hours" required="1"/>
-                        </tree>
+                        </list>
                     </field>
                 </page>
             </xpath>
 
-            <!-- <xpath expr="//button[@name='%(project.project_share_wizard_action)d']" position="attributes">
-                <attribute name="groups">aktiv_pms.group_aktiv_project_manager,project.group_project_manager
-                </attribute>
+            <!-- v17 had xpaths restricting project_share_wizard_action and project_collaborator_action
+                 buttons to manager groups. project_share_wizard_action still exists in v19 (project module),
+                 but project_collaborator_action was removed in v19. Block preserved as v17 reference;
+                 the printf-style xmlid lookup syntax has been escaped (double-percent) so Odoo's
+                 xmlid preprocessor does not try to resolve the missing action.
+            <xpath expr="//button[@name='%%(project.project_share_wizard_action)d']" position="attributes">
+                <attribute name="groups">aktiv_pms.group_aktiv_project_manager,project.group_project_manager</attribute>
             </xpath>
-            <xpath expr="//button[@name='%(project.project_collaborator_action)d']" position="attributes">
-                <attribute name="groups">aktiv_pms.group_aktiv_project_manager,project.group_project_manager
-                </attribute>
-            </xpath> -->
-            
+            <xpath expr="//button[@name='%%(project.project_collaborator_action)d']" position="attributes">
+                <attribute name="groups">aktiv_pms.group_aktiv_project_manager,project.group_project_manager</attribute>
+            </xpath>
+            -->
+
             <!-- <xpath expr="//page[@name='settings']" position="attributes">
-                <attribute name="groups">project.group_project_manager,aktiv_pms.group_aktiv_project_manager
-                </attribute>
+                <attribute name="groups">project.group_project_manager,aktiv_pms.group_aktiv_project_manager</attribute>
             </xpath> -->
 
             <!-- Added New Page for Credentials in Project -->
@@ -251,10 +250,16 @@
                 </button>
             </xpath>
 
-            <xpath expr="//field[@name='analytic_account_id']" position="attributes">
+            <!-- v17 field name "analytic_account_id" on project.project was renamed to "account_id" in v19. -->
+            <xpath expr="//field[@name='account_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
 
+            <!-- v17 replaced project's "group_documents_analytics" group with a custom rating UI
+                 (allow_rating, rating_active, rating_status, rating_status_period) on the project form.
+                 In v19 those rating fields were moved off project.project to project.task.type (stage):
+                 the project base form no longer has a "group_documents_analytics" group, and
+                 allow_rating no longer exists as a project field. Block preserved as v17 reference.
             <xpath expr="//group[@name='group_documents_analytics']"
                    position="replace">
                     <group name="group_documents_analytics" string="Analytics" col="1" class="row mt16 o_settings_container" invisible="not allow_rating">
@@ -274,6 +279,7 @@
                         </div>
                     </group>
             </xpath>
+            -->
 
             <xpath expr="//field[@name='label_tasks']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -313,12 +319,12 @@
     </record>
 
     <record id="project.open_view_project_all" model="ir.actions.act_window">
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <record id="project.open_view_project_all_group_stage"
             model="ir.actions.act_window">
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <record id="project.open_view_task_list_kanban" model="ir.actions.act_window.view">
@@ -368,7 +374,7 @@
         </field>
         <field name="binding_model_id" ref="project.model_project_project"/>
         <field name="binding_type">action</field>
-        <field name="groups_id" eval="[(4, ref('project.group_project_manager'))]"/>
+        <field name="group_ids" eval="[(4, ref('project.group_project_manager'))]"/>
     </record>
 
     <!-- <record id="res_config_settings_view_form_extend" model="ir.ui.view">

@@ -2,7 +2,7 @@
 	padding: 0px 14px !important;
 }
 	
-.o_navbar_apps_menu.show .dropdown-menu {
+.mk_app_menu.dropdown-menu {
 	display: flex !important;
 	flex-direction: row !important;
 	flex-wrap: wrap !important;
@@ -16,6 +16,8 @@
     border: none;
     border-radius: 0;
 	user-select: none;
+    margin-top: 0 !important;
+	margin-bottom: 0 !important;
 	background: {
         size: cover;
         repeat: no-repeat;
