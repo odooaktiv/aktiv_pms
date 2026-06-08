@@ -360,6 +360,24 @@ class AccountAnalyticLine(models.Model):
     def timesheet_approved(self):
         """Open wizard when project functional approves timesheet for the second time"""
         self._check_approval_lock_date()
+        approved_with_remaining = self.filtered(
+            lambda l: l.state == 'approved' and l.remaining_hours > 0
+        )
+        if approved_with_remaining:
+            dates = '\n'.join(
+                '• %s | %s | %s | %s' % (
+                    r.date,
+                    r.employee_id.name,
+                    r.project_id.name or '-',
+                    r.task_id.name or '-',
+                )
+                for r in approved_with_remaining
+            )
+            raise ValidationError(
+                _("The following entries are already Approved and have Remaining Hours set.\n"
+                  "Please Reset them first before approving again:\n\n%s") % dates
+            )
+
         for rec in self:
             user = rec.env.user
             vals = {

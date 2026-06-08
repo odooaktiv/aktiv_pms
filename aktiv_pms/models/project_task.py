@@ -900,6 +900,7 @@ class ProjectTask(models.Model):
         project_task_id = int(self.pm_tool_task_id)
         project_task = odoo_conn.env["project.task"].read(project_task_id, ['project_id'])
         if not project_task:
+            _logger.info("[MANUAL SYNC] b2b task not found | task_id=%s | pm_tool_task_id=%s", self.ids, project_task_id)
             raise ValidationError(_("Task not found in PM Tool."))
 
         success_message = _("Timesheets synced successfully!")
@@ -907,6 +908,9 @@ class ProjectTask(models.Model):
 
         timesheets_to_sync = self.timesheet_ids.filtered(lambda t: t.data_sync == "not_sync" and t.employee_id.user_id.user_name == user_name
                                                          and (t.unit_amount != 0 or (t.unit_amount == 0 and t.pmtool_timesheet_id)))
+
+        _logger.info("[MANUAL SYNC] task_id=%s | user=%s | entries_to_sync=%s", self.ids, self.env.user.login, len(timesheets_to_sync))
+
         if not timesheets_to_sync:
             return self.display_notification(_("Warning!"), no_timesheet_message, False)
 
@@ -930,8 +934,10 @@ class ProjectTask(models.Model):
 
                 pm_ts = odoo_conn.env["account.analytic.line"].browse(int(timesheet.pmtool_timesheet_id))
                 if pm_ts:
+                    _logger.info("[MANUAL SYNC] UPDATE | b2c_id=%s | date=%s | b2b_id=%s", timesheet.id, timesheet.date, timesheet.pmtool_timesheet_id)
                     pm_ts.write(vals)
                 else:
+                    _logger.info("[MANUAL SYNC] CREATE | b2c_id=%s | date=%s", timesheet.id, timesheet.date)
                     timesheet_id = odoo_conn.env["account.analytic.line"].create(vals)
                     timehseet_vals.update({"id": timesheet.id, "pmtool_timesheet_id": timesheet_id})
                     
@@ -942,6 +948,7 @@ class ProjectTask(models.Model):
             return self.display_notification(_("Success"), success_message, False)
 
         except Exception as e:
+            _logger.error("[MANUAL SYNC] FAILED | task_id=%s | user=%s | error=%s", self.ids, self.env.user.login, e)
             raise ValidationError(e)
 
     @api.model
