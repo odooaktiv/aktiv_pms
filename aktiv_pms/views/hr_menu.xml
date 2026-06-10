@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Hide Learning menu from Employees app -->
+    <menuitem id="hr_skills.hr_skill_learning_menu" active="0"/>
+
+    <!-- Hide Reporting menu from Employees app -->
+    <menuitem id="hr.hr_menu_hr_reports" active="0"/>
+</odoo>

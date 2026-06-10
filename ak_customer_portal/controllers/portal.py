@@ -9,6 +9,7 @@ from odoo.addons.portal.controllers.portal import CustomerPortal
 from odoo.addons.portal.controllers.portal import pager as portal_pager  # pylint: disable=E0401
 from odoo.exceptions import AccessError, MissingError  # pylint: disable=E0401
 from odoo.http import request  # pylint: disable=E0401
+from odoo.fields import Domain
 from odoo.tools import date_utils
 from odoo.tools import groupby as groupbyelem  # pylint: disable=E0401
 
@@ -23,44 +24,42 @@ class TimesheetCustomerPortalCustom(TimesheetCustomerPortal):
         values = super(TimesheetCustomerPortalCustom, self)._prepare_home_portal_values(
             counters
         )
-        total_timesheet_ids = self._get_project_timesheet_ids()
-        domain = [("id", "in", total_timesheet_ids)]
-        timesheet_sudo = request.env["account.analytic.line"].sudo()
-        timesheet_count = timesheet_sudo.search_count(domain)
-        values.update({"timesheet_count": timesheet_count})
+        if "timesheet_count" in counters:
+            total_timesheet_ids = self._get_project_timesheet_ids()
+            domain = [("id", "in", total_timesheet_ids)]
+            timesheet_sudo = request.env["account.analytic.line"].sudo()
+            timesheet_count = timesheet_sudo.search_count(domain)
+            values.update({"timesheet_count": timesheet_count})
         return values
 
     def _get_searchbar_sortings(self):
         """Inherit method to remove employee, project and description from sort by"""
         res = super(TimesheetCustomerPortalCustom, self)._get_searchbar_sortings()
-        remove_elements_from_sort_by = ["employee", "name"]
+        remove_elements_from_sort_by = ["employee_id", "name"]
         if not request.env.user.has_group("aktiv_pms.group_aktiv_project_manager"):
-            remove_elements_from_sort_by.append("project")
-        # "project",
+            remove_elements_from_sort_by.append("project_id")
         for element in remove_elements_from_sort_by:
-            res.pop(element)
+            res.pop(element, None)
         return res
 
     def _get_searchbar_groupby(self):
         """Inherit method to remove employee and project from Group By"""
         res = super(TimesheetCustomerPortalCustom, self)._get_searchbar_groupby()
-        remove_elements_from_group_by = ["employee"]
+        remove_elements_from_group_by = ["employee_id"]
         if not request.env.user.has_group("aktiv_pms.group_aktiv_project_manager"):
-            remove_elements_from_group_by.append("project")
-        # , "project"
+            remove_elements_from_group_by.append("project_id")
         for element in remove_elements_from_group_by:
-            res.pop(element)
+            res.pop(element, None)
         return res
 
     def _get_searchbar_inputs(self):
         """Inherit method to remove employee and project from Search in all"""
         res = super(TimesheetCustomerPortalCustom, self)._get_searchbar_inputs()
-        remove_elements_from_search_in_all = ["employee"]
+        remove_elements_from_search_in_all = ["employee_id"]
         if not request.env.user.has_group("aktiv_pms.group_aktiv_project_manager"):
-            remove_elements_from_search_in_all.append("project")
-        # , "project"
+            remove_elements_from_search_in_all.append("project_id")
         for element in remove_elements_from_search_in_all:
-            res.pop(element)
+            res.pop(element, None)
         return res
 
     def _get_project_timesheet_ids(self):
@@ -192,8 +191,8 @@ class TimesheetCustomerPortalCustom(TimesheetCustomerPortal):
         }
         # default sort by value
         if not sortby:
-            sortby = "date"
-        order = searchbar_sortings[sortby]["order"]
+            sortby = "date desc"
+        order = sortby
         # default filter by value
         if not filterby:
             filterby = "all"
@@ -228,8 +227,7 @@ class TimesheetCustomerPortalCustom(TimesheetCustomerPortal):
         # timesheets will be displayed on portal level /my/timesheets
 
         def get_timesheets():
-            groupby_mapping = self._get_groupby_mapping()
-            field = groupby_mapping.get(groupby, None)
+            field = None if groupby == "none" else groupby
             orderby = "%s, %s" % (field, order) if field else order
 
             current_project_timesheets = timesheet_sudo.search(

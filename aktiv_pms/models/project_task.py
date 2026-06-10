@@ -14,6 +14,8 @@ from ..utils import get_connection
 
 _logger = logging.getLogger(__name__)
 
+AKTIV_CLOSED_STATES = ('done', 'cancel')
+
 
 class ProjectTask(models.Model):
     _inherit = "project.task"
@@ -51,7 +53,7 @@ class ProjectTask(models.Model):
         help="Use to make Go Live Date field readonly if Deployment Type (In Project) is Phase Wise", store=True)
     qa_ids = fields.One2many("quality.analysis", "task_id", string="Quality Analysis")
     state = fields.Selection(
-        selection_add=[
+        selection=[
             ("new", "Planned"),
             ("approval", "Customer Approval"),
             ("dev", "Development"),
@@ -60,23 +62,12 @@ class ProjectTask(models.Model):
             ("qa", "QA Testing"),
             ("redevelop", "Re-Development"),
             ("cust_review", "Customer Review"),
+            ("done", "Done"),
+            ("cancel", "Cancel"),
             ("on_hold", "On Hold"),
             ("ready_deploy", "Ready for Deployment"),
-            ("apps", "Apps"),
+            ("apps", "Apps")
         ],
-        ondelete={
-            "new": "set default",
-            "approval": "set default",
-            "dev": "set default",
-            "call_consult": "set default",
-            "cd_review": "set default",
-            "qa": "set default",
-            "redevelop": "set default",
-            "cust_review": "set default",
-            "on_hold": "set default",
-            "ready_deploy": "set default",
-            "apps": "set default",
-        },
         default="new",
         group_expand="_group_expand_states",
     )
@@ -85,6 +76,24 @@ class ProjectTask(models.Model):
 
     def _inverse_state(self):
         pass
+
+    @property
+    def OPEN_STATES(self):
+        return [v for v in self._fields['state'].get_values(self.env) if v not in AKTIV_CLOSED_STATES]
+
+    @api.depends('state')
+    def _compute_is_closed(self):
+        for task in self:
+            task.is_closed = task.state in AKTIV_CLOSED_STATES
+
+    def _search_is_closed(self, operator, value):
+        if operator == 'in':
+            searched_states = list(AKTIV_CLOSED_STATES)
+        elif operator == 'not in':
+            searched_states = self.OPEN_STATES
+        else:
+            return NotImplemented
+        return [('state', 'in', searched_states)]
 
     success_ratio = fields.Float(
         "Success", compute="_compute_test_case_count", store=True
@@ -255,7 +264,7 @@ class ProjectTask(models.Model):
     hide_re_development_btn = fields.Boolean(compute='_compute_hide_re_development_btn')
 
     @api.model
-    def get_view(self, view_id=None, view_type='tree', **kwargs):
+    def get_view(self, view_id=None, view_type='list', **kwargs):
         res = super().get_view(view_id, view_type, **kwargs)
         if view_type == 'form':
             user = self.env['res.users'].browse(self.env.context.get('uid', False))
@@ -1063,7 +1072,7 @@ class ProjectTask(models.Model):
             "type": "ir.actions.act_window",
             "name": "Quality Analysis",
             "res_model": "quality.analysis",
-            "view_mode": "tree,form",
+            "view_mode": "list,form",
             "domain": [("task_id", "=", self.id)],
             "context": {"default_task_id": self.id},
             "target": "current",

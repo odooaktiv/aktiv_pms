@@ -32,21 +32,48 @@ def migrate(cr, version):
     if not version:
         return
 
-    # 1. Rename the view XML ID from *_tree to *_list
+    # 1. Keep the legacy XML ID from colliding with the new list view XML ID.
+    #
+    # The XML file in 19.0 already creates view_backup_conf_list. If the old
+    # tree XML ID is still present, renaming it would trip the unique
+    # ir_model_data(module, name) constraint. In that case, just drop the stale
+    # XML ID and leave the new one in place.
     cr.execute(
         """
-        UPDATE ir_model_data
-        SET name = 'view_backup_conf_list'
+        SELECT id
+        FROM ir_model_data
         WHERE module = 'auto_backup'
           AND name = 'view_backup_conf_tree'
         """
     )
-    if cr.rowcount:
-        _logger.info(
-            "auto_backup migration: renamed XML ID "
-            "view_backup_conf_tree -> view_backup_conf_list (%d row)",
-            cr.rowcount,
+    old_xmlid = cr.fetchone()
+    if old_xmlid:
+        cr.execute(
+            """
+            SELECT 1
+            FROM ir_model_data
+            WHERE module = 'auto_backup'
+              AND name = 'view_backup_conf_list'
+            """
         )
+        if cr.fetchone():
+            cr.execute("DELETE FROM ir_model_data WHERE id = %s", [old_xmlid[0]])
+            _logger.info(
+                "auto_backup migration: dropped stale XML ID view_backup_conf_tree"
+            )
+        else:
+            cr.execute(
+                """
+                UPDATE ir_model_data
+                SET name = 'view_backup_conf_list'
+                WHERE id = %s
+                """,
+                [old_xmlid[0]],
+            )
+            _logger.info(
+                "auto_backup migration: renamed XML ID "
+                "view_backup_conf_tree -> view_backup_conf_list"
+            )
 
     # 2. Rename old _sql_constraints-style PG constraint names to the new
     #    models.Constraint naming convention.

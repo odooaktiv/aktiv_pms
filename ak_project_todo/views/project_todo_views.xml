@@ -85,11 +85,29 @@
             <xpath expr="//field[@name='personal_stage_type_id']" position="replace">
                 <field name="stage_id" domain="[('sop_stage', '=', True)]" string="Stage" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}" />
             </xpath>
-            <xpath expr="//field[@name='tag_ids']" position="attributes">
-                <attribute name="domain">[('is_sop_bank', '=', True)]</attribute>
+            <xpath expr="//sheet/div[h1]" position="replace"/>
+            <xpath expr="//sheet/group" position="replace"/>
+            <xpath expr="//header" position="inside">
+                <div class="py-1 px-2 border rounded bg-view">
+                    <field name="tag_ids"
+                           widget="many2many_tags"
+                           options="{'color_field': 'color', 'no_create_edit': True}"
+                           domain="[('is_sop_bank', '=', True)]"
+                           class="me-2"
+                           placeholder="Tags"/>
+                </div>
+                <div class="py-1 px-2 border rounded bg-view">
+                    <field name="user_ids"
+                           widget="many2many_avatar_user"
+                           options="{'no_quick_create': True}"
+                           placeholder="Assignees"/>
+                </div>
             </xpath>
             <xpath expr="//field[@name='description']" position="attributes">
                 <attribute name="options">{'collaborative': false}</attribute>
+            </xpath>
+            <xpath expr="//widget[@name='todo_chatter_panel']" position="replace">
+                <chatter/>
             </xpath>
         </field>
     </record>

@@ -54,47 +54,46 @@ class QualityAnalysis(models.Model):
             }
         )
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """To generate the sequence for the test cases."""
 
-        qa_ids = False
-        project_task = False
-        if not vals.get("task_id"):
-            default_task_id = self.env.context.get("default_task_id")
-            if default_task_id:
-                vals["task_id"] = default_task_id
-        if vals.get("task_id"):
-            qa_ids = self.env["project.task"].browse(vals["task_id"]).mapped("qa_ids")
-            project_task = self.env["project.task"].browse(vals["task_id"])
-        if project_task:
-            if project_task.qa_state_count > 1:
-                vals["is_new"] = True
-            if not qa_ids and project_task.is_delete is False:
-                count = 1
-                vals["sequence"] = "TC_" + str(vals.get("task_id")) + "_" + str(count)
-            else:
-                if project_task.is_delete is True:
-                    vals["sequence"] = (
-                        "TC_"
-                        + str(vals.get("task_id"))
-                        + "_"
-                        + str(project_task.qa_line_length + 1)
-                    )
-                    project_task.is_delete = False
-                elif project_task.is_delete is False:
-                    vals["sequence"] = (
-                        "TC_"
-                        + str(vals.get("task_id"))
-                        + "_"
-                        + str(
-                            int(
-                                qa_ids[len(project_task[0]["qa_ids"]) - 1]["sequence"].split('_')[-1]   # .split('_') : [Fixed] sequence start from 1 after 10
+        for vals in vals_list:
+            if not vals.get("task_id"):
+                default_task_id = self.env.context.get("default_task_id")
+                if default_task_id:
+                    vals["task_id"] = default_task_id
+            if vals.get("task_id"):
+                qa_ids = self.env["project.task"].browse(vals["task_id"]).mapped("qa_ids")
+                project_task = self.env["project.task"].browse(vals["task_id"])
+                if project_task:
+                    if project_task.qa_state_count > 1:
+                        vals["is_new"] = True
+                    if not qa_ids and project_task.is_delete is False:
+                        count = 1
+                        vals["sequence"] = "TC_" + str(vals.get("task_id")) + "_" + str(count)
+                    else:
+                        if project_task.is_delete is True:
+                            vals["sequence"] = (
+                                "TC_"
+                                + str(vals.get("task_id"))
+                                + "_"
+                                + str(project_task.qa_line_length + 1)
                             )
-                            + 1
-                        )
-                    )
-            return super(QualityAnalysis, self).create(vals)
+                            project_task.is_delete = False
+                        elif project_task.is_delete is False:
+                            vals["sequence"] = (
+                                "TC_"
+                                + str(vals.get("task_id"))
+                                + "_"
+                                + str(
+                                    int(
+                                        qa_ids[len(project_task[0]["qa_ids"]) - 1]["sequence"].split('_')[-1]   # .split('_') : [Fixed] sequence start from 1 after 10
+                                    )
+                                    + 1
+                                )
+                            )
+        return super(QualityAnalysis, self).create(vals_list)
 
     def unlink(self):
         """Method for getting deleted record details"""

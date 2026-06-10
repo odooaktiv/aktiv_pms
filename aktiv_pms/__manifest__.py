@@ -15,7 +15,7 @@
     "name": "Aktiv PMS",
     "category": "Services/Project",
     "author": "Aktiv Software",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "license": "OPL-1",
     "depends": ["project", "hr_timesheet", "analytic", "ak_crm","ak_public_holidays"],
     "data": [
@@ -51,6 +51,7 @@
         "views/urgent_task_views.xml",
         "views/knowledge_bank.xml",
         "views/task_type_views.xml",
+        "views/mail_menu_overrides.xml",
         "report/report_timesheet_template.xml",
         "wizard/create_project_pms.xml",
     ],

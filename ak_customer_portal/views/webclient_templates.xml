@@ -57,8 +57,10 @@
             <t t-set="no_footer" t-value="True"/>
         </xpath>
         <xpath expr="//div[hasclass('oe_website_login_container')]" position="replace">
-            <div class="oe_website_login_container container h-100">
-                <div class="row h-100">
+            <div class="oe_website_login_container container">
+                <!-- v19: website.layout wraps in <main> without height, so h-100 collapses.
+                     Use min-vh-100 to fill the viewport regardless of parent height. -->
+                <div class="row min-vh-100">
                     <div class="col-md-12  p-0 login_background d-flex align-items-center"
                          style="background-image:url('/ak_customer_portal/static/src/image/aktiv_bg.jpg');flex-direction: row-reverse;background-position: center;
     background-size: cover;
@@ -67,7 +69,7 @@
                         <div class="login_card_container col-md-4 float-right">
                             <p class="text-center custom_p_class member_login">Login</p>
                             <div id="login_card" class=" d-none ghost_div"/>
-                            <t t-raw="0"/>
+                            <t t-out="0"/>
                         </div>
                     </div>
                 </div>
@@ -76,6 +78,14 @@
     </template>
 
     <template id="aktiv_login_website" inherit_id="web.login">
+        <!-- v19: Remove the "Choose a user" OWL component that hides the login form on initial load -->
+        <xpath expr="//owl-component[@name='web.user_switch']" position="replace"/>
+        <!-- v19: auth_passkey adds "Use a Passkey" via web.login_oauth; remove it -->
+        <xpath expr="//t[@t-call='web.login_oauth']" position="replace"/>
+        <!-- v19: Form has class="d-none" by default when no user is pre-selected; always show it -->
+        <xpath expr="//form[@data-captcha='login']" position="attributes">
+            <attribute name="t-attf-class">oe_login_form</attribute>
+        </xpath>
         <xpath expr="//button[@name='redirect']" position="replace"/>
         <xpath expr="//div[hasclass('field-login')]/label" position="replace"/>
         <xpath expr="//label[@for='password']" position="replace"/>
@@ -84,21 +94,26 @@
             <i class="fa fa-envelope custom_icon"></i>
         </xpath>
 
+        <!-- v19: parent of password input changed from div.mb-3 to div.input-group; use add to
+             preserve Bootstrap input-group class (required for eye-toggle button styling) -->
         <xpath expr="//input[@name='password']/.." position="attributes">
-            <attribute name="class">field-password</attribute>
+            <attribute name="class" add="field-password" separator=" "/>
         </xpath>
 
         <xpath expr="//input[@name='password']" position="inside">
             <i class="fa fa-key custom_icon"></i>
         </xpath>
-
-
-
     </template>
 
     <template id="aktiv_login" inherit_id="auth_signup.login">
-        <xpath expr="//a[@t-if='reset_password_enabled']" position="attributes">
-            <attribute name="t-attf-class">#{'reset_password_text_center'}</attribute>
+        <!-- v19: auth_signup places Reset Password after label[@for='password'] (between email and
+             password). Move it back to after the Log in button to match v17 behaviour. -->
+        <xpath expr="//a[@t-if='reset_password_enabled']" position="replace"/>
+        <xpath expr="//div[hasclass('oe_login_buttons')]" position="after">
+            <div class="justify-content-center mt-2 d-flex small">
+                <a t-if="reset_password_enabled" class="reset_password_text_center"
+                   t-attf-href="/web/reset_password?{{ keep_query() }}">Reset Password</a>
+            </div>
         </xpath>
     </template>
 

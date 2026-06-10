@@ -4,6 +4,19 @@
 		<template id="survey_fill_form_start" inherit_id="survey.survey_fill_form_start">
 			<xpath expr="//div[hasclass('o_survey_start')]" position="replace">
 				<t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+				<!-- V19: SurveyForm.submitForm() unconditionally reads this element's value on the
+				     start screen. Our custom template removes survey_fill_header so we must keep
+				     a hidden placeholder here to avoid "Cannot read properties of null" crash. -->
+				<select name="lang_code" class="o_survey_lang_selector d-none">
+					<t t-if="languages">
+						<option t-foreach="languages" t-as="language" t-att-value="language[0]"
+						        t-att-selected="language[0] == lang_code and 'selected' or None"
+						        t-out="language[1]"/>
+					</t>
+					<t t-else="">
+						<option t-att-value="lang_code" selected="selected" t-out="lang_code"/>
+					</t>
+				</select>
 				<div class="survey_start_wrapper">
 					<div class="survey_start_logo">
 						<img t-attf-src="#{base_url}/ak_survey/static/description/icon.png"
@@ -178,7 +191,11 @@
 		</template>
 
 		<template id="survey_layout" inherit_id="survey.layout">
-			<xpath expr="//div[@class='py-3 m-0 p-0 text-end']" position="replace"/>
+			<!-- V19: SurveyForm JS requires .o_survey_navigation_wrapper to exist in the DOM.
+			     Keep a hidden placeholder; navigation is handled by inline buttons in our custom templates. -->
+			<xpath expr="//div[@class='py-3 m-0 p-0 text-end']" position="replace">
+				<div class="o_survey_navigation_wrapper d-none"/>
+			</xpath>
 		</template>
 
 		<template id="survey_page_fill" inherit_id="survey.survey_page_fill">

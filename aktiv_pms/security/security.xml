@@ -5,19 +5,46 @@
         <field name="name">Project Manager</field>
     </record> -->
 
-    <!-- Privilege grouping for Aktiv PMS groups (v19 replacement for category_id on res.groups) -->
-    <record id="res_groups_privilege_aktiv_pms" model="res.groups.privilege">
-        <field name="name">Aktiv PMS</field>
-        <field name="category_id" ref="base.module_category_services_project"/>
+    <!-- Ensure the standard Project privilege (User/Administrator) stays in the Services section.
+         This corrects any stale DB value left by older versions of this module. -->
+    <record id="project.res_groups_privilege_project" model="res.groups.privilege">
+        <field name="sequence">3</field>
+        <field name="category_id" ref="base.module_category_services"/>
     </record>
 
-    <!--Project Manager Group-->
+    <!-- One privilege per Aktiv PMS role — each appears as its own independent checkbox row
+         below the standard Project row in the same Services section (V17-equivalent behaviour). -->
+    <record id="res_groups_privilege_aktiv_project_lead" model="res.groups.privilege">
+        <field name="name">Project Lead</field>
+        <field name="sequence">10</field>
+        <field name="category_id" ref="base.module_category_services"/>
+    </record>
+
+    <record id="res_groups_privilege_aktiv_lead_engineer" model="res.groups.privilege">
+        <field name="name">Lead Engineer</field>
+        <field name="sequence">20</field>
+        <field name="category_id" ref="base.module_category_services"/>
+    </record>
+
+    <record id="res_groups_privilege_aktiv_project_functional" model="res.groups.privilege">
+        <field name="name">Project Functional</field>
+        <field name="sequence">30</field>
+        <field name="category_id" ref="base.module_category_services"/>
+    </record>
+
+    <record id="res_groups_privilege_aktiv_project_qa" model="res.groups.privilege">
+        <field name="name">Project QA</field>
+        <field name="sequence">40</field>
+        <field name="category_id" ref="base.module_category_services"/>
+    </record>
+
+    <!--Project Lead Group-->
     <record id="group_aktiv_project_manager" model="res.groups">
         <field name="name">Project Lead</field>
         <field name="user_ids"
                eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         <field name="implied_ids" eval="[(4, ref('project.group_project_user')), (4, ref('hr_timesheet.group_hr_timesheet_approver'))]"/>
-        <field name="privilege_id" ref="res_groups_privilege_aktiv_pms"/>
+        <field name="privilege_id" ref="res_groups_privilege_aktiv_project_lead"/>
     </record>
 
     <!--Project QA Group-->
@@ -26,7 +53,7 @@
         <field name="user_ids"
                eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
-        <field name="privilege_id" ref="res_groups_privilege_aktiv_pms"/>
+        <field name="privilege_id" ref="res_groups_privilege_aktiv_project_qa"/>
     </record>
 
     <!--Project User Group-->
@@ -34,21 +61,22 @@
         <field name="implied_ids" eval="[(4, ref('hr_timesheet.group_hr_timesheet_user'))]"/>
     </record>
 
-    <!--Project functional group -->
+    <!--Project Functional Group-->
     <record id="group_aktiv_project_functional" model="res.groups">
         <field name="name">Project Functional</field>
         <field name="user_ids"
                eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         <field name="implied_ids" eval="[(4, ref('project.group_project_user'))]"/>
-        <field name="privilege_id" ref="res_groups_privilege_aktiv_pms"/>
+        <field name="privilege_id" ref="res_groups_privilege_aktiv_project_functional"/>
     </record>
 
+    <!--Lead Engineer Group-->
     <record id="group_aktiv_project_team_leader" model="res.groups">
         <field name="name">Lead Engineer</field>
         <field name="user_ids"
                eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         <field name="implied_ids" eval="[(4, ref('hr_timesheet.group_hr_timesheet_approver'))]"/>
-        <field name="privilege_id" ref="res_groups_privilege_aktiv_pms"/>
+        <field name="privilege_id" ref="res_groups_privilege_aktiv_lead_engineer"/>
     </record>
 
     <!-- Group: Allow Edit Old Timesheets -->
@@ -60,6 +88,7 @@
     <record id="group_allow_approve_old_timesheets" model="res.groups">
         <field name="name">Allow Approval of Old Timesheets</field>
     </record>
+
 
     <record id="project.project_public_members_rule" model="ir.rule">
         <field name="active" eval="False"/>

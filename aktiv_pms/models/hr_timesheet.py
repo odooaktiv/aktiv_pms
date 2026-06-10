@@ -94,9 +94,9 @@ class AccountAnalyticLine(models.Model):
             rec.utilization_rate = (rec.approved_hours/rec.effective_hours) if rec.effective_hours else 0.0
 
     @api.model
-    def get_view(self, view_id=None, view_type='tree', **kwargs):
+    def get_view(self, view_id=None, view_type='list', **kwargs):
         res = super().get_view(view_id, view_type, **kwargs)
-        if view_type == 'tree':
+        if view_type == 'list':
             user = self.env['res.users'].browse(self.env.context.get('uid', False))
             restricted_groups = user._get_restricted_group()
             

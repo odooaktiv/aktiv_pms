@@ -13,6 +13,12 @@ from ..utils import get_connection
 class Project(models.Model):
     _inherit = "project.project"
 
+    def _compute_closed_task_count(self):
+        self._ProjectProject__compute_task_count(
+            count_field='closed_task_count',
+            additional_domain=[('state', 'in', ['done', 'cancel'])],
+        )
+
     deployment_type = fields.Selection([
         ("task_wise", "Task Wise"),
         ("phase_wise", "Phase Wise"),
@@ -449,7 +455,7 @@ class Project(models.Model):
                     lambda l: l.task_type_id.id == self.env.ref('aktiv_pms.task_type_customization').id
                 ).id
             else:
-                action["view_mode"] = "tree,form,kanban,calendar,pivot,graph,activity"
+                action["view_mode"] = "list,form,kanban,calendar,pivot,graph,activity"
         if self._context.get("display_only_consulting_task"):
             action["domain"].append(
                 ("task_type_id", "=", self.env.ref('aktiv_pms.task_type_consulting').id),
@@ -465,7 +471,7 @@ class Project(models.Model):
                     lambda l: l.task_type_id.id == self.env.ref('aktiv_pms.task_type_consulting').id
                 ).id
             else:
-                action["view_mode"] = "tree,form,kanban,calendar,pivot,graph,activity"
+                action["view_mode"] = "list,form,kanban,calendar,pivot,graph,activity"
         return action
 
     @api.depends("timesheet_ids")

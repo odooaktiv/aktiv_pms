@@ -1,84 +1,79 @@
 /** @odoo-module **/
 
-import Dialog from "@web/legacy/js/core/dialog";
+// In Odoo 19:
+//   - @web/legacy/js/core/dialog was removed; Bootstrap 5 modals via window.Modal are used instead.
+//   - rpc is no longer a service (bindService("rpc") fails); import it directly.
+import { rpc } from "@web/core/network/rpc";
 import publicWidget from '@web/legacy/js/public/public_widget';
 
 
 publicWidget.registry.TaskDetailRenderer = publicWidget.Widget.extend({
 
-    init() {
-        this._super(...arguments);
-        this.rpc = this.bindService("rpc");
-    },
-
     events: Object.assign({}, publicWidget.Widget.prototype.events, {
         'click .task_separate_details': '_onClickTaskDetail',
-        'click .sub_task_count': '_onClickSubTaskCount'
+        'click .sub_task_count': '_onClickSubTaskCount',
     }),
 
     selector: '#wrapwrap',
 
-    _onClickTaskDetail (ev) {
-        const $taskDiv = $(ev.currentTarget);
-        const taskId = parseInt($taskDiv.data('task-id'));
-        const taskName = $taskDiv.data('task-name');
-        const url = "/project/task/" + taskId
-        this.rpc(url, {}
-        ).then((html) => {
-            const $content = $(html);
-            new Dialog(this, {
-                title: `Task: ${taskName}`,
-                size: 'extra-large',
-                $content: $content,
-                buttons: [{
-                    text: 'Close',
-                    close: true,
-                }],
-            }).open();
+    /**
+     * Create and show a Bootstrap 5 modal with the given title and HTML content.
+     * Appended to document.body and auto-removed on hide.
+     */
+    _showModal(title, htmlContent) {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.setAttribute('tabindex', '-1');
+        modal.innerHTML = `
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        modal.querySelector('.modal-title').textContent = title;
+        modal.querySelector('.modal-body').innerHTML = htmlContent;
+        document.body.appendChild(modal);
+        window.Modal.getOrCreateInstance(modal).show();
+        modal.addEventListener('hidden.bs.modal', () => modal.remove(), { once: true });
+        return modal;
+    },
+
+    _onClickTaskDetail(ev) {
+        const taskDiv = ev.currentTarget;
+        const taskId = parseInt(taskDiv.dataset.taskId);
+        const taskName = taskDiv.dataset.taskName;
+        rpc('/project/task/' + taskId, {}).then((html) => {
+            this._showModal(`Task: ${taskName}`, html);
         }).catch((error) => {
             console.error('Error fetching task detail:', error);
         });
-        
     },
 
-    _onClickSubTaskCount (ev) {
-        var self = this;
-        const $taskDiv = $(ev.currentTarget);
-        const taskId = parseInt($taskDiv.data('task-id'));
-        const url = "/project/sub_task/" + taskId
-        this.rpc(url, {}).then(function(html) {
-            var $content = $(html);
-            var dialog = new Dialog(this, {
-                title: `Task: ${$taskDiv.data('task-name')}`,
-                size: 'extra-large',
-                $content: $content,
-                buttons: [{
-                    text: 'Close',
-                    close: true
-                }]
-            });
-            dialog.opened().then(function() {
-                dialog.$('tr.sub_task_details').click(function() {
-                    var tr_tag = $(this);
-                    if (tr_tag.attr('data-task-id')) {
-                        var tr_task_id = parseInt(tr_tag.attr('data-task-id'));
-                        var url = "/project/task/" + tr_task_id
-                        self.rpc(url, {}).then(function(html) {
-                            var $content = $(html);
-                            new Dialog(self, {
-                                title: `Task: ${tr_tag.attr('data-task-name')}`,
-                                size: 'extra-large',
-                                $content: $content,
-                                buttons: [{
-                                    text: 'Close',
-                                    close: true
-                                }]
-                            }).open();
-                        });
-                    };
+    _onClickSubTaskCount(ev) {
+        const taskDiv = ev.currentTarget;
+        const taskId = parseInt(taskDiv.dataset.taskId);
+        rpc('/project/sub_task/' + taskId, {}).then((html) => {
+            const modal = this._showModal(`Task: ${taskDiv.dataset.taskName}`, html);
+            modal.addEventListener('shown.bs.modal', () => {
+                modal.querySelectorAll('tr.sub_task_details').forEach((tr) => {
+                    tr.addEventListener('click', () => {
+                        const trTaskId = parseInt(tr.dataset.taskId);
+                        if (trTaskId) {
+                            rpc('/project/task/' + trTaskId, {}).then((html) => {
+                                this._showModal(`Task: ${tr.dataset.taskName}`, html);
+                            });
+                        }
+                    });
                 });
-            });
-            dialog.open();
+            }, { once: true });
         });
     },
 });
