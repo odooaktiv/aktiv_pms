@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.fields import Domain
 from datetime import timedelta
 
 
@@ -30,19 +31,18 @@ class ResUser(models.Model):
         }
 
     @api.model
-    def _name_search(self, name, domain=None, operator='ilike', limit=None, order=None):
-        domain = domain or []
+    def name_search(self, name='', domain=None, operator='ilike', limit=100):
+        domain = Domain(domain or Domain.TRUE)
         context = self._context
         project_model = self.env['project.project']
         user_ids = []
 
         def get_project_and_map(context_key, map_fields):
-            project_id = project_model.browse(context[context_key])
+            project = project_model.browse(context[context_key])
             ids = []
             for field in map_fields:
-                ids.extend(project_id.mapped(field).ids)
-            result = list(set(ids))
-            return result
+                ids.extend(project.mapped(field).ids)
+            return list(set(ids))
 
         if context.get("for_dev"):
             user_ids = get_project_and_map("for_dev", ["developer_ids"])
@@ -54,8 +54,8 @@ class ResUser(models.Model):
             user_ids = get_project_and_map("urgent_task", ["user_id", "consultant_ids"])
 
         if user_ids:
-            domain += [('id', 'in', user_ids)]
-        return super()._name_search(name, domain, operator, limit, order)
+            domain = domain & Domain('id', 'in', user_ids)
+        return super().name_search(name, domain, operator, limit)
 
 
 

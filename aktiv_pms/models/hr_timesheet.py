@@ -138,7 +138,7 @@ class AccountAnalyticLine(models.Model):
             user_id = employee.user_id
 
             if user_id:
-                user_groups = set(user_id.group_ids.mapped('category_id').mapped('xml_id'))
+                user_groups = set(v for v in user_id.group_ids.get_external_id().values() if v)
                 restricted_groups = user_id._get_restricted_group()
 
                 if "project.group_project_user" in user_groups:
@@ -195,15 +195,16 @@ class AccountAnalyticLine(models.Model):
         if check_date < cutoff_date:
             raise ValidationError(_("Timesheet Entry is locked for this Date"))
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         # Enforces date lock check for non-project managers before allowing timesheet changes.
         if not self.env.user.has_group('project.group_project_manager'):
-            self._check_lock_date(vals.get('date'))
-        vals = self.update_user_type(vals)
-        record = super(AccountAnalyticLine, self).create(vals)
-        record._compute_status()
-        return record
+            for vals in vals_list:
+                self._check_lock_date(vals.get('date'))
+        vals_list = [self.update_user_type(vals) for vals in vals_list]
+        records = super(AccountAnalyticLine, self).create(vals_list)
+        records._compute_status()
+        return records
 
     def write(self, vals):
         """Method Override to update state when timesheet entries are updated"""
@@ -360,6 +361,24 @@ class AccountAnalyticLine(models.Model):
     def timesheet_approved(self):
         """Open wizard when project functional approves timesheet for the second time"""
         self._check_approval_lock_date()
+        approved_with_remaining = self.filtered(
+            lambda l: l.state == 'approved' and l.remaining_hours > 0
+        )
+        if approved_with_remaining:
+            dates = '\n'.join(
+                '• %s | %s | %s | %s' % (
+                    r.date,
+                    r.employee_id.name,
+                    r.project_id.name or '-',
+                    r.task_id.name or '-',
+                )
+                for r in approved_with_remaining
+            )
+            raise ValidationError(
+                _("The following entries are already Approved and have Remaining Hours set.\n"
+                  "Please Reset them first before approving again:\n\n%s") % dates
+            )
+
         for rec in self:
             user = rec.env.user
             vals = {

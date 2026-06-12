@@ -33,6 +33,7 @@ class ProjectCreationWizard(models.TransientModel):
             raise ValidationError(e)
         if not odoo_conn:
             raise ValidationError("Please establish connection with database!")
+        odoo_conn.env.context.update({'mail_create_nosubscribe': True, 'mail_create_nolog': True})
         partner = odoo_conn.env["res.partner"].search([('name', 'ilike', self.partner_id.name)], limit=1)
         if partner:
             partner_id = partner[0]
