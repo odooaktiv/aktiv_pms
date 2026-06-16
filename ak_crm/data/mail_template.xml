@@ -47,7 +47,7 @@
                                 <br/>
                                 <t t-if="object.id">
                                     <p style="padding-top: 24px; padding-bottom: 16px;">
-                                        <a t-att-href="'/web#id=%s&amp;model=crm.lead&amp;view_type=form' % (object.id)" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">View Lead/Opportunity</a>
+                                        <a t-att-href="object._notify_get_action_link('view')" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">View Lead/Opportunity</a>
                                     </p>
                                 </t>
                             </td>
@@ -111,7 +111,7 @@
                                 <br/>
                                 <t t-if="object.id">
                                     <p style="padding-top: 24px; padding-bottom: 16px;">
-                                        <a t-att-href="'/web#id=%s&amp;model=crm.lead&amp;view_type=form' % (object.id)" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">View Lead/Opportunity</a>
+                                        <a t-att-href="object._notify_get_action_link('view')" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">View Lead/Opportunity</a>
                                     </p>
                                 </t>
                             </td>
@@ -175,7 +175,7 @@
                                 <br/>
                                 <t t-if="object.id">
                                     <p style="padding-top: 24px; padding-bottom: 16px;">
-                                        <a t-att-href="'/web#id=%s&amp;model=crm.lead&amp;view_type=form' % (object.id)" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">View Lead/Opportunity</a>
+                                        <a t-att-href="object._notify_get_action_link('view')" style="background-color:#875A7B; padding: 10px; text-decoration: none; color: #fff; border-radius: 5px;">View Lead/Opportunity</a>
                                     </p>
                                 </t>
                             </td>
