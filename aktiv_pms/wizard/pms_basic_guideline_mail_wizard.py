@@ -76,7 +76,6 @@ class PmsBasicGuidelineMailWizard(models.TransientModel):
                     res_id,
                     force_send=True,
                     email_values=email_values,
-                    notif_layout=False,
                 )
                 # add attachment in mail template
                 template.attachment_ids = [(6, 0, [attach_data.id])]
