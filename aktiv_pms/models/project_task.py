@@ -718,16 +718,8 @@ class ProjectTask(models.Model):
                 rec.is_team_leader = True
 
     def get_task_url(self):
-        """This method will return url of event in mail template"""
-
-        action_id = self.env.ref("project.action_view_all_task")
-        url = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
-        task_url = (
-                "/web#id=%s" % (self.id)
-                + "&action=%s" % (action_id.id)
-                + "&model=project.task&view_type=form"
-        )
-        return url + task_url
+        """This method will return url of task in mail template"""
+        return self._notify_get_action_link('view')
 
     def action_start_task(self):
         """Button action  to start task."""
