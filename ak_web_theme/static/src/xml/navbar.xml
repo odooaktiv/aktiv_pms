@@ -6,7 +6,7 @@
        t-inherit-mode="extension">
 
         <!-- Remove default app name dropdown item -->
-        <xpath expr="//DropdownItem[@t-if='!env.isSmall and currentApp']" position="replace"/>
+        <xpath expr="//DropdownItem[@t-esc='currentApp.name']" position="replace"/>
 
         <!-- Replace systray container to preserve v17 layout -->
         <xpath expr="//div[hasclass('o_menu_systray')]" position="replace">

@@ -49,7 +49,7 @@
                     <field name="is_visible_dashboard"/>
                     <field name="deployment_type"/>
                     <field name="go_live_date"
-                        required="deployment_type == 'task_wise'"
+                        required="deployment_type != 'task_wise'"
                         readonly="deployment_type in (False, 'phase_wise')"
                         />
                     <field name="hide_re_development_btn" invisible="1"/>
@@ -61,6 +61,13 @@
                 <xpath expr="//form/header/field[@name='stage_id']" position="replace">
                     <field name="state" widget="statusbar"
                            statusbar_visible="new,approval,cust_review,done,cancel,apps"/>
+                </xpath>
+                <!-- Hide the core v19 state-selection widget shown in the title next to the
+                     priority stars. It expects core task states, but this module overrides
+                     `state` with a custom workflow already shown in the statusbar above, so
+                     it only renders a confusing duplicate "Planned" label. -->
+                <xpath expr="//div[hasclass('o_state_container')]" position="attributes">
+                    <attribute name="invisible">1</attribute>
                 </xpath>
                 <!-- <xpath expr="//button[@name='action_assign_to_me']"
                        position="attributes">

@@ -15,10 +15,6 @@
         <field name="model_id" ref="model_project_project"/>
         <field name="domain_force">[('is_sop_bank', '=', True)]</field>
         <field name="groups" eval="[(4, ref('ak_project_todo.sop_bank_user'))]"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_read" eval="True"/>
-        <field name="perm_create" eval="False"/>
-        <field name="perm_unlink" eval="False"/>
     </record>
 
     <record id="sop_bank_admin_access" model="ir.rule">

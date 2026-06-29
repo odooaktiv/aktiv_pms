@@ -35,20 +35,25 @@ class Website(Website):
             request.env['ir.http'].reroute(homepage_url)
 
         # Check for page
-        website_page = request.env['ir.http']._serve_page()
-        if website_page:
+        # _serve_page() in V19 raises IndexError when response body is empty
+        website_page = None
+        try:
+            website_page = request.env['ir.http']._serve_page()
+        except IndexError:
+            pass
+
+        if website_page is not None:
             # Customization Starts
-            if not request.env.context.get("uid"):
+            if not request.session.uid:
                 return request.redirect("/web/login")
             return request.redirect("/my/home")
             # Customization Ends
-            return website_page
 
         # Check for controller
         if homepage_url and homepage_url != '/':
             try:
                 return request._serve_ir_http()
-            except (AccessError, NotFound, SessionExpiredException):
+            except Exception:
                 pass
 
         # Fallback on first accessible menu

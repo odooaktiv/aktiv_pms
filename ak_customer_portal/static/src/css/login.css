@@ -21,6 +21,27 @@
     position:relative;
 }
 
+/* Remove the boxed border around the password show/hide (eye) toggle button
+   (Odoo core renders it with class "border") and tuck it inside the gray
+   password pill so it matches the borderless input styling. */
+.field-password .o_show_password{
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: #021440;
+    /* Bootstrap raises a focused .form-control inside an input-group to z-index:5,
+       which would hide this absolutely-positioned button while typing. Stay above it. */
+    z-index: 10;
+    padding: 0 6px;
+}
+.field-password #password{
+    padding-right: 40px;
+}
+
 .custom_icon{
     position: absolute;
     top: 18px;

@@ -112,6 +112,7 @@
         <field name="groups" eval="[(4, ref('project.group_project_user'))]"/>
     </record>
 
+
     <!-- Rule for Project Lead to show his own projects -->
     <record id="project_owner_own_project_rule" model="ir.rule">
         <field name="name">Project: Project Lead: Can view and edit their own project</field>
@@ -231,15 +232,18 @@
         <field name="groups" eval="[(4, ref('aktiv_pms.group_aktiv_project_manager')), (4, ref('hr_timesheet.group_hr_timesheet_approver'))]"/>
     </record>
 
-   <!--  <record id="hr_timesheet.timesheet_line_rule_user" model="ir.rule">
+    <record id="hr_timesheet.timesheet_line_rule_user" model="ir.rule">
         <field name="domain_force">[
-                '|', '|', '|', '|',
-                ('project_id.developer_ids', 'in', user.id),
-                ('project_id.task_qa_ids', 'in', user.id),
-                ('project_id.code_reviewer_ids', 'in', user.id),
-            ]
-        </field>
-    </record> -->
+            ('user_id', '=', user.id),
+            ('project_id', '!=', False),
+            '|', '|', '|', '|',
+                ('project_id.developer_ids', '=', user.id),
+                ('project_id.task_qa_ids', '=', user.id),
+                ('project_id.code_reviewer_ids', '=', user.id),
+                ('project_id.team_leader_ids', '=', user.id),
+                ('project_id.consultant_ids', '=', user.id)
+        ]</field>
+    </record>
 
 
     <function name="write" model="ir.model.data">
