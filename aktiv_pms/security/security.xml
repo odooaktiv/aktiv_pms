@@ -56,6 +56,17 @@
         <field name="privilege_id" ref="res_groups_privilege_aktiv_project_qa"/>
     </record>
 
+    <!-- Timesheet User Group -->
+    <function name="write" model="res.groups"
+              eval="[[ref('hr_timesheet.group_hr_timesheet_user'),
+                      ref('hr_timesheet.group_hr_timesheet_approver'),
+                      ref('hr_timesheet.group_timesheet_manager')],
+                     {'privilege_id': ref('hr_timesheet.res_groups_privilege_timesheets')}]"/>
+
+    <function name="write" model="res.groups.privilege"
+              eval="[[ref('hr_timesheet.res_groups_privilege_timesheets')],
+                     {'sequence': 50}]"/>
+
     <!--Project User Group-->
     <record id="project.group_project_user" model="res.groups">
         <field name="implied_ids" eval="[(4, ref('hr_timesheet.group_hr_timesheet_user'))]"/>
