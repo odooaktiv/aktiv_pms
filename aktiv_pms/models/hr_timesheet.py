@@ -294,7 +294,7 @@ class AccountAnalyticLine(models.Model):
         :rtype: bool
         """
         user = self.env.user
-        project = self.project_id
+        project = self.project_id.sudo()
 
         if user.id in project.team_leader_ids.ids and user.has_group('aktiv_pms.group_aktiv_project_team_leader'):
             return True
@@ -424,6 +424,25 @@ class AccountAnalyticLine(models.Model):
         we have removed logic and simply called it.
         """
         self.timesheet_approved()
+
+    def web_read(self, specification):
+        if 'project_id' not in specification:
+            return super().web_read(specification)
+
+        # Fetch all fields except project_id to avoid AccessError on projects
+        # the user cannot access. Then re-attach project_id via sudo, replicating
+        # the V17 behaviour where Many2one display names used value.sudo().display_name.
+        spec_without_project = {k: v for k, v in specification.items() if k != 'project_id'}
+        result = super().web_read(spec_without_project)
+
+        for record_data, record in zip(result, self):
+            project = record.sudo().project_id
+            record_data['project_id'] = (
+                {'id': project.id, 'display_name': project.sudo().display_name}
+                if project else False
+            )
+
+        return result
 
     @api.onchange('state')
     def onchange_state(self):

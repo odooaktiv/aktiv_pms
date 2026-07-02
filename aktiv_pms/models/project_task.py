@@ -30,6 +30,19 @@ class ProjectTask(models.Model):
             return project_developer.ids
 
 
+    def web_read(self, specification):
+        if 'project_id' not in specification:
+            return super().web_read(specification)
+        spec_without_project = {k: v for k, v in specification.items() if k != 'project_id'}
+        result = super().web_read(spec_without_project)
+        for record_data, record in zip(result, self):
+            project = record.sudo().project_id
+            record_data['project_id'] = (
+                {'id': project.id, 'display_name': project.sudo().display_name}
+                if project else False
+            )
+        return result
+
     def get_tasks(self):
         """Method to get tasks from pm tool using genreic method."""
         odoo_conn = False
