@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates>
     <t t-name="ak_timesheet_systray.FetchTimesheetEntries">
-        <Dropdown position="'bottom-end'" autoOpen="false">
-            <t t-set-slot="toggler">
+        <Dropdown position="'bottom-end'">
+            <button class="btn o-timesheet-systray-toggler position-relative border-0 bg-transparent"
+                    t-on-click="() => this.handleTimesheetSystrayClick()">
                 <img src="/ak_timesheet_systray/static/description/img.png" style="width:20px;height:20px;" role="img"
-                     class="fa fa-pie-chart" alt="Custom Icon" aria-label="Timesheet Entries"
-                     t-on-click="() => this.handleTimesheetSystrayClick()"/>
+                     class="fa fa-pie-chart" alt="Custom Icon" aria-label="Timesheet Entries"/>
                 <span t-if="counter" class="o-mail-MessagingMenu-counter badge rounded-pill">
                     <t t-esc="counter"/>
                 </span>
-            </t>
-            <div t-if="state.timesheetEntries and state.timesheetEntries.length === 0"
+            </button>
+            <t t-set-slot="content">
+            <div t-if="state.syncing" class="d-flex align-items-center justify-content-center gap-2 p-3"
+                 style="width: 400px; color: #35b164; font-weight: bold;">
+                <span class="spinner-border spinner-border-sm" role="status"/>
+                <span>Syncing timesheet entries...</span>
+            </div>
+            <div t-if="!state.syncing and state.timesheetEntries and state.timesheetEntries.length === 0"
                  class="dropdown-item"
                  style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #ddd;">
                 <span style="height: 15px;width: 400px; display: flex; align-items: center; justify-content: center;
@@ -234,6 +240,7 @@
                     </t>
                 </div>
             </div>
+            </t>
         </Dropdown>
     </t>
 </templates>

@@ -74,6 +74,13 @@
 				<div class="wrap">
 					<div class="o_survey_finished">
 						<t t-set="base_url" t-value="request.env['ir.config_parameter'].sudo().get_param('web.base.url')"/>
+						 <div t-if="survey.certification" class="mt16 mb16">
+							  <a role="button" class="btn btn-primary btn-lg"
+								 t-att-href="'/survey/%s/get_certification' % survey.id">
+								<i class="fa fa-fw fa-trophy" role="img" aria-label="Download certification" title="Download certification"/>
+								Download certification
+							  </a>
+						 </div>
 						<div class="survey_end_wrapper">
 							<div class="survey_end_logo">
 								<img t-attf-src="#{base_url}/ak_survey/static/description/icon.png"

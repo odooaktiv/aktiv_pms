@@ -17,8 +17,8 @@
     ],
     "assets": {
         "web.assets_backend": [
-            # "ak_timesheet_systray/static/src/**/*",
-            # 'ak_timesheet_systray/static/scss/timesheet_style.scss'
+            "ak_timesheet_systray/static/src/**/*",
+            'ak_timesheet_systray/static/scss/timesheet_style.scss'
         ],
     },
     "installable": True,

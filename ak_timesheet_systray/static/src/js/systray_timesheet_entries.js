@@ -2,9 +2,9 @@
 
 import { useService } from '@web/core/utils/hooks';
 import { registry } from "@web/core/registry";
+import { user } from "@web/core/user";
 import { Component, useState, onMounted, onWillUnmount } from "@odoo/owl";
 import { Dropdown } from "@web/core/dropdown/dropdown";
-import { busService } from "@bus/services/bus_service";
 
 export class FetchTimesheetEntries extends Component {
     static components = { Dropdown };
@@ -13,17 +13,20 @@ export class FetchTimesheetEntries extends Component {
     };
 
     setup() {
-//        this.actionService = useService("action");
         this.orm = useService("orm");
+        this.busService = useService("bus_service");
         this.state = useState({
             timesheetEntries: [],
             error: null,
             sync : false,
+            syncing : false,
             activeTab : 'all',
             counter: 0,
                     });
 
-        this.uid = useService("user")['userId'];
+        this.uid = user.userId;
+
+        this.onUnsyncUpdate = this.onUnsyncUpdate.bind(this);
 
 //         Fetch entries when component is mounted
         onMounted(async () => {
@@ -38,18 +41,13 @@ export class FetchTimesheetEntries extends Component {
     }
 
     setupUpCounter() {
-        const channel = `unsync_timesheet_update_${this.uid}`;
-        this.env.services.bus_service.addChannel(channel);
-        this.env.services.bus_service.addEventListener('notification', this.handleNotification.bind(this));
-
+        this.busService.addChannel(`unsync_timesheet_update_${this.uid}`);
+        this.busService.subscribe("unsync_timesheet_update", this.onUnsyncUpdate);
     }
 
     cleanupUpCounter() {
-        if (this.busService) {
-            const channel = `unsync_timesheet_update_${this.uid}`;
-            this.busService.removeChannel(channel);
-            this.busService.removeEventListener('notification', this.handleNotification.bind(this));
-        }
+        this.busService.unsubscribe("unsync_timesheet_update", this.onUnsyncUpdate);
+        this.busService.deleteChannel(`unsync_timesheet_update_${this.uid}`);
     }
 
     async handleTimesheetSystrayClick() {
@@ -57,29 +55,15 @@ export class FetchTimesheetEntries extends Component {
         await this.fetchTimesheetEntries();
     }
 
-
-    async handleNotification(event) {
-    // Extract the actual notifications from event.detail
-        const notifications = event.detail;
-
-        if (!Array.isArray(notifications)) {
-            console.error('Expected an iterable notifications object, but received:', notifications);
-            return;
-        }
-
-        for (const { payload, type } of notifications) {
-            if (type === 'unsync_timesheet_update' && payload.user_id === this.uid) {
-                if (payload.action === 'update_counter') {
-                    // Only trigger the counter update if the action is specifically 'update_counter'
-                    await this.updateCounter();
-                }
-            }
+    async onUnsyncUpdate(payload) {
+        if (payload.user_id === this.uid && payload.action === 'update_counter') {
+            await this.updateCounter();
         }
     }
 
     async updateCounter() {
         const unsync_search_domain = [['user_id', '=', this.uid], ['data_sync', '=', 'not_sync'], ['date', '>=', '2024-03-01']];
-        const unsync_search_count = await this.orm.searchCount("account.analytic.line", unsync_search_domain);
+        const unsync_search_count = await this.orm.silent.searchCount("account.analytic.line", unsync_search_domain);
         const count = unsync_search_count
         this.state.counter = count;  // Update the counter in the state
         await this.fetchTimesheetEntries();
@@ -87,10 +71,14 @@ export class FetchTimesheetEntries extends Component {
 
 
     async syncTimesheetEntries(){
-         try {
+        if (this.state.syncing) {
+            return;
+        }
+        this.state.syncing = true;
+        try {
             const function_call = await this.orm.silent.call("project.task", "action_sync_timesheet_pm_tool", [this.uid]);
             const unsync_search_domain = [['user_id', '=', this.uid], ['data_sync', '=', 'not_sync'], ['date', '>=', '2024-03-01']];
-            const unsync_search_count = await this.orm.searchCount("account.analytic.line", unsync_search_domain);
+            const unsync_search_count = await this.orm.silent.searchCount("account.analytic.line", unsync_search_domain);
             const count = unsync_search_count
             if (count === 0) {
                 this.state.sync = true;
@@ -100,6 +88,8 @@ export class FetchTimesheetEntries extends Component {
             }
         } catch (error) {
             console.error('Failed to sync timesheet entries:', error);
+        } finally {
+            this.state.syncing = false;
         }
     }
 
@@ -274,7 +264,7 @@ export class FetchTimesheetEntries extends Component {
             const fields = ["name", 'date', 'unit_amount', 'project_id', 'task_id', 'id'];
             const domain = [['project_id', '!=', false],['user_id', '=', this.uid],['data_sync', '=', 'not_sync'],
             ['date', '>=', '2024-03-01']];
-            const result = await this.orm.searchRead("account.analytic.line", domain, fields, {
+            const result = await this.orm.silent.searchRead("account.analytic.line", domain, fields, {
                 limit: 300
             });
 
