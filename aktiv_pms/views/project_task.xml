@@ -49,7 +49,6 @@
                     <field name="is_visible_dashboard"/>
                     <field name="deployment_type"/>
                     <field name="go_live_date"
-                        required="deployment_type != 'task_wise'"
                         readonly="deployment_type in (False, 'phase_wise')"
                         />
                     <field name="hide_re_development_btn" invisible="1"/>
