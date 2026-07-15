@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, models
+from odoo.tools.mail import email_normalize, email_split
+
+# Company mailboxes that generate leads via the mail gateway; never suggest
+# them back as a recipient when replying on the resulting lead/opportunity.
+INTERNAL_CATCHALL_EMAILS = {
+    "odoo@aktivsoftware.com",
+    "sales@aktivsoftware.com",
+    "finerytestwibtec@gmail.com",  # TEMP: local test mailbox, remove before deploying
+}
 
 
 class MailThread(models.AbstractModel):
@@ -76,3 +85,17 @@ class MailThread(models.AbstractModel):
         res = super(MailThread, self)._get_message_create_valid_field_names()
         res.update({'mail_to'})
         return res
+
+    def _sort_suggested_messages(self, messages):
+        """ Never suggest our own catch-all mailboxes (sales@, odoo@) as a
+        reply-all recipient, whether they were the sender or the original
+        "to"/"cc" of the inbound message that created this lead. """
+        messages = super()._sort_suggested_messages(messages)
+
+        def _is_internal(msg):
+            addresses = {email_normalize(msg.email_from), msg.author_id.email_normalized}
+            for field in (msg.incoming_email_to, msg.incoming_email_cc):
+                addresses.update(email_normalize(e) for e in email_split(field or ""))
+            return bool(addresses & INTERNAL_CATCHALL_EMAILS)
+
+        return messages.filtered(lambda msg: not _is_internal(msg))
