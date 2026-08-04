@@ -342,7 +342,7 @@ class ProjectCustomerPortal(CustomerPortal):
         domain = [('project_id', '=', project.id), ("parent_id", "=", False),]
         # pager
         url = "/my/projects/%s" % project.id
-        values = self._prepare_tasks_values(page, date_begin, date_end, sortby, search, search_in, groupby, url, domain, su=bool(access_token), project=project)
+        values = self._prepare_tasks_values(page, date_begin, date_end, sortby, search, search_in, groupby, url, domain, su=bool(access_token) and request.env.user.has_group('base.group_public'), project=project)
         # adding the access_token to the pager's url args,
         # so we are not prompted for loging when switching pages
         # if access_token is None, the arg is not present in the URL
@@ -354,12 +354,13 @@ class ProjectCustomerPortal(CustomerPortal):
             page_name='project',
             pager=pager,
             project=project,
+            multiple_projects=False,
             task_url=f'projects/{project.id}/task',
             preview_object=project,
         )
-
+        # default value is set to 'project' in _prepare_tasks_values, so we have to set it to 'none' here.
         if not groupby:
-            values['groupby'] = 'project' if self._display_project_groupby(project) else 'none'
+            values['groupby'] = 'none'
 
         return self._get_page_view_values(project, access_token, values, 'my_projects_history', False, **kwargs)
 
