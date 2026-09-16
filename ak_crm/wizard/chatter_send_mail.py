@@ -137,7 +137,7 @@ class ChatterSendMail(models.TransientModel):
     #             }
     #         )
 
-    def prepare_message_vals(self, parent_id, subtype_id, lead):
+    def prepare_message_vals(self, parent_id, subtype_id):
         """Prepare vals of mail.message"""
         return {
             "author_id": self.env.user.partner_id.id,
@@ -153,7 +153,6 @@ class ChatterSendMail(models.TransientModel):
             "message_type": "comment",
             "subtype_id": subtype_id,
             "add_sign": not bool(self.template_id),
-            "record_name": lead.display_name,
             "mail_to": self.email_to,
         }
 
@@ -183,7 +182,7 @@ class ChatterSendMail(models.TransientModel):
         lead = self.env["crm.lead"].browse(self._context.get("default_res_id"))
         if self.subtype_id:
             subtype_id = self.subtype_id.id
-        message_vals = self.prepare_message_vals(parent_id, subtype_id, lead)
+        message_vals = self.prepare_message_vals(parent_id, subtype_id)
 
         message_vals = dict((key, val) for key, val in message_vals.items() if key in self.env['mail.message']._fields)
         new_message = lead.message_post(**message_vals)
