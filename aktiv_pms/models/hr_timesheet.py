@@ -16,8 +16,11 @@ class AccountAnalyticLine(models.Model):
     state = fields.Selection(
         [("approval", "Pending For Approval"), ("approved", "Approved")],
         default="approval",
+        copy=False,
     )
-    approved_hours = fields.Float(string="Productive Hours")
+    approved_hours = fields.Float(string="Productive Hours", copy=False)
+    employee_id = fields.Many2one(copy=False)
+    user_id = fields.Many2one(copy=False)
     last_approval_reason = fields.Text(string="Last Approval Reason", copy=False)
     approved_hours_logs = fields.Text(string="Productive Hours Logs",
         copy=False, readonly=True)
@@ -28,8 +31,9 @@ class AccountAnalyticLine(models.Model):
         [("not_sync", "Not Sync"), ("sync", "Sync")],
         "Timesheet Sync",
         default="not_sync",
+        copy=False,
     )
-    pmtool_timesheet_id = fields.Char("PM Tool Task Id")
+    pmtool_timesheet_id = fields.Char("PM Tool Task Id", copy=False)
     user_type = fields.Selection([("dev", "Developer"), ("qa", "QA")])
     remaining_hours = fields.Float(string="Remaining Approval Hours", default=0)
     checked = fields.Boolean(string="Productive Hours Amends")
@@ -80,12 +84,12 @@ class AccountAnalyticLine(models.Model):
     @api.depends("approved_hours", "unit_amount")
     def _compute_productivity(self):
         for rec in self:
-            rec.productivity = (rec.approved_hours / rec.unit_amount) if rec.approved_hours else 0.0
+            rec.productivity = (rec.approved_hours / rec.unit_amount) if rec.approved_hours and rec.unit_amount else 0.0
 
     @api.depends("effective_hours", "unit_amount")
     def _compute_efficiency(self):
         for rec in self:
-            rec.efficiency = (rec.effective_hours/rec.unit_amount) if rec.effective_hours else 0.0
+            rec.efficiency = (rec.effective_hours/rec.unit_amount) if rec.effective_hours and rec.unit_amount else 0.0
 
 
     @api.depends("effective_hours", "approved_hours")
@@ -281,6 +285,10 @@ class AccountAnalyticLine(models.Model):
     def onchange_unit_amount(self):
         if self.project_id.allow_effective_as_invested_hours:
             self.effective_hours = self.unit_amount
+        if not self.unit_amount:
+            self.effective_hours = 0.0
+            self.approved_hours = 0.0
+            self.remaining_hours = 0.0
 
     @api.model
     def bulk_timesheet_approved(self):
