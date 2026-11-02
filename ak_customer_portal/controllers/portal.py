@@ -83,7 +83,19 @@ class TimesheetCustomerPortalCustom(TimesheetCustomerPortal):
 
         # if project stokholder so display only his projects related to the project stackholder.
         # if user project manager so display all projects at portal level.
-        if request.env.user.has_group("aktiv_pms.group_aktiv_project_manager") or request.env.user.id == SUPERUSER_ID:
+        involved_projects = project_model.search([
+            '|', '|', '|',
+            ('consultant_ids', 'in', request.env.user.id),
+            ('project_owner_ids', 'in', request.env.user.id),
+            ('user_id', '=', request.env.user.id),
+            ('customer_success_manager_id', '=', request.env.user.id),
+        ])
+        if request.env.user.id == SUPERUSER_ID:
+            project = project_model.search([])
+        elif involved_projects:
+            # involved user (consultant, project lead, stakeholder or customer success manager): only his own projects
+            project = involved_projects
+        elif request.env.user.has_group("aktiv_pms.group_aktiv_project_manager"):
             project = project_model.search([])
         elif stackholder_projects:
             project = stackholder_projects
@@ -601,7 +613,21 @@ class ProjectCustomerPortal(CustomerPortal):
 
         # if project stokholder so display only his projects related to the project stackholder.
         # if user project manager so display all projects at portal level.
-        if request.env.user.has_group("aktiv_pms.group_aktiv_project_manager") or request.env.user.id == SUPERUSER_ID:
+        involved_projects = project_model.search([
+            '|', '|', '|',
+            ('consultant_ids', 'in', request.env.user.id),
+            ('project_owner_ids', 'in', request.env.user.id),
+            ('user_id', '=', request.env.user.id),
+            ('customer_success_manager_id', '=', request.env.user.id),
+        ], order=order)
+        if request.env.user.id == SUPERUSER_ID:
+            projects = project_model.search(
+               [], order=order, offset=pager["offset"]
+            )
+        elif involved_projects:
+            # involved user (consultant, project lead, stakeholder or customer success manager): only his own projects
+            projects = involved_projects
+        elif request.env.user.has_group("aktiv_pms.group_aktiv_project_manager"):
             projects = project_model.search(
                [], order=order, offset=pager["offset"]
             )
