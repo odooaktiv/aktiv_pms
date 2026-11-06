@@ -16,7 +16,7 @@
                         <div class="content-group">
                             <div class="row mt16">
                                 <div class="col-6">
-                                    <label for="ip_addr" string="IP Address" class="col-lg-3 o_light_label"/>
+                                    <label for="ip_addr" string="PM Tool URL / IP" class="col-lg-3 o_light_label"/>
                                     <field name="ip_addr"/>
                                 </div>
                                 <div class="col-6">

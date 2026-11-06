@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlparse
 
 import odoorpc
 from odoo.exceptions import ValidationError
@@ -15,12 +16,18 @@ def get_connection(env):
 
     if ip_addr and db_name and username and password:
         try:
-            # Extract hostname and port from the IP address
-            hostname, port = ip_addr.split(":")
-            port = int(port)
-            
+            # Accept "host:port", "host", "http://host[:port]" or "https://host[:port]"
+            value = ip_addr.strip()
+            if "://" not in value:
+                value = "http://" + value
+            parsed = urlparse(value)
+            hostname = parsed.hostname
+            secure = parsed.scheme == "https"
+            port = parsed.port or (443 if secure else 80)
+            protocol = "jsonrpc+ssl" if secure else "jsonrpc"
+
             # Establish the connection
-            odoo_rpc = odoorpc.ODOO(hostname, port=port)
+            odoo_rpc = odoorpc.ODOO(hostname, protocol=protocol, port=port)
             odoo_rpc.login(db_name, username, password)
             return odoo_rpc
         except Exception as e:
