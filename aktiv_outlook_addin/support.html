@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Aktiv for Outlook — Support</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      max-width: 42rem;
+      margin: 3rem auto;
+      padding: 0 1.25rem;
+      line-height: 1.6;
+    }
+    h1 { font-size: 1.5rem; }
+    dt { font-weight: 600; margin-top: 1rem; }
+    dd { margin: 0.25rem 0 0 0; }
+    .note { opacity: 0.7; font-size: 0.875rem; margin-top: 2.5rem; }
+  </style>
+</head>
+<body>
+  <h1><img src="assets/icon-64.png" alt="" width="32" height="32" style="vertical-align:middle;margin-right:8px"/>Aktiv for Outlook — Support</h1>
+
+  <p>
+    This add-in shows information from your Odoo database alongside the email
+    you are reading.
+  </p>
+
+  <h2>Requirements</h2>
+  <dl>
+    <dt>Odoo 19</dt>
+    <dd>Reachable over HTTPS with a valid public certificate.</dd>
+
+    <dt>The Mail Plugin module</dt>
+    <dd>Enable it in Odoo under Settings → General Settings → Integrations → Mail Plugin.</dd>
+
+    <dt>An internal Odoo user account</dt>
+    <dd>
+      Portal users cannot connect this add-in. Odoo restricts inbox linking to
+      internal users, and there is no way around it.
+    </dd>
+  </dl>
+
+  <h2>Common problems</h2>
+  <dl>
+    <dt>"The Mail Plugin module isn't installed on that Odoo database"</dt>
+    <dd>Enable Mail Plugin in Odoo's General Settings, then reconnect.</dd>
+
+    <dt>"Only Internal Users can link their inboxes to this database"</dt>
+    <dd>You signed in as a portal user. Sign in with an internal account.</dd>
+
+    <dt>"Your Odoo access has expired or was revoked"</dt>
+    <dd>
+      The API key was removed in Odoo. Reconnect from the panel to issue a new one.
+      You can review keys under Settings → Users → your user → API Keys.
+    </dd>
+
+    <dt>The panel is blank</dt>
+    <dd>
+      Usually your Odoo server is not sending CORS headers — most often a reverse
+      proxy in front of Odoo stripping them.
+    </dd>
+  </dl>
+
+  <h2>Contact</h2>
+  <p>
+    <!-- TODO: a real, monitored address is required before AppSource submission. -->
+    Email: <a href="mailto:support@example.com">support@example.com</a>
+  </p>
+
+  <p class="note">
+    Placeholder support page. Before submitting to AppSource this needs a real
+    monitored contact address, and the listing separately requires a privacy
+    policy and terms-of-use URL that do not yet exist.
+  </p>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Aktiv for Outlook</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    :root {
+      color-scheme: light dark;
+      /* Aktiv Software brand: crimson to deep indigo, as in the logo symbol. */
+      --aktiv-crimson: #b0203a;
+      --aktiv-indigo: #2e2156;
+      --aktiv-accent: var(--aktiv-crimson);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --aktiv-accent: #e0556c; }
+    }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 14px;
+      margin: 0;
+      padding: 12px;
+    }
+    .hidden { display: none; }
+
+    /* Aktiv brand bar. */
+    .aktiv-brand {
+      display: flex; align-items: center; gap: 8px;
+      margin: -12px -12px 12px; padding: 10px 12px;
+      border-bottom: 3px solid transparent;
+      border-image: linear-gradient(90deg, var(--aktiv-crimson), var(--aktiv-indigo)) 1;
+    }
+    .aktiv-brand img { width: 28px; height: 28px; flex: none; }
+    .aktiv-brand .name { font-weight: 700; font-size: 15px; letter-spacing: 0.2px; }
+    .aktiv-brand .name b { color: var(--aktiv-accent); }
+    .aktiv-brand .tag { font-size: 11px; opacity: 0.65; }
+    button[type="submit"], #body > button, .send-row button {
+      background: var(--aktiv-crimson); color: #fff;
+      border: 1px solid var(--aktiv-crimson); border-radius: 4px;
+    }
+    button[type="submit"]:hover, #body > button:hover, .send-row button:hover {
+      background: var(--aktiv-indigo); border-color: var(--aktiv-indigo);
+    }
+    input:focus { outline: 2px solid var(--aktiv-accent); outline-offset: 1px; }
+    label { display: block; margin-bottom: 4px; font-weight: 600; }
+    input[type="text"], input[type="password"], input[type="url"] {
+      width: 100%; padding: 6px; box-sizing: border-box; margin-bottom: 10px;
+    }
+    button { padding: 6px 12px; margin-top: 8px; cursor: pointer; }
+    #error { color: #a4262c; margin-top: 8px; white-space: pre-wrap; }
+    #status { color: #0b6a0b; margin-top: 8px; white-space: pre-wrap; }
+    .muted { opacity: 0.7; font-size: 12px; }
+    #body button { margin-right: 8px; }
+
+    /* Which server this mailbox is talking to, and the way off it. */
+    #connection {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      font-size: 12px; opacity: 0.75;
+      border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+      padding-bottom: 8px; margin-bottom: 10px;
+    }
+    #connection span { overflow-wrap: anywhere; }
+    #disconnect-btn { margin-top: 0; margin-right: 0; flex: none; }
+
+    /* Send-and-file. Ruled off from the rows above it because those only ever
+       file a copy and this one puts the mail on its way to the customer -
+       misreading the two costs an email, not a click. */
+    .send-row {
+      border-top: 1px solid rgba(128, 128, 128, 0.3);
+      margin-top: 10px; padding-top: 4px;
+    }
+
+    /* Candidate leads/tickets. Full width because record names are long and
+       the panel is narrow - truncating them defeats the point of the list. */
+    .picker-row {
+      display: block; width: 100%; text-align: left;
+      margin: 4px 0 0 0; overflow-wrap: anywhere;
+    }
+
+    /* Search-by-name row above the picker list - the only way in on a
+       compose draft with no recipient yet to match an address against. */
+    .picker-search { display: flex; gap: 6px; margin-bottom: 4px; }
+    .picker-search input { flex: 1; margin-bottom: 0; }
+    .picker-search button { margin-top: 0; }
+    .linkish {
+      background: none; border: none; color: inherit;
+      padding: 4px 0; margin-top: 6px; opacity: 0.7;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="aktiv-brand">
+    <img src="assets/icon-64.png" alt="Aktiv Software"/>
+    <div>
+      <div class="name"><b>Aktiv</b> for Outlook</div>
+      <div class="tag">Making Digitalization More Human</div>
+    </div>
+  </header>
+
+  <div id="loading">Loading…</div>
+
+  <!-- Shown until the mailbox has an Odoo access token in roamingSettings. -->
+  <form id="connect-form" class="hidden">
+    <label for="odoo-login">Username</label>
+    <input type="text" id="odoo-login" placeholder="your.email@company.com" required/>
+
+    <label for="odoo-password">Password</label>
+    <input type="password" id="odoo-password" placeholder="Your Odoo account password or API key" required/>
+
+    <label for="odoo-url">URL</label>
+    <input type="url" id="odoo-url" value="https://erp.aktivsoftware.com" placeholder="https://erp.aktivsoftware.com" required/>
+
+    <label for="odoo-db">Database Name</label>
+    <input type="text" id="odoo-db" placeholder="Usually your company name or the database identifier"/>
+
+    <button type="submit">Connect</button>
+    <p class="muted">Requires the Mail Plugin module and an internal user account.</p>
+  </form>
+
+  <!-- Everything hook-specific renders here. See renderHook() in taskpane.js. -->
+  <div id="body" class="hidden"></div>
+
+  <div id="status" class="hidden"></div>
+  <div id="error" class="hidden"></div>
+
+  <!-- ?v= makes Outlook fetch the scripts again instead of reusing a copy it
+       saved earlier. Change it (to the release date) whenever config.js or
+       taskpane.js changes. -->
+  <script src="config.js?v=20261119"></script>
+  <script src="taskpane.js?v=20261119"></script>
+</body>
+</html>

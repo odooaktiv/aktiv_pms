@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Connected</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+</head>
+<body>
+  <p>Finishing up…</p>
+
+  <!--
+    Step 5. Odoo's auth_confirm has redirected here with ?success=1&auth_code=..&state=..
+    (see mail_plugin/controllers/authenticate.py:52).
+
+    We are back on the add-in's own origin, which is the whole point: messageParent
+    only works from a page whose origin matches the add-in. That is the constraint
+    the bounce/callback pair exists to satisfy.
+
+    The auth_code is HMAC-signed and expires 3 minutes after Odoo minted it, so the
+    taskpane must redeem it immediately.
+  -->
+  <script>
+    Office.onReady(function () {
+      var q = new URLSearchParams(location.search);
+      Office.context.ui.messageParent(JSON.stringify({
+        success: q.get("success") === "1",
+        auth_code: q.get("auth_code") || "",
+        state: q.get("state") || ""
+      }));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides"
+  xsi:type="MailApp">
+
+  <!-- Generate once, never change it. Changing the Id orphans every existing install. -->
+  <Id>f4fca388-c0ec-4cfb-b111-fd8f5d9b597e</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Aktiv Software</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+
+  <DisplayName DefaultValue="Aktiv for Outlook"/>
+  <Description DefaultValue="See and act on your Odoo data from the email you are reading or writing."/>
+
+  <IconUrl DefaultValue="https://portal.aktivsoftware.com/addin/assets/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://portal.aktivsoftware.com/addin/assets/icon-128.png"/>
+  <SupportUrl DefaultValue="https://portal.aktivsoftware.com/addin/support.html"/>
+
+  <!-- Only YOUR origin. Customer Odoo servers are reached by fetch(), which
+       AppDomains does not govern - CORS does. Odoo's mail_plugin routes already
+       declare cors="*". This mirrors Odoo SA's own shipped manifest. -->
+  <AppDomains>
+    <AppDomain>https://portal.aktivsoftware.com</AppDomain>
+    <AppDomain>https://erp.aktivsoftware.com</AppDomain>
+  </AppDomains>
+
+  <Hosts>
+    <Host Name="Mailbox"/>
+  </Hosts>
+
+  <Requirements>
+    <Sets>
+      <Set Name="Mailbox" MinVersion="1.3"/>
+    </Sets>
+  </Requirements>
+
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="https://portal.aktivsoftware.com/addin/taskpane.html"/>
+        <RequestedHeight>250</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+    <!-- Compose. Same page - taskpane.js branches on the item shape, see
+         isCompose(). ItemEdit takes no RequestedHeight; the schema has no such
+         element here and adding one fails validation on sideload. -->
+    <Form xsi:type="ItemEdit">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="https://portal.aktivsoftware.com/addin/taskpane.html"/>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
+
+  <!-- Match Odoo SA: ReadWriteItem, not ReadWriteMailbox. Narrower scope,
+       easier validation. Widen only if you genuinely need other messages. -->
+  <Permissions>ReadWriteItem</Permissions>
+
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
+    <!-- Edit covers new mail, reply, forward and reopened drafts - i.e. every
+         point where the mail has not been sent yet. -->
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/>
+  </Rule>
+  <DisableEntityHighlighting>false</DisableEntityHighlighting>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
+
+      <Requirements>
+        <bt:Sets DefaultMinVersion="1.3">
+          <bt:Set Name="Mailbox"/>
+        </bt:Sets>
+      </Requirements>
+
+      <Hosts>
+        <Host xsi:type="MailHost">
+          <DesktopFormFactor>
+            <ExtensionPoint xsi:type="MessageReadCommandSurface">
+              <OfficeTab id="TabDefault">
+                <Group id="aktivGroup">
+                  <Label resid="groupLabel"/>
+                  <Control xsi:type="Button" id="aktivOpenPane">
+                    <Label resid="btnLabel"/>
+                    <Supertip>
+                      <Title resid="btnLabel"/>
+                      <Description resid="btnTip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="icon16"/>
+                      <bt:Image size="32" resid="icon32"/>
+                      <bt:Image size="80" resid="icon80"/>
+                    </Icon>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="taskpaneUrl"/>
+                    </Action>
+                  </Control>
+                </Group>
+              </OfficeTab>
+            </ExtensionPoint>
+
+            <!-- Same button on the compose ribbon, so the panel is reachable
+                 while the mail is still being written. ExtensionPoint order is
+                 fixed by the schema: Read before Compose. Group and Control ids
+                 must be unique across the whole manifest, hence the suffixes -
+                 reusing aktivGroup/aktivOpenPane here fails validation. -->
+            <ExtensionPoint xsi:type="MessageComposeCommandSurface">
+              <OfficeTab id="TabDefault">
+                <Group id="aktivGroupCompose">
+                  <Label resid="groupLabel"/>
+                  <Control xsi:type="Button" id="aktivOpenPaneCompose">
+                    <Label resid="btnLabel"/>
+                    <Supertip>
+                      <Title resid="btnLabel"/>
+                      <Description resid="btnTipCompose"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="icon16"/>
+                      <bt:Image size="32" resid="icon32"/>
+                      <bt:Image size="80" resid="icon80"/>
+                    </Icon>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="taskpaneUrl"/>
+                    </Action>
+                  </Control>
+                </Group>
+              </OfficeTab>
+            </ExtensionPoint>
+          </DesktopFormFactor>
+        </Host>
+      </Hosts>
+
+      <Resources>
+        <bt:Images>
+          <bt:Image id="icon16" DefaultValue="https://portal.aktivsoftware.com/addin/assets/icon-16.png"/>
+          <bt:Image id="icon32" DefaultValue="https://portal.aktivsoftware.com/addin/assets/icon-32.png"/>
+          <bt:Image id="icon80" DefaultValue="https://portal.aktivsoftware.com/addin/assets/icon-80.png"/>
+        </bt:Images>
+        <bt:Urls>
+          <bt:Url id="taskpaneUrl" DefaultValue="https://portal.aktivsoftware.com/addin/taskpane.html"/>
+        </bt:Urls>
+        <bt:ShortStrings>
+          <bt:String id="groupLabel" DefaultValue="Aktiv"/>
+          <bt:String id="btnLabel" DefaultValue="Open Aktiv"/>
+        </bt:ShortStrings>
+        <bt:LongStrings>
+          <bt:String id="btnTip" DefaultValue="Look up this sender in your Odoo database."/>
+          <bt:String id="btnTipCompose" DefaultValue="Create an Odoo lead or ticket from this mail before you send it."/>
+        </bt:LongStrings>
+      </Resources>
+
+      <!-- THE COMMERCIAL DIFF.
+           Odoo SA's manifest has no WebApplicationInfo - it is free, so it never
+           needs to know who you are. This block is what lets taskpane.js call
+           Office.auth.getAccessTokenAsync() and get a verifiable JWT for the
+           signed-in M365 user, which your licensing API validates and keys on
+           the tenant id (tid) claim.
+
+           REMOVED FOR NOW - deliberately, not by oversight. It needs a real
+           Azure AD app registration, and a placeholder GUID here fails manifest
+           validation on sideload. config.js has DEV_SKIP_LICENSE:true so nothing
+           calls getAccessTokenAsync yet. Odoo SA's shipped manifest has no
+           WebApplicationInfo at all and works fine.
+
+           Restore this block, with real values, when you build /api/license:
+
+             <WebApplicationInfo>
+               <Id>YOUR-AZURE-AD-CLIENT-ID</Id>
+               <Resource>api://portal.aktivsoftware.com/YOUR-AZURE-AD-CLIENT-ID</Resource>
+               <Scopes>
+                 <Scope>openid</Scope>
+                 <Scope>profile</Scope>
+               </Scopes>
+             </WebApplicationInfo>
+
+           Both values must match the registration's Application ID URI exactly.
+           See README.md "Before it runs". -->
+
+    </VersionOverrides>
+  </VersionOverrides>
+</OfficeApp>

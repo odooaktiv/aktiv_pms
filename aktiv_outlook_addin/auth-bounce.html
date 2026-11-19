@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Connecting to Odoo…</title>
+</head>
+<body>
+  <p>Redirecting to your Odoo server…</p>
+
+  <!--
+    Step 2 of the handshake. Why this page exists at all:
+
+    Office requires the URL passed to displayDialogAsync() to be on the SAME
+    DOMAIN as the add-in. We cannot open the customer's Odoo directly. So the
+    dialog opens here, on our origin, and immediately navigates away to their
+    server. Cross-domain navigation *inside* an already-open dialog is fine -
+    that is why AppDomains only needs our own origin.
+
+    No office.js needed here; this page only redirects. messageParent happens
+    later, in auth-callback.html, once we are back on our origin.
+  -->
+  <script>
+    (function () {
+      var q = new URLSearchParams(location.search);
+      var odoo = q.get("odoo");
+
+      // Never redirect to a non-https target, and never to something we cannot parse.
+      var origin;
+      try {
+        var u = new URL(odoo);
+        if (u.protocol !== "https:") throw new Error("not https");
+        origin = u.origin;
+      } catch (e) {
+        document.body.textContent = "Invalid Odoo URL.";
+        return;
+      }
+
+      // Resolve relative to this document, not location.origin - origin never
+      // includes a path, so if these files are served under a subpath (e.g.
+      // /addin/) rather than a domain root, origin + "/auth-callback.html"
+      // would 404 by dropping that subpath.
+      var params = new URLSearchParams({
+        scope: q.get("scope") || "outlook",          // Odoo prefixes -> odoo.plugin.outlook
+        friendlyname: q.get("name") || "Outlook",    // shown on the Allow/Deny screen
+        redirect: new URL("auth-callback.html", location.href).toString(),
+        state: q.get("state") || ""                  // echoed back; taskpane verifies it
+      });
+
+      // Odoo's /mail_plugin/auth is auth="user", so this bounces through their
+      // login first if the user has no session. auth_confirm then 302s to our
+      // callback because it redirects with local=False.
+      location.replace(origin + "/mail_plugin/auth?" + params.toString());
+    })();
+  </script>
+</body>
+</html>
