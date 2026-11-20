@@ -20,6 +20,10 @@ class ProjectCreationWizard(models.TransientModel):
         """Method which will connect the db of pm tool and create the project and general task
         in aktiv pmtool"""
 
+        if not self.partner_id:
+            raise ValidationError(
+                "Please set a Customer on the project before creating the B2B project.")
+
         context = self.env.context
         project = self.env['project.project']
         if context.get('active_model') == 'project.project':
@@ -27,6 +31,9 @@ class ProjectCreationWizard(models.TransientModel):
         else:
             b2c_project_id = project.search([('name','=',self.name)])
         b2c_project_id.is_project_create = True
+        # Keep the B2C project in sync with the customer chosen in the wizard.
+        if b2c_project_id and b2c_project_id.partner_id != self.partner_id:
+            b2c_project_id.partner_id = self.partner_id
         try:
             odoo_conn = get_connection(self.env)
         except Exception as e:
@@ -34,7 +41,10 @@ class ProjectCreationWizard(models.TransientModel):
         if not odoo_conn:
             raise ValidationError("Please establish connection with database!")
         odoo_conn.env.context.update({'mail_create_nosubscribe': True, 'mail_create_nolog': True})
-        partner = odoo_conn.env["res.partner"].search([('name', 'ilike', self.partner_id.name)], limit=1)
+        # Prefer an exact (case-insensitive) name match, then fall back to a partial match.
+        partner = odoo_conn.env["res.partner"].search([('name', '=ilike', self.partner_id.name)], limit=1)
+        if not partner:
+            partner = odoo_conn.env["res.partner"].search([('name', 'ilike', self.partner_id.name)], limit=1)
         if partner:
             partner_id = partner[0]
         else:
