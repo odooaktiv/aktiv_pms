@@ -61,7 +61,8 @@
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tag_ids']" position="after">
-                <field name="project_type_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+                <field name="project_type_id" required="customer_project" invisible="not customer_project"
+                       options="{'no_create': True, 'no_open': True}"/>
                 <field name="customer_project"/>
                 <field name="project_tracker_link" widget="url" placeholder="https://drive.google.com/..."
                        invisible="not customer_project" required="customer_project"/>
