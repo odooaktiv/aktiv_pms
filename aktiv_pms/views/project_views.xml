@@ -14,6 +14,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="team_leader_ids" widget="many2many_tags"/>
+                <field name="project_type_id" optional="show"/>
             </xpath>
             <xpath expr="//field[@name='last_update_status']" position="after">
                 <field name="development_hours" optional="hide"
@@ -60,7 +61,13 @@
         <field name="inherit_id" ref="project.edit_project"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="project_type_id" required="1" options="{'no_create': True, 'no_open': True}"/>
                 <field name="customer_project"/>
+                <field name="project_tracker_link" widget="url" placeholder="https://drive.google.com/..."
+                       invisible="not customer_project" required="customer_project"/>
+                <field name="customer_tool_ids" widget="many2many_tags"
+                       placeholder="Tools the customer used before..."
+                       invisible="not customer_project"/>
                 <!-- If Deployment Type is Task Wise Go Live Date will be invisible -->
                 <field name="deployment_type"/>
                 <field name="go_live_date"
@@ -347,11 +354,16 @@
                 <filter string="Customer Project" name="customer_project" domain="[('customer_project', '=', True)]"/>
             </xpath>
 
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="project_type_id"/>
+            </xpath>
+
             <xpath expr="//group/filter[@name='Manager']" position="attributes">
                 <attribute name="string">Project Lead</attribute>
             </xpath>
             <xpath expr="//group/filter[@name='Manager']" position="after">
                 <filter name="group_by_team_leader_ids" string="Lead Engineer" context="{'group_by': 'team_leader_ids'}"/>
+                <filter name="group_by_project_type" string="Project Type" context="{'group_by': 'project_type_id'}"/>
             </xpath>
         </field>
     </record>

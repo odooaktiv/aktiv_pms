@@ -21,4 +21,6 @@ from . import (
     knowledge_bank,
     urgent_task,
     task_type,
+    customer_tool,
+    project_type,
 )

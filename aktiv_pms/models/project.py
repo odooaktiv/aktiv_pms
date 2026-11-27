@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 
+import re
 import pytz
 from dateutil.relativedelta import relativedelta
 from odoo import _, api, fields, models
@@ -145,7 +146,60 @@ class Project(models.Model):
     username = fields.Char(string="User Name")
     password = fields.Char(string="Password")
     commit_token = fields.Char(string="Commit Token")
+    def _default_project_type(self):
+        """New projects default to Success Pack, the arrangement every existing project
+        has so far."""
+        ptype = self.env.ref("aktiv_pms.project_type_success_pack", raise_if_not_found=False)
+        return ptype.id if ptype else False
+
+    project_type_id = fields.Many2one(
+        "project.type",
+        string="Project Type",
+        default=_default_project_type,
+        ondelete="restrict",
+        index=True,
+        tracking=True,
+        help="Commercial arrangement of the project (fixed cost, success pack, time and "
+        "material, ...). Types are configured under Project > Configuration > Project Types.",
+    )
+    project_type_code = fields.Char(
+        related="project_type_id.code", string="Project Type Code", readonly=True
+    )
+
+    @api.model
+    def _backfill_project_type(self):
+        """Give projects without a type the default one (runs on every update; cheap and
+        idempotent, and done in SQL so no tracking messages or side effects)."""
+        default = self._default_project_type()
+        if default:
+            self.env.cr.execute(
+                "UPDATE project_project SET project_type_id = %s WHERE project_type_id IS NULL",
+                (default,),
+            )
+            self.env.invalidate_all()
+
     customer_project = fields.Boolean('Is Customer Project?')
+
+    project_tracker_link = fields.Char(
+        string='Project Tracker Link',
+        help="Link to this project's drive / tracker. Required for customer projects.",
+    )
+
+    @api.constrains('project_tracker_link')
+    def _check_project_tracker_link(self):
+        for project in self:
+            link = (project.project_tracker_link or '').strip()
+            if link and not re.match(r'^https?://\S+$', link, re.IGNORECASE):
+                raise ValidationError(_(
+                    "Project Tracker Link must be a full web address starting with "
+                    "http:// or https:// (for example a Google Drive folder link)."
+                ))
+
+    customer_tool_ids = fields.Many2many(
+        'project.customer.tool',
+        string='Customer Previous Tools',
+        help="Other tools the customer used or still uses.",
+    )
     pm_tool_project_id = fields.Char(string='PM Tool Project ID')
     pm_tool_task_id = fields.Char(string='PM Tool Task ID')
     pm_tool_task_name = fields.Char(string='PM Tool Task Name')

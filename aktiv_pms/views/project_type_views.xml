@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_type_view_list" model="ir.ui.view">
+        <field name="name">project.type.list</field>
+        <field name="model">project.type</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="project_count" string="Projects"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="project_type_view_form" model="ir.ui.view">
+        <field name="name">project.type.form</field>
+        <field name="model">project.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                            <field name="project_count" string="Projects using it"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" placeholder="What this kind of project means..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="project_type_view_search" model="ir.ui.view">
+        <field name="name">project.type.search</field>
+        <field name="model">project.type</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_project_type" model="ir.actions.act_window">
+        <field name="name">Project Types</field>
+        <field name="res_model">project.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_project_type" name="Project Types"
+              parent="project.menu_project_config" action="action_project_type"
+              sequence="25"
+              groups="project.group_project_manager,aktiv_pms.group_aktiv_project_manager"/>
+</odoo>

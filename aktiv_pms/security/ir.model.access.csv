@@ -55,3 +55,10 @@ access_task_type,access_task_type,model_task_type,,1,1,1,1
 
 access_project_creation_wizard_manager,project.creation.wizard,model_project_creation_wizard,aktiv_pms.group_aktiv_project_manager,1,1,1,1
 access_project_creation_wizard_user,project.creation.wizard,model_project_creation_wizard,project.group_project_user,1,0,0,0
+access_customer_tool_pms_manager,project.customer.tool project lead,model_project_customer_tool,aktiv_pms.group_aktiv_project_manager,1,1,1,1
+access_customer_tool_pms_functional,project.customer.tool project functional,model_project_customer_tool,aktiv_pms.group_aktiv_project_functional,1,1,1,1
+access_customer_tool_user,project.customer.tool user,model_project_customer_tool,base.group_user,1,0,0,0
+access_project_type_user,project.type user,model_project_type,base.group_user,1,0,0,0
+access_project_type_portal,project.type portal,model_project_type,base.group_portal,1,0,0,0
+access_project_type_pms_manager,project.type pms manager,model_project_type,aktiv_pms.group_aktiv_project_manager,1,1,1,1
+access_project_type_pm,project.type project manager,model_project_type,project.group_project_manager,1,1,1,1

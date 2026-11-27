@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- The three starting types. noupdate: names/descriptions can be edited in the UI and
+         an upgrade will not overwrite them. Add further types from Project > Configuration >
+         Project Types; behaviour keys on the technical code. -->
+    <data noupdate="1">
+        <record id="project_type_fixed_cost" model="project.type">
+            <field name="name">Fixed Cost</field>
+            <field name="code">fixed_cost</field>
+            <field name="sequence">10</field>
+            <field name="description">Agreed scope for a fixed price. Progress is followed by phases and milestones.</field>
+        </record>
+        <record id="project_type_success_pack" model="project.type">
+            <field name="name">Success Pack</field>
+            <field name="code">success_pack</field>
+            <field name="sequence">20</field>
+            <field name="description">Prepaid pack of hours that the customer draws down as work is done.</field>
+        </record>
+        <record id="project_type_time_material" model="project.type">
+            <field name="name">Time and Material</field>
+            <field name="code">time_material</field>
+            <field name="sequence">30</field>
+            <field name="description">Billed for the time spent and the materials used.</field>
+        </record>
+    </data>
+
+    <!-- Projects created before this field existed are Success Pack projects. -->
+    <data noupdate="0">
+        <function model="project.project" name="_backfill_project_type"/>
+    </data>
+</odoo>
